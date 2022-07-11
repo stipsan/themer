@@ -1,5 +1,6 @@
 import NextHead from 'next/head'
-import favicon from 'public/favicon.svg'
+import png from 'public/favicon.png'
+import svg from 'public/favicon.svg'
 import { memo } from 'react'
 
 interface Props {
@@ -16,7 +17,8 @@ function Head({ lightest, darkest }: Props) {
         content={darkest}
         media="(prefers-color-scheme: dark)"
       />
-      <link rel="shortcut icon" type="image/svg" href={favicon.src} />
+      <link rel="icon" type="image/svg" href={svg.src} />
+      <link rel="icon" type="image/png" href={png.src} />
     </NextHead>
   )
 }

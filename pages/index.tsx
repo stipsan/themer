@@ -4,11 +4,12 @@ import {
   Grid,
   Text,
   ThemeProvider,
+  usePrefersDark,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import { useMagicRouter } from 'hooks/useMagicRouter'
 import { useThemeFromHues } from 'hooks/useTheme'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { StudioLayout, StudioProvider } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
@@ -27,7 +28,14 @@ export default function Index() {
   const darkest = '#0f172a'
   const lightest = '#fff'
 
+  const prefersDark = usePrefersDark()
   const [scheme, setScheme] = useState<ThemeColorSchemeKey>('light')
+  // if the preferred color scheme changes, then react to this change
+  useEffect(() => {
+    const nextScheme = prefersDark ? 'dark' : 'light'
+    setScheme(nextScheme)
+  }, [prefersDark])
+
   const hues = useMemo(
     () =>
       ({
@@ -93,7 +101,8 @@ export default function Index() {
                 config={blogConfig}
                 unstable_noAuthBoundary
                 unstable_history={history}
-                onSchemeChange={(nextScheme) => setScheme(nextScheme)}
+                scheme={scheme}
+                // onSchemeChange={(nextScheme) => setScheme(nextScheme)}
               >
                 <ThemeProvider theme={theme} scheme={scheme}>
                   <StudioLayout />

@@ -100,13 +100,18 @@ interface Props {
   // The scheme detected from the usePrefersDark hook
   systemScheme: ThemeColorSchemeKey
 }
-export default function Themer({ systemScheme, themeUrl }: Props) {
+export default function Themer({
+  systemScheme,
+  themeUrl: initialThemeUrl,
+}: Props) {
   const [transition, startTransition] = useTransition()
+  const [themeUrl, setThemeUrl] = useState(initialThemeUrl)
+  console.log('Before suspense', new Date(), themeUrl)
   const magic = suspend(async () => {
     const { hues, theme } = await import(/* webpackIgnore: true */ themeUrl)
     return { hues, theme }
   }, [themeUrl])
-  console.log({ magic })
+  console.log('After suspense', new Date(), magic)
   const [view, setView] = useState<'default' | 'split'>('default')
 
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(

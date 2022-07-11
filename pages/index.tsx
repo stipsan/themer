@@ -47,7 +47,7 @@ export default function Index() {
       const searchParams = new URLSearchParams(
         process.env.NODE_ENV === 'production' ? '?min' : ''
       )
-      const initialParams = new URLSearchParams(location.href)
+      const initialParams = new URLSearchParams(location.search)
 
       const paramsAllowlist = [
         'lightest',

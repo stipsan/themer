@@ -5,6 +5,7 @@ import type {
   ThemeColorSpotKey,
 } from '@sanity/ui'
 import type { StudioTheme } from 'sanity'
+import type { PartialDeep } from 'type-fest'
 import { applyHues } from 'utils/applyHues'
 import {
   blue,
@@ -22,7 +23,7 @@ import { createTonesFromHues } from 'utils/createTonesFromHues'
 import type { Hues } from 'utils/types'
 
 interface Options {
-  hues: Hues
+  hues: PartialDeep<Hues>
   // if there's a color property on the studioTheme it will be overridden/ignored, thus we change the typing allowing it to be omitted
   // but at the same time not _enforcing_ it to be omitted and create unnecessary TS errors for those passing `import {studioTheme} from '@sanity/ui'` directly
   studioTheme: Omit<StudioTheme, 'color'> & { color?: unknown }

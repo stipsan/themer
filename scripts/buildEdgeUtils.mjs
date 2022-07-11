@@ -104,9 +104,11 @@ const buildTemplateString = async () => {
   
     return hex
   }
+
+  export const hues = process.env.__HUES__
   
   export const theme = themeFromHues({
-    hues: process.env.__HUES__, 
+    hues, 
     studioTheme,
     multiply,
     screen,
@@ -151,7 +153,12 @@ export function themeFromHuesTemplate(hues, minified) {
   const template = minified ? ${JSON.stringify(
     minifiedPrebuiltFromEsbuild
   )} : ${JSON.stringify(prebuiltFromEsbuild)}
-  return "// Generated " + new Date().toJSON() + "\\n" + template.replace(
+  const tip = minified ? ${JSON.stringify(
+    '// Minified build, remove `?minified` for easier debugging'
+  )} : ${JSON.stringify(
+        '// Not minified, append `?minified` to the request for much smaller output'
+      )}
+  return "// Generated " + new Date().toJSON() + "\\n" + tip + "\\n" + template.replace(
     'process.env.__HUES__',
     JSON.stringify(hues, null, minified ? 0 : 2)
   )

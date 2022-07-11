@@ -1,5 +1,6 @@
 import { themeFromHuesTemplate } from 'edge-utils/themeFromHuesTemplate.mjs'
 import type { NextRequest } from 'next/server'
+import { isMidPoint } from 'utils/isMidPoint'
 import type { Hue } from 'utils/types'
 
 export const config = {
@@ -34,8 +35,8 @@ export default async function handler(req: NextRequest) {
     const res = themeFromHuesTemplate(
       {
         default: parseHue('default', searchParams, lightest, darkest),
-        transparent: parseHue('transparent', searchParams, lightest, darkest),
         primary: parseHue('primary', searchParams, lightest, darkest),
+        transparent: parseHue('transparent', searchParams, lightest, darkest),
         positive: parseHue('positive', searchParams, lightest, darkest),
         caution: parseHue('caution', searchParams, lightest, darkest),
         critical: parseHue('critical', searchParams, lightest, darkest),
@@ -158,9 +159,3 @@ function assertValidMidPoint(input: number): Hue['midPoint'] {
   }
   throw new ValidationError(`Invalid midPoint: ${input}`)
 }
-
-const validMidPoints = new Set([
-  50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950,
-])
-const isMidPoint = (input: number): input is Hue['midPoint'] =>
-  validMidPoints.has(input)

@@ -1,4 +1,5 @@
 import type { ColorHueConfig } from '@sanity/color'
+import React from 'react'
 
 export interface Hue extends Omit<ColorHueConfig, 'title' | 'midPoint'> {
   // @TODO convert ColorTintKey from @sanity/color into numbers and reuse
@@ -12,4 +13,10 @@ export interface Hues {
   positive: Hue
   caution: Hue
   critical: Hue
+}
+
+export interface ThemePreset {
+  title: string
+  icon?: React.ReactNode
+  url: string
 }

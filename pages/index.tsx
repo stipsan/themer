@@ -376,23 +376,22 @@ export default function Index() {
                     <StudioLayout />
                   </ThemeProvider>
                 </StudioProvider>
-                <StudioProvider
-                  key="split"
-                  config={blogConfig}
-                  unstable_noAuthBoundary
-                  unstable_history={history}
-                  scheme="dark"
-                  // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
-                  // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
-                >
-                  {' '}
-                  <SyncColorScheme forceScheme="dark" />
-                  {view === 'split' && (
+                {view === 'split' && (
+                  <StudioProvider
+                    key="split"
+                    config={blogConfig}
+                    unstable_noAuthBoundary
+                    unstable_history={history}
+                    scheme="dark"
+                    // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
+                    // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
+                  >
+                    <SyncColorScheme forceScheme="dark" />
                     <ThemeProvider key="dark" theme={theme} scheme="dark">
                       <StudioLayout />
                     </ThemeProvider>
-                  )}
-                </StudioProvider>
+                  </StudioProvider>
+                )}
               </Grid>
             </FixNavDrawerPosition>
           </StyledGrid>

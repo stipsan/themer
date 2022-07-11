@@ -1,3 +1,5 @@
+import { MusicNoteIcon } from '@heroicons/react/outline'
+import { COLOR_TINTS } from '@sanity/color'
 import {
   DesktopIcon,
   MasterDetailIcon,
@@ -28,6 +30,7 @@ import { useThemeFromHues } from 'hooks/useTheme'
 import {
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -39,6 +42,11 @@ import styled from 'styled-components'
 import type { Hue } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
+
+const SynthWaveIcon = styled(MusicNoteIcon)`
+  width: 16px;
+  stroke-width: 1.4;
+`
 
 // Trying to impress Snorre with my 1337 CSS haxxor
 const FixNavDrawerPosition = styled(Card)`
@@ -65,7 +73,8 @@ const StyledGrid = styled(Grid)`
 
 // @TODO find a better z-index than 101
 const HeaderCard = styled(Card)`
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 101;
 `
 
@@ -134,7 +143,7 @@ export default function Index() {
         },
         caution: {
           mid: '#fde047',
-          midPoint: 500,
+          midPoint: 300,
           lightest: '#f7f2f5',
           darkest: '#171721',
         },
@@ -225,7 +234,11 @@ export default function Index() {
         darkest={theme.color.dark.default.base.bg}
       />
       <ThemeProvider theme={theme} scheme={scheme}>
-        <Card height="fill" tone="transparent">
+        <Card
+          height="fill"
+          tone="transparent"
+          style={{ ['color-scheme' as any]: scheme }}
+        >
           <StyledGrid columns={[1, 1]} height="fill">
             <Card
               as="form"
@@ -239,9 +252,9 @@ export default function Index() {
                 event.preventDefault()
               }}
               height="fill"
-              overflow="hidden"
+              overflow="auto"
               scheme={scheme}
-              style={{ zIndex: 200 }}
+              style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
             >
               <HeaderCard
                 paddingX={[3]}
@@ -254,10 +267,7 @@ export default function Index() {
                   <Logo spin={spins} transition={transition} />
                   <Card padding={[3]}>
                     <Text weight="semibold" muted>
-                      Themer for Sanity Studio v3{' '}
-                      <button onClick={() => setResetHueFields((inc) => ++inc)}>
-                        reset
-                      </button>
+                      Themer for Sanity Studio v3
                     </Text>
                   </Card>
                 </Inline>
@@ -265,7 +275,7 @@ export default function Index() {
               <Card borderRight height="fill" tone="default">
                 <Grid columns={[2]}>
                   <Card padding={[4]}>
-                    <Label htmlFor="view" size={0}>
+                    <Label htmlFor="view" size={0} muted>
                       View
                     </Label>
                     <Card paddingY={2}>
@@ -318,7 +328,7 @@ export default function Index() {
                     </Card>
                   </Card>
                   <Card padding={[4]}>
-                    <Label htmlFor="scheme" size={0}>
+                    <Label htmlFor="scheme" size={0} muted>
                       Scheme
                     </Label>
                     <Card paddingY={2}>
@@ -375,8 +385,43 @@ export default function Index() {
                     </Card>
                   </Card>
                 </Grid>
-                <Card>Presets</Card>
-                <Card borderTop height="fill" paddingY={1}>
+                <Card>
+                  {' '}
+                  <Card paddingX={[4]} paddingBottom={2}>
+                    <Label htmlFor="presets" size={0} muted>
+                      Presets
+                    </Label>
+                    <Card paddingY={2}>
+                      <MenuButton
+                        button={
+                          <Button
+                            fontSize={1}
+                            paddingY={2}
+                            paddingX={3}
+                            tone="default"
+                            mode="ghost"
+                            icon={SynthWaveIcon}
+                            text={'Synth Wave Pink'}
+                          />
+                        }
+                        id="view"
+                        menu={
+                          <Menu>
+                            <MenuItem icon={MasterDetailIcon} text="Default" />
+                            <MenuItem
+                              icon={<SynthWaveIcon />}
+                              text={'Synth Wave Pink'}
+                              disabled
+                            />
+                          </Menu>
+                        }
+                        placement="right"
+                        popover={{ portal: true }}
+                      />
+                    </Card>
+                  </Card>
+                </Card>
+                <Card height="fill" paddingY={1}>
                   {[
                     'Default',
                     'Primary',
@@ -482,49 +527,140 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
   console.log('HueFields', { config })
   /**
    * Default
-  lightest   mid    darkest
-  color      color  color
-  mid point
-  |----------- dot ---------|
+  
   Tones preview
   50 100 200 ---- 800 900 950
    */
+
+  const midRangeId = `${title.toLowerCase()}-mid-range-${useId()}`
+  const colorStyle = {
+    boxSizing: 'border-box',
+    background: 'var(--card-border-color)',
+    border: '1px solid var(--card-border-color)',
+    borderRadius: '2px',
+    padding: '0px 2px',
+    appearance: 'none',
+    margin: 0,
+  }
+
+  const tone = title.toLowerCase() as any
+
   return (
-    <Card paddingY={3} paddingX={4} tone="default">
-      <Text size={2} weight="medium">
+    <Card paddingY={3} paddingX={4} tone={tone} shadow={1}>
+      <Text size={2} weight="medium" muted>
         {title}
       </Text>
-      <Grid columns={[1, 3]} paddingY={3}>
-        <Card>
+      <Grid columns={[1, 3]} paddingTop={4}>
+        <Card tone={tone}>
           <Label muted size={0}>
             Lightest
           </Label>
-          <Card paddingY={2}>
+          <Card paddingY={2} tone={tone}>
             <input
               name={`${title.toLowerCase()}-lightest`}
               type="color"
               defaultValue={config.lightest}
+              style={colorStyle as any}
             />
             <Text
               as="output"
               muted
               size={0}
-              style={{ paddingTop: '0.2rem', fontFeatureSettings: 'tnum' }}
+              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
             >
               {config.lightest}
             </Text>
           </Card>
         </Card>
-        <Card hidden>
-          <Label size={0}>mid</Label>
+        <Card tone={tone}>
+          <Label muted size={0}>
+            Mid
+          </Label>
+          <Card paddingY={2} tone={tone}>
+            <input
+              name={`${title.toLowerCase()}-mid`}
+              type="color"
+              defaultValue={config.mid}
+              style={colorStyle as any}
+            />
+            <Text
+              as="output"
+              muted
+              size={0}
+              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+            >
+              {config.mid}
+            </Text>
+          </Card>
         </Card>
-        <Card hidden>
-          <Label size={0}>darkest</Label>
+        <Card tone={tone}>
+          <Label muted size={0}>
+            Darkest
+          </Label>
+          <Card paddingY={2} tone={tone}>
+            <input
+              name={`${title.toLowerCase()}-darkest`}
+              type="color"
+              defaultValue={config.darkest}
+              style={colorStyle as any}
+            />
+            <Text
+              as="output"
+              muted
+              size={0}
+              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+            >
+              {config.darkest}
+            </Text>
+          </Card>
         </Card>
       </Grid>
+      <Card tone={tone} paddingTop={3}>
+        <Label muted size={0}>
+          Mid point ({roundToScale(config.midPoint)})
+        </Label>
+        <Card paddingY={2} tone={tone}>
+          <StyledRange
+            // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
+            type="range"
+            min={50}
+            max={950}
+            defaultValue={config.midPoint}
+            list={midRangeId}
+            onPointerUp={(event) => {
+              event.currentTarget.value = roundToScale(
+                event.currentTarget.value as any
+              ) as any
+            }}
+            onBlur={(event) => {
+              event.currentTarget.value = roundToScale(
+                event.currentTarget.value as any
+              ) as any
+            }}
+          />
+          <datalist id={midRangeId}>
+            {COLOR_TINTS.map((tint) => (
+              <option key={tint} value={tint} />
+            ))}
+          </datalist>
+        </Card>
+      </Card>
     </Card>
   )
 }
+
+const StyledRange = styled.input`
+  accent-color: var(--card-focus-ring-color, currentColor);
+  width: 100%;
+
+  &::-webkit-slider-runnable-track {
+    border-color: var(--card-focus-ring-color, currentColor);
+  }
+  &[type='range']::-webkit-slider-thumb {
+    border-color: var(--card-focus-ring-color, currentColor);
+    background-color: var(--card-focus-ring-color, currentColor);
+  }
+`
 
 /*
 // @TODO revisit later
@@ -560,3 +696,14 @@ background: red
 `
 
 // */
+
+function roundToScale(value: number): number {
+  if (value < 75) {
+    return 50
+  }
+  if (value > 925) {
+    return 950
+  }
+
+  return Math.round(value / 100) * 100
+}

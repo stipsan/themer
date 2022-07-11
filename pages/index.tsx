@@ -3,6 +3,7 @@ import {
   BoundaryElementProvider,
   Card,
   Grid,
+  Inline,
   PortalProvider,
   Text,
   ThemeProvider,
@@ -20,9 +21,9 @@ import styled, { css } from 'styled-components'
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
 const StyledGrid = styled(Grid)`
-  gap: 1px;
-
   @media screen and (min-width: 600px) {
+    gap-row: 1px;
+
     && {
       grid-template-columns: 300px 1fr;
     }
@@ -115,50 +116,50 @@ export default function Index() {
   // console.log(useRouter().query)
   console.log('scheme', { scheme })
 
-  const portalRef = useRef<HTMLDivElement | null>(null)
-  const [documentScrollElement, setDocumentScrollElement] =
-    useState<HTMLDivElement | null>(null)
-
   return (
     <>
       <Head lightest={lightest} darkest={darkest} />
       <ThemeProvider theme={theme} scheme={scheme}>
         <Card height="fill" tone="transparent">
           <StyledGrid columns={[1, 1]} height="fill">
-            <Card shadow={1} height="fill" overflow="hidden">
-              <HeaderCard padding={[3, 3, 4]} shadow={1}>
-                <Text><Logo /> Hello world!</Text>
-              </HeaderCard>
-            </Card>
-            <Card overflow="hidden" id="sanity">
-              <PortalProvider
-                element={portalRef.current}
-                __unstable_elements={{
-                  documentScrollElement: documentScrollElement,
-                }}
+            <Card height="fill" overflow="hidden" scheme={scheme}>
+              <HeaderCard
+                paddingX={[3]}
+                paddingY={[2]}
+                scheme="dark"
+                borderRight
+                shadow={scheme === 'dark' ? 1 : undefined}
               >
-                <BoundaryElementProvider element={documentScrollElement}>
-                  <Scroller
-                    $disabled={false}
-                    data-testid="sidebar-panel-scroller"
-                    ref={setDocumentScrollElement}
-                  >
-                    <StudioProvider
-                      config={blogConfig}
-                      unstable_noAuthBoundary
-                      unstable_history={history}
-                      scheme={scheme}
-                      // onSchemeChange={(nextScheme) => setScheme(nextScheme)}
-                    >
-                      <ThemeProvider theme={theme} scheme={scheme}>
-                        <StudioLayout />
-                      </ThemeProvider>
-                    </StudioProvider>
-                  </Scroller>
-
-                  <div data-testid="document-panel-portal" ref={portalRef} />
-                </BoundaryElementProvider>
-              </PortalProvider>
+                <Inline>
+                  <Logo spin />
+                  <Card padding={[3]}>
+                    <Text weight="semibold" muted>
+                      Themer for Sanity Studio v3
+                    </Text>
+                  </Card>
+                </Inline>
+              </HeaderCard>
+              <Card
+                padding={[2, 3, 3]}
+                borderRight
+                height="fill"
+                tone="transparent"
+              >
+                <Text>Content</Text>
+              </Card>
+            </Card>
+            <Card>
+              <StudioProvider
+                config={blogConfig}
+                unstable_noAuthBoundary
+                unstable_history={history}
+                scheme={scheme}
+                // onSchemeChange={(nextScheme) => setScheme(nextScheme)}
+              >
+                <ThemeProvider theme={theme} scheme={scheme}>
+                  <StudioLayout />
+                </ThemeProvider>
+              </StudioProvider>
             </Card>
           </StyledGrid>
         </Card>

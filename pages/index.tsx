@@ -1,4 +1,10 @@
-import { DesktopIcon, MoonIcon, SunIcon } from '@sanity/icons'
+import {
+  DesktopIcon,
+  MasterDetailIcon,
+  MoonIcon,
+  SplitVerticalIcon,
+  SunIcon,
+} from '@sanity/icons'
 import {
   type ThemeColorSchemeKey,
   Button,
@@ -73,9 +79,7 @@ function SyncColorScheme({
 }
 
 export default function Index() {
-  // @TODO grab these from the theme
-  const darkest = '#0f172a'
-  const lightest = '#fff'
+  const [view, setView] = useState<'default' | 'split'>('default')
 
   const prefersDark = usePrefersDark()
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(
@@ -136,11 +140,29 @@ export default function Index() {
   const history = useMagicRouter('/')
   const _theme = useThemeFromHues({ hues })
   const theme = useMemo(() => {
-    const { media, ...theme } = _theme
-
-    // Adjust media queries to fit the sidebar
-    return { ...theme, media: media.map((media) => media + SIDEBAR_WIDTH) }
-  }, [_theme])
+    return {
+      ..._theme,
+      // Adjust media queries to fit the sidebar
+      media:
+        view === 'split'
+          ? [
+              360 * 2 + SIDEBAR_WIDTH,
+              600 * 2 + SIDEBAR_WIDTH,
+              900 * 1.5 + SIDEBAR_WIDTH,
+              1200 + SIDEBAR_WIDTH,
+              1800 + SIDEBAR_WIDTH / 2,
+              2400,
+            ]
+          : [
+              360 + SIDEBAR_WIDTH,
+              600 + SIDEBAR_WIDTH / 2,
+              900,
+              1200,
+              1800,
+              2400,
+            ],
+    }
+  }, [_theme, view])
   console.log({ theme })
   const blogConfig = useMemo(
     () => ({ ...blog, theme, scheme }),
@@ -185,20 +207,69 @@ export default function Index() {
               <Card borderRight height="fill" tone="default">
                 <Grid columns={[2]}>
                   <Card padding={[4]}>
-                    <Label htmlFor="view" size={1}>
+                    <Label htmlFor="view" size={0}>
                       View
                     </Label>
+                    <Card paddingY={2}>
+                      <MenuButton
+                        button={
+                          <Button
+                            fontSize={1}
+                            paddingY={2}
+                            paddingX={3}
+                            tone="default"
+                            mode="ghost"
+                            icon={
+                              view === 'default'
+                                ? MasterDetailIcon
+                                : SplitVerticalIcon
+                            }
+                            text={
+                              view === 'default' ? 'Default' : 'Split-screen'
+                            }
+                          />
+                        }
+                        id="view"
+                        menu={
+                          <Menu>
+                            <MenuItem
+                              icon={MasterDetailIcon}
+                              text={
+                                view === 'default'
+                                  ? 'Default'
+                                  : 'Switch back to default'
+                              }
+                              disabled={view === 'default'}
+                              onClick={() => setView('default')}
+                            />
+                            <MenuItem
+                              icon={SplitVerticalIcon}
+                              text={
+                                view === 'split'
+                                  ? 'Split-screen'
+                                  : 'Switch to split-screen'
+                              }
+                              disabled={view === 'split'}
+                              onClick={() => setView('split')}
+                            />
+                          </Menu>
+                        }
+                        placement="right"
+                        popover={{ portal: true }}
+                      />
+                    </Card>
                   </Card>
                   <Card padding={[4]}>
-                    <Label htmlFor="scheme" size={1}>
+                    <Label htmlFor="scheme" size={0}>
                       Scheme
                     </Label>
                     <Card paddingY={2}>
                       <MenuButton
                         button={
                           <Button
-                            fontSize={2}
-                            padding={3}
+                            fontSize={1}
+                            paddingY={2}
+                            paddingX={3}
                             tone="default"
                             mode="ghost"
                             icon={
@@ -251,12 +322,18 @@ export default function Index() {
             <FixNavDrawerPosition
               ref={uglyHackRef}
               style={{
-                ['--ugly-hack-width' as any]: uglyHackRef?.current
-                  ? `${uglyHackRect?.width}px`
-                  : undefined,
-                ['--ugly-hack-height' as any]: uglyHackRef?.current
-                  ? `${uglyHackRect?.height}px`
-                  : undefined,
+                ['--ugly-hack-width' as any]:
+                  uglyHackRef?.current && uglyHackRect?.width
+                    ? `${uglyHackRect.width}px`
+                    : undefined,
+                ['--ugly-hack-height' as any]:
+                  uglyHackRef?.current && uglyHackRect?.height
+                    ? `${
+                        /*view === 'split'
+                          ? uglyHackRect.height / 2
+                          : */ uglyHackRect.height
+                      }px`
+                    : undefined,
               }}
             >
               <StudioProvider
@@ -268,9 +345,39 @@ export default function Index() {
                 // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
               >
                 <SyncColorScheme forceScheme={scheme} />
-                <ThemeProvider theme={theme} scheme={scheme}>
-                  <StudioLayout />
-                </ThemeProvider>
+                <Grid
+                  height="fill"
+                  columns={[1, view === 'split' ? 2 : 1]}
+                  // @TODO fix rows layout
+                  // rows={[view === 'split' ? 2 : 1, 1]}
+                  /*
+                  style={{
+                    height: view === 'split' ? '200dvh' : '100dvh',
+                    maxHeight:  view === 'split' ? '200vh' :'100vh',
+                    overflow: 'auto',
+                  }}
+                  // */
+                  // @TODO fix scroll on mobile split view
+                  style={{
+                    height: '100dvh',
+                    maxHeight: '100vh',
+                    overflow: 'auto',
+                  }}
+                >
+                  <ThemeProvider
+                    // Workaround media queries not updating by changing the key
+                    key={view === 'split' ? 'light' : 'default'}
+                    theme={theme}
+                    scheme={view === 'split' ? 'light' : scheme}
+                  >
+                    <StudioLayout />
+                  </ThemeProvider>
+                  {view === 'split' && (
+                    <ThemeProvider key="dark" theme={theme} scheme="dark">
+                      <StudioLayout />
+                    </ThemeProvider>
+                  )}
+                </Grid>
               </StudioProvider>
             </FixNavDrawerPosition>
           </StyledGrid>

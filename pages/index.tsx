@@ -11,6 +11,7 @@ import {
   type ThemeColorSchemeKey,
   Button,
   Card,
+  Flex,
   Grid,
   Inline,
   Label,
@@ -257,20 +258,26 @@ export default function Index() {
               style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
             >
               <HeaderCard
-                paddingX={[3]}
+                paddingLeft={[3]}
                 paddingY={[2]}
                 scheme="dark"
-                borderRight
                 shadow={scheme === 'dark' ? 1 : undefined}
               >
-                <Inline>
+                <Card
+                  borderRight
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '32px 1fr',
+                    alignItems: 'center',
+                  }}
+                >
                   <Logo spin={spins} transition={transition} />
-                  <Card padding={[3]}>
-                    <Text weight="semibold" muted>
+                  <Card paddingY={[3]} paddingX={[3]}>
+                    <Text weight="semibold" muted style={{ flex: 2 }}>
                       Themer for Sanity Studio v3
                     </Text>
                   </Card>
-                </Inline>
+                </Card>
               </HeaderCard>
               <Card borderRight height="fill" tone="default">
                 <Grid columns={[2]}>
@@ -546,7 +553,7 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
   const tone = title.toLowerCase() as any
 
   return (
-    <Card paddingY={3} paddingX={4} tone={tone} shadow={1}>
+    <Card paddingTop={4} paddingX={4} paddingBottom={2} tone={tone} shadow={1}>
       <Text size={2} weight="medium" muted>
         {title}
       </Text>

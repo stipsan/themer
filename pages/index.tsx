@@ -11,16 +11,31 @@ import {
   MenuItem,
   Text,
   ThemeProvider,
+  useElementRect,
   usePrefersDark,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import Logo from 'components/Logo'
 import { useMagicRouter } from 'hooks/useMagicRouter'
 import { useThemeFromHues } from 'hooks/useTheme'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
+
+const SIDEBAR_WIDTH = 300
+
+// Trying to impress Snorre with my 1337 CSS haxxor
+const FixNavDrawerPosition = styled(Card)`
+  position: relative;
+
+  & [data-ui='Navbar'] + div {
+    top: calc(100vh - var(--ugly-hack-height, 0));
+    top: calc(100dvh - var(--ugly-hack-height, 0));
+    left: calc(100vw - var(--ugly-hack-width, 0));
+    left: calc(100dvw - var(--ugly-hack-width, 0));
+  }
+`
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
 const StyledGrid = styled(Grid)`
@@ -28,7 +43,7 @@ const StyledGrid = styled(Grid)`
     gap-row: 1px;
 
     && {
-      grid-template-columns: 300px 1fr;
+      grid-template-columns: ${SIDEBAR_WIDTH}px 1fr;
     }
   }
 `
@@ -119,21 +134,38 @@ export default function Index() {
     []
   )
   const history = useMagicRouter('/')
-  const theme = useThemeFromHues({ hues })
+  const _theme = useThemeFromHues({ hues })
+  const theme = useMemo(() => {
+    const { media, ...theme } = _theme
+
+    // Adjust media queries to fit the sidebar
+    return { ...theme, media: media.map((media) => media + SIDEBAR_WIDTH) }
+  }, [_theme])
+  console.log({ theme })
   const blogConfig = useMemo(
     () => ({ ...blog, theme, scheme }),
     [theme, scheme]
   )
+  const uglyHackRef = useRef(null)
+  const uglyHackRect = useElementRect(uglyHackRef.current)
   // console.log(useRouter().query)
-  console.log('scheme', { scheme })
+  console.log('uglyHackRect', { uglyHackRect, uglyHackRef })
 
   return (
     <>
-      <Head lightest={lightest} darkest={darkest} />
+      <Head
+        lightest={theme.color.light.default.base.bg}
+        darkest={theme.color.dark.default.base.bg}
+      />
       <ThemeProvider theme={theme} scheme={scheme}>
         <Card height="fill" tone="transparent">
           <StyledGrid columns={[1, 1]} height="fill">
-            <Card height="fill" overflow="hidden" scheme={scheme}>
+            <Card
+              height="fill"
+              overflow="hidden"
+              scheme={scheme}
+              style={{ zIndex: 200 }}
+            >
               <HeaderCard
                 paddingX={[3]}
                 paddingY={[2]}
@@ -151,13 +183,13 @@ export default function Index() {
                 </Inline>
               </HeaderCard>
               <Card borderRight height="fill" tone="default">
-                <Grid columns={[1, 2]}>
-                  <Card padding={[3, 4, 4]}>
+                <Grid columns={[2]}>
+                  <Card padding={[4]}>
                     <Label htmlFor="view" size={1}>
                       View
                     </Label>
                   </Card>
-                  <Card padding={[3, 4, 4]}>
+                  <Card padding={[4]}>
                     <Label htmlFor="scheme" size={1}>
                       Scheme
                     </Label>
@@ -208,7 +240,7 @@ export default function Index() {
                             />
                           </Menu>
                         }
-                        placement="left"
+                        placement="right"
                         popover={{ portal: true }}
                       />
                     </Card>
@@ -216,7 +248,17 @@ export default function Index() {
                 </Grid>
               </Card>
             </Card>
-            <Card>
+            <FixNavDrawerPosition
+              ref={uglyHackRef}
+              style={{
+                ['--ugly-hack-width' as any]: uglyHackRef?.current
+                  ? `${uglyHackRect?.width}px`
+                  : undefined,
+                ['--ugly-hack-height' as any]: uglyHackRef?.current
+                  ? `${uglyHackRect?.height}px`
+                  : undefined,
+              }}
+            >
               <StudioProvider
                 config={blogConfig}
                 unstable_noAuthBoundary
@@ -230,7 +272,7 @@ export default function Index() {
                   <StudioLayout />
                 </ThemeProvider>
               </StudioProvider>
-            </Card>
+            </FixNavDrawerPosition>
           </StyledGrid>
         </Card>
       </ThemeProvider>

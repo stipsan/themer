@@ -9,6 +9,7 @@ export default function Index() {
     <>
       <Head lightest={lightest} darkest={darkest} />
       <h1>Hello world!</h1>
+      <h2>{process.env.NEXT_PUBLIC_SANITY_DATASET} {process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}</h2>
     </>
   )
 }

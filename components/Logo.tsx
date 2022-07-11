@@ -1461,10 +1461,6 @@ const ColorWheel = forwardRef(function ColorWheel(
         fill="#ff0004"
         d="M15.58141.00588c.102358-.002681.204738-.004377.307126-.005092l.111701 15.999359Z"
       />
-      <path
-        fillOpacity="0.652562"
-        d="M30 16c0 7.731987-6.268013 14-14 14-7.731986 0-14-6.268013-14-14S8.268014 2 16 2c7.731987 0 14 6.268013 14 14Z"
-      />
     </svg>
   )
 })
@@ -1509,28 +1505,46 @@ const StyledSanityLogo = styled(SanityLogo)`
 `
 
 interface Props {
-  spin?: boolean
+  spin?: number
+  transition?: boolean
 }
-function Logo({ spin }: Props) {
-  const ref = useRef(null)
-  const [rotate, setRotate] = useState(0)
+function Logo({ spin, transition }: Props) {
+  const wheelRef = useRef(null)
+  const logoRef = useRef(null)
 
   useEffect(() => {
-    if (spin) {
-      setRotate((rotate) => rotate + 360 * 1.5)
-    }
-  }, [spin])
-  useEffect(() => {
-    if (ref.current && spin) {
-      animate(ref.current, { rotate }, { easing: spring({ stiffness: 70 }) })
+    if (wheelRef.current && spin) {
+      console.count('spin')
+      console.log(spin % 360)
+      const rotate = (spin * 391) % 720
+      animate(
+        wheelRef.current,
+        { rotate: transition ? -rotate : rotate },
+        { easing: spring({ stiffness: 70 }) }
+      )
       // animate(ref.current, {rotate: [null, rotate]}, { duration: 3})
     }
-  }, [rotate, spin])
+  }, [spin, transition])
+  useEffect(() => {
+    if (logoRef.current && transition) {
+      const animation = animate(
+        logoRef.current,
+        { opacity: [null, 0.9, 1], scale: [null, 0.9, 1] },
+        {
+          repeat: Infinity,
+          duration: 1,
+          direction: 'alternate',
+          easing: 'ease-out',
+        }
+      )
+      return () => animation.cancel()
+    }
+  }, [transition])
 
   return (
-    <Figure onClick={() => setRotate((rotate) => rotate + 360 * 1.1)}>
-      <ColorWheel ref={ref} />
-      <StyledSanityLogo />
+    <Figure>
+      <ColorWheel ref={wheelRef} />
+      <StyledSanityLogo ref={logoRef} />
     </Figure>
   )
 }

@@ -16,6 +16,7 @@ import {
   MenuButton,
   MenuItem,
   Text,
+  TextInput,
   ThemeProvider,
   useElementRect,
   usePrefersDark,
@@ -24,10 +25,18 @@ import Head from 'components/Head'
 import Logo from 'components/Logo'
 import { useMagicRouter } from 'hooks/useMagicRouter'
 import { useThemeFromHues } from 'hooks/useTheme'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
 import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
+import type { Hue } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
 
@@ -79,6 +88,7 @@ function SyncColorScheme({
 }
 
 export default function Index() {
+  const [transition, startTransition] = useTransition()
   const [view, setView] = useState<'default' | 'split'>('default')
 
   const prefersDark = usePrefersDark()
@@ -170,8 +180,43 @@ export default function Index() {
   )
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)
+
+  const [spins, setSpin] = useState(0)
+  const spin = useCallback(
+    () => startTransition(() => setSpin((spins) => ++spins)),
+    []
+  )
+  const throttleRef = useRef(0)
+  const scheduleHuesUpdate = useCallback(() => {
+    if (typeof cancelIdleCallback === 'function') {
+      cancelIdleCallback(throttleRef.current)
+    } else {
+      cancelAnimationFrame(throttleRef.current)
+    }
+    const scheduledUpdate = () => {
+      if (!formRef.current) {
+        throw new Error('No form ref')
+      }
+
+      const formData = new FormData(formRef.current)
+      console.log('formData', formData)
+    }
+
+    if (typeof requestIdleCallback === 'function') {
+      throttleRef.current = requestIdleCallback(scheduledUpdate, {
+        timeout: 1000,
+      })
+    } else {
+      throttleRef.current = requestAnimationFrame(scheduledUpdate)
+    }
+  }, [])
+
+  const formRef = useRef(null)
   // console.log(useRouter().query)
   console.log('uglyHackRect', { uglyHackRect, uglyHackRef })
+  const [resetHueFields, setResetHueFields] = useState(0)
+
+  console.log('formRef', formRef.current)
 
   return (
     <>
@@ -183,6 +228,16 @@ export default function Index() {
         <Card height="fill" tone="transparent">
           <StyledGrid columns={[1, 1]} height="fill">
             <Card
+              as="form"
+              ref={formRef}
+              onChange={(event) => {
+                spin()
+                console.log('form onchange', event)
+                scheduleHuesUpdate()
+              }}
+              onSubmit={(event) => {
+                event.preventDefault()
+              }}
               height="fill"
               overflow="hidden"
               scheme={scheme}
@@ -196,10 +251,13 @@ export default function Index() {
                 shadow={scheme === 'dark' ? 1 : undefined}
               >
                 <Inline>
-                  <Logo spin />
+                  <Logo spin={spins} transition={transition} />
                   <Card padding={[3]}>
                     <Text weight="semibold" muted>
-                      Themer for Sanity Studio v3
+                      Themer for Sanity Studio v3{' '}
+                      <button onClick={() => setResetHueFields((inc) => ++inc)}>
+                        reset
+                      </button>
                     </Text>
                   </Card>
                 </Inline>
@@ -317,6 +375,25 @@ export default function Index() {
                     </Card>
                   </Card>
                 </Grid>
+                <Card>Presets</Card>
+                <Card borderTop height="fill" paddingY={1}>
+                  {[
+                    'Default',
+                    'Primary',
+                    'Transparent',
+                    'Positive',
+                    'Caution',
+                    'Critical',
+                  ].map((title) => {
+                    return (
+                      <HueFields
+                        key={`${title}-${resetHueFields}`}
+                        config={hues[title.toLowerCase()]}
+                        title={title}
+                      />
+                    )
+                  })}
+                </Card>
               </Card>
             </Card>
             <FixNavDrawerPosition
@@ -400,3 +477,86 @@ export default function Index() {
     </>
   )
 }
+
+function HueFields({ config, title }: { config: Hue; title: string }) {
+  console.log('HueFields', { config })
+  /**
+   * Default
+  lightest   mid    darkest
+  color      color  color
+  mid point
+  |----------- dot ---------|
+  Tones preview
+  50 100 200 ---- 800 900 950
+   */
+  return (
+    <Card paddingY={3} paddingX={4} tone="default">
+      <Text size={2} weight="medium">
+        {title}
+      </Text>
+      <Grid columns={[1, 3]} paddingY={3}>
+        <Card>
+          <Label muted size={0}>
+            Lightest
+          </Label>
+          <Card paddingY={2}>
+            <input
+              name={`${title.toLowerCase()}-lightest`}
+              type="color"
+              defaultValue={config.lightest}
+            />
+            <Text
+              as="output"
+              muted
+              size={0}
+              style={{ paddingTop: '0.2rem', fontFeatureSettings: 'tnum' }}
+            >
+              {config.lightest}
+            </Text>
+          </Card>
+        </Card>
+        <Card hidden>
+          <Label size={0}>mid</Label>
+        </Card>
+        <Card hidden>
+          <Label size={0}>darkest</Label>
+        </Card>
+      </Grid>
+    </Card>
+  )
+}
+
+/*
+// @TODO revisit later
+// Using .attrs to fool the type checker as @sanity/ui isn't prepared to style it
+// No worries, we're styling it here
+const ColorInput = styled(TextInput).attrs({ type: 'color' as 'text' })`
+flex: none;
+padding: 0;
+background: red
+
+&&[type="color"] {
+  ${({theme}) => {
+    console.log('theme from func', theme)
+    return `
+    --size-diff-positive: ${theme.sanity.color.solid.positive.enabled.bg};
+    --size-diff-negative: ${theme.sanity.color.solid.critical.enabled.bg};
+    --input-fg-color: ${theme.sanity.color.input.default.enabled.fg};
+    --input-placeholder-color: ${theme.sanity.color.input.default.enabled.placeholder};
+  `
+  }}
+	-webkit-appearance: none;
+	border: none;
+	width: 32px;
+	height: 32px;
+  padding: 1px;
+}
+& [type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+& [type="color"]::-webkit-color-swatch {
+	border: none; 
+}
+`
+
+// */

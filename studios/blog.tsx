@@ -1,5 +1,6 @@
 import { type WorkspaceOptions, defineType } from 'sanity'
 import { deskTool } from 'sanity/desk'
+import slugify from 'slugify'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
@@ -16,10 +17,24 @@ const postType = defineType({
     },
     {
       name: 'slug',
-      title: 'Slug',
       type: 'slug',
-      options: {
-        source: 'title',
+      options: { source: 'title' },
+      validation: (Rule) => {
+        return Rule.required().custom(async (value) => {
+          const currentSlug = value && value.current
+          if (!currentSlug) {
+            return true
+          }
+
+          if (currentSlug.length >= 96) {
+            return `Must be less than ${96} characters`
+          }
+
+          if (currentSlug !== slugify(currentSlug, { lower: true })) {
+            return 'Must be a valid slug'
+          }
+          return true
+        })
       },
     },
     {

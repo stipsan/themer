@@ -336,49 +336,64 @@ export default function Index() {
                     : undefined,
               }}
             >
-              <StudioProvider
-                config={blogConfig}
-                unstable_noAuthBoundary
-                unstable_history={history}
-                scheme={scheme}
-                // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
-                // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
-              >
-                <SyncColorScheme forceScheme={scheme} />
-                <Grid
-                  height="fill"
-                  columns={[1, view === 'split' ? 2 : 1]}
-                  // @TODO fix rows layout
-                  // rows={[view === 'split' ? 2 : 1, 1]}
-                  /*
+              <Grid
+                height="fill"
+                columns={[1, view === 'split' ? 2 : 1]}
+                // @TODO fix rows layout
+                // rows={[view === 'split' ? 2 : 1, 1]}
+                /*
                   style={{
                     height: view === 'split' ? '200dvh' : '100dvh',
                     maxHeight:  view === 'split' ? '200vh' :'100vh',
                     overflow: 'auto',
                   }}
                   // */
-                  // @TODO fix scroll on mobile split view
-                  style={{
-                    height: '100dvh',
-                    maxHeight: '100vh',
-                    overflow: 'auto',
-                  }}
+                // @TODO fix scroll on mobile split view
+                style={{
+                  height: '100dvh',
+                  maxHeight: '100vh',
+                  overflow: 'auto',
+                }}
+              >
+                <StudioProvider
+                  key="default"
+                  config={blogConfig}
+                  unstable_noAuthBoundary
+                  unstable_history={history}
+                  scheme={view === 'split' ? 'light' : scheme}
+                  // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
+                  // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
                 >
+                  <SyncColorScheme
+                    forceScheme={view === 'split' ? 'light' : scheme}
+                  />
                   <ThemeProvider
                     // Workaround media queries not updating by changing the key
-                    key={view === 'split' ? 'light' : 'default'}
+                    // key={view === 'split' ? 'light' : 'default'}
                     theme={theme}
                     scheme={view === 'split' ? 'light' : scheme}
                   >
                     <StudioLayout />
                   </ThemeProvider>
+                </StudioProvider>
+                <StudioProvider
+                  key="split"
+                  config={blogConfig}
+                  unstable_noAuthBoundary
+                  unstable_history={history}
+                  scheme="dark"
+                  // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
+                  // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
+                >
+                  {' '}
+                  <SyncColorScheme forceScheme="dark" />
                   {view === 'split' && (
                     <ThemeProvider key="dark" theme={theme} scheme="dark">
                       <StudioLayout />
                     </ThemeProvider>
                   )}
-                </Grid>
-              </StudioProvider>
+                </StudioProvider>
+              </Grid>
             </FixNavDrawerPosition>
           </StyledGrid>
         </Card>

@@ -27,7 +27,8 @@
     "react-dom": "^18.2.0",
     "sanity": "^3.0.0-dev-preview.9",
     "slugify": "^1.6.5",
-    "styled-components": "^5.3.5"
+    "styled-components": "^5.3.5",
+    "suspend-react": "^0.0.8"
   },
   "devDependencies": {
     "@types/node": "^18.0.3",

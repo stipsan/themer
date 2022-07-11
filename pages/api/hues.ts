@@ -41,7 +41,7 @@ export default async function handler(req: NextRequest) {
         caution: parseHue('caution', searchParams, lightest, darkest),
         critical: parseHue('critical', searchParams, lightest, darkest),
       },
-      searchParams.has('minified')
+      searchParams.has('min')
     )
     const resDur = Date.now() - resStart
     return new Response(res, {

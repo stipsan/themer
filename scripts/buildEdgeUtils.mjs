@@ -154,9 +154,9 @@ export function themeFromHuesTemplate(hues, minified) {
     minifiedPrebuiltFromEsbuild
   )} : ${JSON.stringify(prebuiltFromEsbuild)}
   const tip = minified ? ${JSON.stringify(
-    '// Minified build, remove `?minified` for easier debugging'
+    '// Minified build, remove `?min` for easier debugging'
   )} : ${JSON.stringify(
-        '// Not minified, append `?minified` to the request for much smaller output'
+        '// Not minified, append `?min` to the request for much smaller output'
       )}
   return "// Generated " + new Date().toJSON() + "\\n" + tip + "\\n" + template.replace(
     'process.env.__HUES__',

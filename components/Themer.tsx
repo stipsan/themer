@@ -11,18 +11,14 @@ import {
   type ThemeColorSchemeKey,
   Button,
   Card,
-  Flex,
   Grid,
-  Inline,
   Label,
   Menu,
   MenuButton,
   MenuItem,
   Text,
-  TextInput,
   ThemeProvider,
   useElementRect,
-  usePrefersDark,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import Logo from 'components/Logo'
@@ -40,6 +36,7 @@ import {
 import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
+import { suspend } from 'suspend-react'
 import type { Hue } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
@@ -103,23 +100,19 @@ interface Props {
   // The scheme detected from the usePrefersDark hook
   systemScheme: ThemeColorSchemeKey
 }
-export default function Themer({}: Props) {
+export default function Themer({ systemScheme, themeUrl }: Props) {
   const [transition, startTransition] = useTransition()
+  const magic = suspend(async () => {
+    const { hues, theme } = await import(/* webpackIgnore: true */ themeUrl)
+    return { hues, theme }
+  }, [themeUrl])
+  console.log({ magic })
   const [view, setView] = useState<'default' | 'split'>('default')
 
-  const prefersDark = usePrefersDark()
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(
     null
   )
-  const [_scheme, setScheme] = useState<ThemeColorSchemeKey>('light')
-  const scheme = forceScheme ?? _scheme
-  // if the preferred color scheme changes, then react to this change
-  // /*
-  useEffect(() => {
-    const nextScheme = prefersDark ? 'dark' : 'light'
-    setScheme(nextScheme)
-  }, [prefersDark])
-  // */
+  const scheme = forceScheme ?? systemScheme
 
   const hues = useMemo(
     () =>
@@ -215,9 +208,12 @@ export default function Themer({}: Props) {
       }
 
       const formData = new FormData(formRef.current)
-      console.log('formData', formData, new URLSearchParams(formData).toString())
+      console.log(
+        'formData',
+        formData,
+        new URLSearchParams(formData).toString()
+      )
       function parseHue(key: string, formData: FormData): Hue {
-
         return {
           mid: formData.get(`${key}-mid`) as string,
         }

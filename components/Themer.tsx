@@ -162,10 +162,9 @@ export default function Themer({
     []
   )
   const history = useMagicRouter('/')
-  const _theme = useThemeFromHues({ hues })
   const theme = useMemo(() => {
     return {
-      ..._theme,
+      ...magic.theme,
       // Adjust media queries to fit the sidebar
       media:
         view === 'split'
@@ -186,7 +185,7 @@ export default function Themer({
               2400,
             ],
     }
-  }, [_theme, view])
+  }, [magic.theme, view])
   console.log({ theme })
   const blogConfig = useMemo(
     () => ({ ...blog, theme, scheme }),

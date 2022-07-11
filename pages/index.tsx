@@ -11,6 +11,7 @@ import Head from 'components/Head'
 import Themer from 'components/Themer'
 import { useRouter } from 'next/router'
 import { Suspense, useEffect, useState } from 'react'
+import { presets } from 'utils/presets'
 
 const fallback = (
   <ThemeProvider scheme="light" theme={studioTheme}>
@@ -48,6 +49,19 @@ export default function Index() {
         process.env.NODE_ENV === 'production' ? '?min' : ''
       )
       const initialParams = new URLSearchParams(location.search)
+
+      const maybePreset = initialParams.has('preset')
+        ? initialParams.get('preset')
+        : null
+      if (maybePreset) {
+        const preset = presets.find((preset) => preset.slug === maybePreset)
+        if (preset) {
+          const url = new URL(preset.url, location.origin)
+          setThemeUrl(url.toString())
+
+          return
+        }
+      }
 
       const paramsAllowlist = [
         'lightest',

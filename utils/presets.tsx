@@ -3,16 +3,18 @@
 import type { ThemePreset } from 'utils/types'
 
 export const DefaultStudioTheme: ThemePreset = {
+  slug: 'default',
   title: 'Default Studio Theme',
   url: '/api/hues',
 }
 
 export const SynthWavePink: ThemePreset = {
-  title: 'Synth Wave Pink',
-  url: '/api/hues?lightest=f7f2f5&darkest=171721&default=8b6584;&primary=ec4899&transparent=503a4c&positive=10b981&caution=fde047;300&critical=fe3459',
+  slug: 'pink-synth-wave',
+  title: 'Pink Synth Wave',
+  url: '/api/hues?lightest=f7f2f5&darkest=171721&default=8b6584&primary=ec4899&transparent=503a4c&positive=10b981&caution=fde047;300&critical=fe3459',
 }
 
-export const presets: ThemePreset[] = [SynthWavePink]
+export const presets: ThemePreset[] = [DefaultStudioTheme, SynthWavePink]
 
 // @TODO sort through these:
 /*

@@ -17,6 +17,7 @@ export interface Hues {
 
 export interface ThemePreset {
   title: string
+  slug: string
   icon?: React.ReactNode
   url: string
 }

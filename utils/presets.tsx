@@ -4,17 +4,17 @@ import type { ThemePreset } from 'utils/types'
 
 export const defaultPreset: ThemePreset = {
   slug: 'default',
-  title: 'Default Studio Theme',
+  title: 'Studio v3',
   url: '/api/hues',
 }
 
-export const pinkSynthWave: ThemePreset = {
-  slug: 'pink-synth-wave',
-  title: 'Pink Synth Wave',
+export const pinkSynth: ThemePreset = {
+  slug: 'pink-synth',
+  title: 'Pink Synth',
   url: '/api/hues?lightest=f7f2f5&darkest=171721&default=8b6584&primary=ec4899&transparent=503a4c&positive=10b981&caution=fde047;300&critical=fe3459',
 }
 
-export const presets: ThemePreset[] = [defaultPreset, pinkSynthWave]
+export const presets: ThemePreset[] = [defaultPreset, pinkSynth]
 
 // @TODO sort through these:
 /*

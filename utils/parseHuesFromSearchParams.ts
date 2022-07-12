@@ -84,8 +84,7 @@ function parseHue(
 
   return {
     mid,
-    // If the mid color is specified, but the midPoint is not, set the midPoint to 500 by default to ensure colors like 'positive' and 'caution' that have other midPoints don't get unexpected results
-    midPoint: midPoint ?? mid ? 500 : undefined,
+    midPoint: midPoint,
     lightest: lightest ?? defaultLightest,
     darkest: darkest ?? defaultDarkest,
   }

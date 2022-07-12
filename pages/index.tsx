@@ -54,7 +54,10 @@ export default function Index() {
         : null
       const inheritFrom =
         presets.find((preset) => preset.slug === slug) || defaultPreset
-      const searchParams = new URLSearchParams(inheritFrom.url)
+      const { pathname, searchParams } = new URL(
+        inheritFrom.url,
+        location.origin
+      )
       if (process.env.NODE_ENV === 'production') searchParams.set('min', '1')
 
       const paramsAllowlist = [
@@ -74,8 +77,9 @@ export default function Index() {
         }
       }
 
+      console.log(searchParams.toString())
       const url = new URL(
-        `/api/hues?${decodeURIComponent(searchParams.toString())}`,
+        `${pathname}?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
       startTransition(() => setPreset({ ...inheritFrom, url: url.toString() }))

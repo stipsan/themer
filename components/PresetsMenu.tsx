@@ -1,45 +1,9 @@
 import { MusicNoteIcon } from '@heroicons/react/outline'
-import { COLOR_TINTS } from '@sanity/color'
-import {
-  DesktopIcon,
-  MasterDetailIcon,
-  MoonIcon,
-  SplitVerticalIcon,
-  SunIcon,
-} from '@sanity/icons'
-import {
-  type CardTone,
-  type ThemeColorSchemeKey,
-  Button,
-  Card,
-  Grid,
-  Label,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  Text,
-  ThemeProvider,
-  useElementRect,
-} from '@sanity/ui'
-import Head from 'components/Head'
-import Logo from 'components/Logo'
-import { useMagicRouter } from 'hooks/useMagicRouter'
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from 'react'
-import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
-import { config as blog } from 'studios/blog'
+import { MasterDetailIcon } from '@sanity/icons'
+import { Button, Card, Label, Menu, MenuButton, MenuItem } from '@sanity/ui'
 import styled from 'styled-components'
-import { suspend } from 'suspend-react'
 import { presets } from 'utils/presets'
-import type { Hue, ThemePreset } from 'utils/types'
+import type { ThemePreset } from 'utils/types'
 
 const SynthWaveIcon = styled(MusicNoteIcon)`
   width: 16px;
@@ -48,7 +12,7 @@ const SynthWaveIcon = styled(MusicNoteIcon)`
 
 // @TODO React.lazy these icons
 const iconFromSlug = (slug: string) => {
-  return slug === 'pink-synth-wave'
+  return slug === 'pink-synth'
     ? SynthWaveIcon
     : slug === 'default'
     ? MasterDetailIcon
@@ -86,6 +50,9 @@ export default function PresetsMenu({ selected, onChange }: Props) {
                   const { slug, icon, title } = _preset
                   return (
                     <MenuItem
+                      fontSize={1}
+                      paddingY={2}
+                      paddingX={3}
                       key={slug}
                       disabled={selected.slug === slug}
                       icon={icon ?? iconFromSlug(slug)}

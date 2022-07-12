@@ -24,7 +24,6 @@ import HuesFields from 'components/HuesFields'
 import Logo from 'components/Logo'
 import PresetsMenu from 'components/PresetsMenu'
 import { useMagicRouter } from 'hooks/useMagicRouter'
-import { useMemoHues } from 'hooks/useMemoHues'
 import {
   useCallback,
   useEffect,
@@ -105,7 +104,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
         import(/* webpackIgnore: true */ url.toString()),
         import('utils/applyHues'),
       ])
-
     return { createTheme, initialHues: applyHues(partialHues) }
   }, [preset.url])
   // used by useMemoHues, is updated by local state when syncing
@@ -242,55 +240,27 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                       View
                     </Label>
                     <Card paddingY={2}>
-                      <MenuButton
-                        button={
-                          <Button
-                            fontSize={1}
-                            paddingY={2}
-                            paddingX={3}
-                            tone="default"
-                            mode="ghost"
-                            icon={
-                              view === 'default'
-                                ? MasterDetailIcon
-                                : SplitVerticalIcon
-                            }
-                            text={
-                              view === 'default' ? 'Default' : 'Split-screen'
-                            }
-                          />
+                      <Button
+                        fontSize={1}
+                        paddingY={2}
+                        paddingX={3}
+                        tone="default"
+                        mode="ghost"
+                        icon={
+                          view === 'default'
+                            ? SplitVerticalIcon
+                            : MasterDetailIcon
                         }
-                        id="view"
-                        menu={
-                          <Menu>
-                            <MenuItem
-                              icon={MasterDetailIcon}
-                              text={
-                                view === 'default'
-                                  ? 'Default'
-                                  : 'Switch back to default'
-                              }
-                              disabled={view === 'default'}
-                              onClick={() =>
-                                startTransition(() => setView('default'))
-                              }
-                            />
-                            <MenuItem
-                              icon={SplitVerticalIcon}
-                              text={
-                                view === 'split'
-                                  ? 'Split-screen'
-                                  : 'Switch to split-screen'
-                              }
-                              disabled={view === 'split'}
-                              onClick={() =>
-                                startTransition(() => setView('split'))
-                              }
-                            />
-                          </Menu>
+                        text={
+                          view === 'default' ? 'Split-screen' : 'Full-screen'
                         }
-                        placement="right"
-                        popover={{ portal: true }}
+                        onClick={() =>
+                          startTransition(() =>
+                            setView((view) =>
+                              view === 'default' ? 'split' : 'default'
+                            )
+                          )
+                        }
                       />
                     </Card>
                   </Card>
@@ -327,6 +297,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                         menu={
                           <Menu>
                             <MenuItem
+                              fontSize={1}
+                              paddingY={2}
+                              paddingX={3}
                               icon={DesktopIcon}
                               text="System"
                               disabled={forceScheme === null}
@@ -335,6 +308,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               }
                             />
                             <MenuItem
+                              fontSize={1}
+                              paddingY={2}
+                              paddingX={3}
                               icon={SunIcon}
                               text="Light"
                               disabled={forceScheme === 'light'}
@@ -343,6 +319,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               }
                             />
                             <MenuItem
+                              fontSize={1}
+                              paddingY={2}
+                              paddingX={3}
                               icon={MoonIcon}
                               text="Dark"
                               disabled={forceScheme === 'dark'}

@@ -78,14 +78,12 @@ const HueFields = memo(function HueFields({
 
   // Sync when another preset is loaded
   useEffect(() => {
-    startTransition(() => {
-      setHue(initialHue)
-      setLightest(initialHue.lightest)
-      setMid(initialHue.mid)
-      setDarkest(initialHue.darkest)
-      setMidPoint(`${initialHue.midPoint}`)
-    })
-  }, [initialHue, startTransition])
+    setHue(initialHue)
+    setLightest(initialHue.lightest)
+    setMid(initialHue.mid)
+    setDarkest(initialHue.darkest)
+    setMidPoint(`${initialHue.midPoint}`)
+  }, [initialHue])
 
   // Sync with onChange, parent comp have to implement startTransition on their end
   useEffect(() => {
@@ -99,7 +97,7 @@ const HueFields = memo(function HueFields({
   50 100 200 ---- 800 900 950
    */
 
-  const midRangeId = `${name}-mid-range-${useId()}`
+  const midRangeId = `${tone}-mid-range-${useId()}`
   const colorStyle = {
     boxSizing: 'border-box',
     background: 'var(--card-border-color)',
@@ -112,42 +110,11 @@ const HueFields = memo(function HueFields({
 
   return (
     <Card paddingTop={4} paddingX={4} paddingBottom={2} tone={tone} shadow={1}>
-      <Text size={2} weight="medium" muted autoCapitalize="">
+      <Text size={2} weight="medium" muted style={{textTransform: 'capitalize'}}>
         {tone}
       </Text>
       <Grid columns={[1, 3]} paddingTop={4}>
-        <Card tone={tone}>
-          <Label muted size={0}>
-            Lightest
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              type="color"
-              style={colorStyle as any}
-              value={lightest}
-              onChange={(event) => {
-                const { value } = event.target
-
-                setLightest(value)
-                prepareTransition()
-                startTransition(() => {
-                  if (isColor(value)) {
-                    setHue((hue) => ({ ...hue, lightest: value }))
-                  }
-                })
-              }}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {hue.lightest}
-            </Text>
-          </Card>
-        </Card>
-        <Card tone={tone}>
+        <Card tone={tone} key="mid">
           <Label muted size={0}>
             Mid
           </Label>
@@ -156,7 +123,7 @@ const HueFields = memo(function HueFields({
               name={`${tone}-mid`}
               type="color"
               style={colorStyle as any}
-              value={mid}
+              value={mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid}
               onChange={(event) => {
                 const { value } = event.target
 
@@ -179,7 +146,42 @@ const HueFields = memo(function HueFields({
             </Text>
           </Card>
         </Card>
-        <Card tone={tone}>
+        <Card tone={tone} key="lightest">
+          <Label muted size={0}>
+            Lightest
+          </Label>
+          <Card paddingY={2} tone={tone}>
+            <input
+              type="color"
+              style={colorStyle as any}
+              value={
+                lightest.length === 4
+                  ? `${lightest}${lightest.replace(/^#/, '')}`
+                  : lightest
+              }
+              onChange={(event) => {
+                const { value } = event.target
+
+                setLightest(value)
+                prepareTransition()
+                startTransition(() => {
+                  if (isColor(value)) {
+                    setHue((hue) => ({ ...hue, lightest: value }))
+                  }
+                })
+              }}
+            />
+            <Text
+              as="output"
+              muted
+              size={0}
+              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+            >
+              {hue.lightest}
+            </Text>
+          </Card>
+        </Card>
+        <Card tone={tone} key="darkest">
           <Label muted size={0}>
             Darkest
           </Label>
@@ -188,7 +190,11 @@ const HueFields = memo(function HueFields({
               name={`${tone}-darkest`}
               type="color"
               style={colorStyle as any}
-              value={darkest}
+              value={
+                darkest.length === 4
+                  ? `${darkest}${darkest.replace(/^#/, '')}`
+                  : darkest
+              }
               onChange={(event) => {
                 const { value } = event.target
 

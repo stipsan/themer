@@ -39,6 +39,7 @@ import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
+import { roundMidPointToScale } from 'utils/roundMidPointToScale'
 import type { Hue, ThemePreset } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
@@ -125,6 +126,19 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     () => createTheme(memoHues),
     [memoHues, createTheme]
   )
+
+  // Backup hue edits to the current URL
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('preset', preset.slug)
+  url.searchParams.set('default', `${memoHues.default.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.default.midPoint)};lightest:${memoHues.default.lightest.replace(/^#/, '')};darkest:${memoHues.default.darkest.replace(/^#/,'')}`)
+  url.searchParams.set('primary', `${memoHues.primary.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.primary.midPoint)};lightest:${memoHues.primary.lightest.replace(/^#/, '')};darkest:${memoHues.primary.darkest.replace(/^#/,'')}`)
+  url.searchParams.set('transparent', `${memoHues.transparent.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.transparent.midPoint)};lightest:${memoHues.transparent.lightest.replace(/^#/, '')};darkest:${memoHues.transparent.darkest.replace(/^#/,'')}`)
+  url.searchParams.set('positive', `${memoHues.positive.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.positive.midPoint)};lightest:${memoHues.positive.lightest.replace(/^#/, '')};darkest:${memoHues.positive.darkest.replace(/^#/,'')}`)
+  url.searchParams.set('caution', `${memoHues.caution.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.caution.midPoint)};lightest:${memoHues.caution.lightest.replace(/^#/, '')};darkest:${memoHues.caution.darkest.replace(/^#/,'')}`)
+  url.searchParams.set('critical', `${memoHues.critical.mid.replace(/^#/, '')};${roundMidPointToScale(memoHues.critical.midPoint)};lightest:${memoHues.critical.lightest.replace(/^#/, '')};darkest:${memoHues.critical.darkest.replace(/^#/,'')}`)
+  window.history.replaceState({}, '', decodeURIComponent(url.href))
+  },[memoHues, preset.slug])
 
   const [view, setView] = useState<'default' | 'split'>('default')
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(

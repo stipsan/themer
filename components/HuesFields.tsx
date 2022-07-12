@@ -12,6 +12,7 @@ import {
   Text,
   Tooltip,
 } from '@sanity/ui'
+import { useRouter } from 'next/router'
 import { mix } from 'polished'
 import {
   type TransitionStartFunction,
@@ -21,6 +22,7 @@ import {
   useState,
 } from 'react'
 import styled from 'styled-components'
+import { backupState } from 'utils/backupState'
 import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import type { Hue, Hues } from 'utils/types'
@@ -80,6 +82,7 @@ const HueFields = memo(function HueFields({
   startTransition: TransitionStartFunction
   prepareTransition: () => void
 }) {
+  const router = useRouter()
   // Fast state for intenral use, for inputs, range drags, the color picker etc
   const [lightest, setLightest] = useState(() => initialHue.lightest)
   const [mid, setMid] = useState(() => initialHue.mid)

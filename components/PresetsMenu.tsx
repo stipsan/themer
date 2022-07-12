@@ -137,7 +137,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
       url.searchParams.set('min', '1')
     }
 
-    return url.toString()
+    return decodeURIComponent(url.toString())
   }, [searchParams])
 
   const esmUrl = useMemo(() => {
@@ -149,7 +149,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
       url.searchParams.set('min', '1')
     }
 
-    return url.toString()
+    return decodeURIComponent(url.toString())
   }, [searchParams])
 
   return (

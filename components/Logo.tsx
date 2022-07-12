@@ -1,5 +1,5 @@
 import { animate, spring } from 'motion'
-import { type Ref, forwardRef, memo, useEffect, useRef, useState } from 'react'
+import { type Ref, forwardRef, memo, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 const ColorWheel = forwardRef(function ColorWheel(
@@ -1513,7 +1513,7 @@ function Logo({ spin, transition }: Props) {
   const logoRef = useRef(null)
 
   useEffect(() => {
-    if (wheelRef.current) {
+    if (wheelRef.current && logoRef.current) {
       if (spin || transition) {
         console.count('spin')
         console.log(spin, { transition }, 'start')
@@ -1525,14 +1525,19 @@ function Logo({ spin, transition }: Props) {
           wheelRef.current,
           { rotate: transition ? -rewind : forward },
           {
-            direction: transition ? 'alternate' : undefined,
-            repeat: transition ? Infinity : 0,
+            // direction: transition ? 'alternate' : undefined,
             easing: spring({ stiffness: 70 }),
           }
+        )
+        const animation2 = animate(
+          logoRef.current,
+          { scale: transition ? 0.9 : 1 },
+          { easing: spring({ stiffness: 70 }) }
         )
         return () => {
           if (transition) {
             animation.stop()
+            animation2.reverse()
           }
         }
       }

@@ -164,7 +164,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)
 
-  const [spins, setSpin] = useState(0)
+  const [spins, setSpin] = useState(1)
   const spin = useCallback(
     () => startTransition(() => setSpin((spins) => ++spins)),
     []

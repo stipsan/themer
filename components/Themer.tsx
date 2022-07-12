@@ -1,4 +1,3 @@
-import { COLOR_TINTS } from '@sanity/color'
 import {
   DesktopIcon,
   MasterDetailIcon,
@@ -29,7 +28,6 @@ import { useMemoHues } from 'hooks/useMemoHues'
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -118,7 +116,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     startTransition(() => setHuesState(initialHues))
   }, [initialHues])
   // Properly memoize the hues state before passing it to the theme creator
-  const memoHues = useMemoHues(huesState)
+  // const memoHues = useMemoHues(huesState)
+  // Test if the JSON stringify and parsing is too costly
+  const memoHues = huesState
   // Now we can create the theme from the memoed hues
   const themeFromHues = useMemo(
     () => createTheme(memoHues),
@@ -194,90 +194,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     }
   }, [])
 
-  /*
-  // Probably replace ALL of this with startTransition
-  const throttleRef = useRef(0)
-  const scheduleHuesUpdate = useCallback(() => {
-    if (typeof cancelIdleCallback === 'function') {
-      cancelIdleCallback(throttleRef.current)
-    } else {
-      cancelAnimationFrame(throttleRef.current)
-    }
-    const scheduledUpdate = () => {
-      if (!formRef.current) {
-        throw new Error('No form ref')
-      }
-
-      const searchParams = new URLSearchParams()
-      const formData = new FormData(formRef.current)
-
-      function createSearchParam(key: string, formData: FormData): string {
-        const parts = []
-
-        if (formData.has(`${key}-mid`)) {
-          const mid = formData.get(`${key}-mid`).toString().replace(/^#/, '')
-          parts.push(mid)
-        }
-
-        if (formData.has(`${key}-midPoint`)) {
-          const midPoint = roundToScale(
-            Number(formData.get(`${key}-midPoint`).toString())
-          )
-          parts.push(midPoint)
-        }
-
-        if (formData.has(`${key}-lightest`)) {
-          const lightest = formData
-            .get(`${key}-lightest`)
-            .toString()
-            .replace(/^#/, 'lightest:')
-          parts.push(lightest)
-        }
-
-        if (formData.has(`${key}-darkest`)) {
-          const darkest = formData
-            .get(`${key}-darkest`)
-            .toString()
-            .replace(/^#/, 'darkest:')
-          parts.push(darkest)
-        }
-
-        return parts.join(';')
-      }
-
-      const defaultParam = createSearchParam('default', formData)
-      const primaryParam = createSearchParam('primary', formData)
-      const transparentParam = createSearchParam('transparent', formData)
-      const positiveParam = createSearchParam('positive', formData)
-      const cautionParam = createSearchParam('caution', formData)
-      const negativeParam = createSearchParam('negative', formData)
-
-      if (defaultParam) searchParams.set('default', defaultParam)
-      if (primaryParam) searchParams.set('primary', primaryParam)
-      if (transparentParam) searchParams.set('transparent', transparentParam)
-      if (positiveParam) searchParams.set('positive', positiveParam)
-      if (cautionParam) searchParams.set('caution', cautionParam)
-      if (negativeParam) searchParams.set('negative', negativeParam)
-
-      const url = new URL(
-        `/api/hues?${decodeURIComponent(searchParams.toString())}`,
-        location.origin
-      )
-      // startTransition(() => setThemeUrlToBeRefactored(url.toString()))
-    }
-
-    if (typeof requestIdleCallback === 'function') {
-      throttleRef.current = requestIdleCallback(scheduledUpdate, {
-        timeout: 1000,
-      })
-    } else {
-      throttleRef.current = requestAnimationFrame(scheduledUpdate)
-    }
-  }, [])
-  // */
-
-  const formRef = useRef(null)
-
   return (
     <>
       <Head
@@ -292,14 +208,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
         >
           <StyledGrid columns={[1, 1]} height="fill">
             <Card
-              as="form"
-              ref={formRef}
-              onChange={(event) => {
-                spin()
-              }}
-              onSubmit={(event) => {
-                event.preventDefault()
-              }}
               height="fill"
               overflow="auto"
               scheme={scheme}

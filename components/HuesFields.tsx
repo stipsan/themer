@@ -1,50 +1,17 @@
 import { COLOR_TINTS } from '@sanity/color'
-import {
-  DesktopIcon,
-  MasterDetailIcon,
-  MoonIcon,
-  SplitVerticalIcon,
-  SunIcon,
-} from '@sanity/icons'
-import {
-  type CardTone,
-  type ThemeColorSchemeKey,
-  Button,
-  Card,
-  Grid,
-  Label,
-  Menu,
-  MenuButton,
-  MenuItem,
-  Text,
-  ThemeProvider,
-  useElementRect,
-} from '@sanity/ui'
-import Head from 'components/Head'
-import Logo from 'components/Logo'
-import PresetsMenu from 'components/PresetsMenu'
-import { useMagicRouter } from 'hooks/useMagicRouter'
-import { useMemoHues } from 'hooks/useMemoHues'
+import { type CardTone, Card, Grid, Label, Text } from '@sanity/ui'
 import {
   type TransitionStartFunction,
   memo,
-  useCallback,
   useEffect,
   useId,
-  useMemo,
-  useRef,
   useState,
-  useTransition,
 } from 'react'
-import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
-import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
-import { suspend } from 'suspend-react'
 import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
-import type { Hue, Hues, ThemePreset } from 'utils/types'
+import type { Hue, Hues } from 'utils/types'
 
-const SIDEBAR_WIDTH = 300
 const RENDER_TONES = [
   'default',
   'primary',
@@ -247,7 +214,7 @@ const HueFields = memo(function HueFields({
       </Grid>
       <Card tone={tone} paddingTop={3}>
         <Label muted size={0}>
-          Mid point ({roundToScale(hue.midPoint)})
+          Mid point ({roundToScale(Number(midPoint))})
         </Label>
         <Card paddingY={2} tone={tone}>
           <StyledRange

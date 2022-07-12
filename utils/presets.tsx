@@ -17,9 +17,8 @@ export const pinkSynth: ThemePreset = {
 export const twCyan: ThemePreset = {
   slug: 'tw-cyan',
   title: 'Tailwind Cyan',
-  url: '/api/hues?default=677389;500;lightest:f9fafb;darkest:101728&primary=51b4d0;500;lightest:effefe;darkest:264d61&transparent=6b727f;500;lightest:f8fafb;darkest:131826&positive=55b785;500;lightest:eefdf5;darkest:214d3b&caution=e2b53e;500;lightest:fefbea;darkest:69411b&critical=e14f62;500;lightest:fdf2f2;darkest:7d2037&min=1'
+  url: '/api/hues?default=677389;500;lightest:f9fafb;darkest:101728&primary=51b4d0;500;lightest:effefe;darkest:264d61&transparent=6b727f;500;lightest:f8fafb;darkest:131826&positive=55b785;500;lightest:eefdf5;darkest:214d3b&caution=e2b53e;500;lightest:fefbea;darkest:69411b&critical=e14f62;500;lightest:fdf2f2;darkest:7d2037&min=1',
 }
-
 
 export const presets: ThemePreset[] = [defaultPreset, pinkSynth, twCyan]
 

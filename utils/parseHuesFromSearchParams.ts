@@ -2,6 +2,7 @@ import type { PartialDeep } from 'type-fest'
 import { isMidPoint } from 'utils/isMidPoint'
 import type { Hue, Hues } from 'utils/types'
 import { ValidationError } from 'utils/ValidationError'
+import { roundMidPointToScale } from './roundMidPointToScale'
 
 export function parseHuesFromSearchParams(
   searchParams: URLSearchParams
@@ -50,7 +51,7 @@ function parseHue(
   }
   for (const param of params) {
     const maybeMid = `#${param}`
-    const maybeMidPoint = Number(param)
+    const maybeMidPoint = roundMidPointToScale(Number(param))
 
     switch (true) {
       case param === '':

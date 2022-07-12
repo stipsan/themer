@@ -405,37 +405,43 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                         id="view"
                         menu={
                           <Menu>
-                            {preset === 'custom' && <>
-                            <MenuItem
-                              key="custom"
-                              icon={MasterDetailIcon}
-                              text="Custom"
-                            />
-                            <MenuDivider />
-                            </>}
-                            {Object.values(presets).map(({slug, icon, title, url}) => (
-                              <MenuItem
-                                key={slug}
-                                disabled={preset === slug}
-                                // @TODO React.lazy these icons
-                                icon={
-                                  icon ??
-                                  slug === 'pink-synth-wave'
-                                    ? SynthWaveIcon
-                                    : slug === 'default'
-                                    ? MasterDetailIcon
-                                    : undefined
-                                }
-                                text={title}
-                                onClick={() => {
-                                  startTransition(() => {
-                                    setPreset(slug)
-                                    const themeUrl = new URL(url, location.origin)
-                                    setThemeUrl(themeUrl.toString())
-                                  })
-                                }}
-                              />
-                            ))}
+                            {preset === 'custom' && (
+                              <>
+                                <MenuItem
+                                  key="custom"
+                                  icon={MasterDetailIcon}
+                                  text="Custom"
+                                />
+                                <MenuDivider />
+                              </>
+                            )}
+                            {Object.values(presets).map(
+                              ({ slug, icon, title, url }) => (
+                                <MenuItem
+                                  key={slug}
+                                  disabled={preset === slug}
+                                  // @TODO React.lazy these icons
+                                  icon={
+                                    icon ?? slug === 'pink-synth-wave'
+                                      ? SynthWaveIcon
+                                      : slug === 'default'
+                                      ? MasterDetailIcon
+                                      : undefined
+                                  }
+                                  text={title}
+                                  onClick={() => {
+                                    startTransition(() => {
+                                      setPreset(slug)
+                                      const themeUrl = new URL(
+                                        url,
+                                        location.origin
+                                      )
+                                      setThemeUrl(themeUrl.toString())
+                                    })
+                                  }}
+                                />
+                              )
+                            )}
                           </Menu>
                         }
                         placement="right"

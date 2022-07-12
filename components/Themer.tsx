@@ -15,16 +15,17 @@ import {
   Label,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   Text,
   ThemeProvider,
   useElementRect,
 } from '@sanity/ui'
 import Head from 'components/Head'
+import HuesFields from 'components/HuesFields'
 import Logo from 'components/Logo'
 import PresetsMenu from 'components/PresetsMenu'
 import { useMagicRouter } from 'hooks/useMagicRouter'
+import { useMemoHues } from 'hooks/useMemoHues'
 import {
   useCallback,
   useEffect,
@@ -38,20 +39,9 @@ import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
-import { presets } from 'utils/presets'
 import type { Hue, ThemePreset } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
-const RENDER_TONES = [
-  'default',
-  'primary',
-  'transparent',
-  'positive',
-  'caution',
-  'critical',
-] as const
-
-
 
 // Trying to impress Snorre with my 1337 CSS haxxor
 const FixNavDrawerPosition = styled(Card)`
@@ -110,27 +100,41 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   const [preset, setPreset] = useState(() => initialPreset)
   const [transition, startTransition] = useTransition()
 
-  const magic = suspend(async () => {
+  const { createTheme, initialHues } = suspend(async () => {
     const url = new URL(preset.url, location.origin)
-    const [{ hues, theme }, { applyHues }] = await Promise.all([
-      import(/* webpackIgnore: true */ url.toString()),
-      import('utils/applyHues'),
-    ])
+    const [{ createTheme, hues: partialHues }, { applyHues }] =
+      await Promise.all([
+        import(/* webpackIgnore: true */ url.toString()),
+        import('utils/applyHues'),
+      ])
 
-    return { hues: applyHues(hues), theme }
+    return { createTheme, initialHues: applyHues(partialHues) }
   }, [preset.url])
+  // used by useMemoHues, is updated by local state when syncing
+  const [huesState, setHuesState] = useState(initialHues)
+
+  // Reset the Hues state when loading a preset on demand
+  useEffect(() => {
+    startTransition(() => setHuesState(initialHues))
+  }, [initialHues])
+  // Properly memoize the hues state before passing it to the theme creator
+  const memoHues = useMemoHues(huesState)
+  // Now we can create the theme from the memoed hues
+  const themeFromHues = useMemo(
+    () => createTheme(memoHues),
+    [memoHues, createTheme]
+  )
 
   const [view, setView] = useState<'default' | 'split'>('default')
-
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(
     null
   )
   const scheme = forceScheme ?? systemScheme
 
   const history = useMagicRouter('/')
-  const theme = useMemo(() => {
+  const previewTheme = useMemo(() => {
     return {
-      ...magic.theme,
+      ...themeFromHues,
       // Adjust media queries to fit the sidebar
       media:
         view === 'split'
@@ -151,11 +155,10 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
               2400,
             ],
     }
-  }, [magic.theme, view])
-  console.log({ theme })
+  }, [themeFromHues, view])
   const blogConfig = useMemo(
-    () => ({ ...blog, theme, scheme }),
-    [theme, scheme]
+    () => ({ ...blog, theme: previewTheme, scheme }),
+    [previewTheme, scheme]
   )
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)
@@ -165,6 +168,34 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     () => startTransition(() => setSpin((spins) => ++spins)),
     []
   )
+
+  // startTransition alone is not enough, so we use a combo of requestIdleCallback if available, with a fallback to requestAnimationFrame
+  // This is to avoid as much main thread jank as we can, while keeping the color picking experience as fast and delightful as the hardware allows
+  const throttleRef = useRef(0)
+
+  const onHuesChange = useCallback((tone: CardTone, hue: Hue) => {
+    if (typeof cancelIdleCallback === 'function') {
+      cancelIdleCallback(throttleRef.current)
+    } else {
+      cancelAnimationFrame(throttleRef.current)
+    }
+    const scheduledUpdate = () => {
+      startTransition(() => {
+        setHuesState((prev) => ({ ...prev, [tone]: hue }))
+      })
+    }
+
+    if (typeof requestIdleCallback === 'function') {
+      throttleRef.current = requestIdleCallback(scheduledUpdate, {
+        timeout: 1000,
+      })
+    } else {
+      throttleRef.current = requestAnimationFrame(scheduledUpdate)
+    }
+  }, [])
+
+  /*
+  // Probably replace ALL of this with startTransition
   const throttleRef = useRef(0)
   const scheduleHuesUpdate = useCallback(() => {
     if (typeof cancelIdleCallback === 'function') {
@@ -243,21 +274,17 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
       throttleRef.current = requestAnimationFrame(scheduledUpdate)
     }
   }, [])
+  // */
 
   const formRef = useRef(null)
-  // console.log(useRouter().query)
-  console.log('uglyHackRect', { uglyHackRect, uglyHackRef })
-  const [resetHueFields, setResetHueFields] = useState(0)
-
-  console.log('formRef', formRef.current)
 
   return (
     <>
       <Head
-        lightest={theme.color.light.default.base.bg}
-        darkest={theme.color.dark.default.base.bg}
+        lightest={previewTheme.color.light.default.base.bg}
+        darkest={previewTheme.color.dark.default.base.bg}
       />
-      <ThemeProvider theme={theme} scheme={scheme}>
+      <ThemeProvider theme={previewTheme} scheme={scheme}>
         <Card
           height="fill"
           tone="transparent"
@@ -269,8 +296,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
               ref={formRef}
               onChange={(event) => {
                 spin()
-                console.log('form onchange', event)
-                scheduleHuesUpdate()
               }}
               onSubmit={(event) => {
                 event.preventDefault()
@@ -425,17 +450,19 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                     </Card>
                   </Card>
                 </Grid>
-                <PresetsMenu selected={preset} onChange={(nextPreset) => startTransition(() => setPreset(nextPreset))} />
+                <PresetsMenu
+                  selected={preset}
+                  onChange={(nextPreset) =>
+                    startTransition(() => setPreset(nextPreset))
+                  }
+                />
                 <Card height="fill" paddingY={1}>
-                  {RENDER_TONES.map((key) => {
-                    return (
-                      <HueFields
-                        key={key}
-                        config={magic.hues[key]}
-                        tone={key}
-                      />
-                    )
-                  })}
+                  <HuesFields
+                    initialHues={initialHues}
+                    startTransition={startTransition}
+                    prepareTransition={spin}
+                    onChange={onHuesChange}
+                  />
                 </Card>
               </Card>
             </Card>
@@ -490,7 +517,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   <ThemeProvider
                     // Workaround media queries not updating by changing the key
                     // key={view === 'split' ? 'light' : 'default'}
-                    theme={theme}
+                    theme={previewTheme}
                     scheme={view === 'split' ? 'light' : scheme}
                   >
                     <StudioLayout />
@@ -507,7 +534,11 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                     // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
                   >
                     <SyncColorScheme forceScheme="dark" />
-                    <ThemeProvider key="dark" theme={theme} scheme="dark">
+                    <ThemeProvider
+                      key="dark"
+                      theme={previewTheme}
+                      scheme="dark"
+                    >
                       <StudioLayout />
                     </ThemeProvider>
                   </StudioProvider>
@@ -519,187 +550,4 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
       </ThemeProvider>
     </>
   )
-}
-
-function HueFields({ config, tone }: { config: Hue; tone: CardTone }) {
-  /**
-   * Default
-  
-  Tones preview
-  50 100 200 ---- 800 900 950
-   */
-
-  const midRangeId = `${name}-mid-range-${useId()}`
-  const colorStyle = {
-    boxSizing: 'border-box',
-    background: 'var(--card-border-color)',
-    border: '1px solid var(--card-border-color)',
-    borderRadius: '2px',
-    padding: '0px 2px',
-    appearance: 'none',
-    margin: 0,
-  }
-
-  return (
-    <Card paddingTop={4} paddingX={4} paddingBottom={2} tone={tone} shadow={1}>
-      <Text size={2} weight="medium" muted autoCapitalize="">
-        {tone}
-      </Text>
-      <Grid columns={[1, 3]} paddingTop={4}>
-        <Card tone={tone}>
-          <Label muted size={0}>
-            Lightest
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              name={`${tone}-lightest`}
-              type="color"
-              defaultValue={config.lightest}
-              style={colorStyle as any}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {config.lightest}
-            </Text>
-          </Card>
-        </Card>
-        <Card tone={tone}>
-          <Label muted size={0}>
-            Mid
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              name={`${tone}-mid`}
-              type="color"
-              defaultValue={config.mid}
-              style={colorStyle as any}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {config.mid}
-            </Text>
-          </Card>
-        </Card>
-        <Card tone={tone}>
-          <Label muted size={0}>
-            Darkest
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              name={`${tone}-darkest`}
-              type="color"
-              defaultValue={config.darkest}
-              style={colorStyle as any}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {config.darkest}
-            </Text>
-          </Card>
-        </Card>
-      </Grid>
-      <Card tone={tone} paddingTop={3}>
-        <Label muted size={0}>
-          Mid point ({roundToScale(config.midPoint)})
-        </Label>
-        <Card paddingY={2} tone={tone}>
-          <StyledRange
-            name={`${tone}-midPoint`}
-            // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
-            type="range"
-            min={50}
-            max={950}
-            defaultValue={config.midPoint}
-            list={midRangeId}
-            onPointerUp={(event) => {
-              event.currentTarget.value = roundToScale(
-                event.currentTarget.value as any
-              ) as any
-            }}
-            onBlur={(event) => {
-              event.currentTarget.value = roundToScale(
-                event.currentTarget.value as any
-              ) as any
-            }}
-          />
-          <datalist id={midRangeId}>
-            {COLOR_TINTS.map((tint) => (
-              <option key={tint} value={tint} />
-            ))}
-          </datalist>
-        </Card>
-      </Card>
-    </Card>
-  )
-}
-
-const StyledRange = styled.input`
-  accent-color: var(--card-focus-ring-color, currentColor);
-  width: 100%;
-
-  &::-webkit-slider-runnable-track {
-    border-color: var(--card-focus-ring-color, currentColor);
-  }
-  &[type='range']::-webkit-slider-thumb {
-    border-color: var(--card-focus-ring-color, currentColor);
-    background-color: var(--card-focus-ring-color, currentColor);
-  }
-`
-
-/*
-// @TODO revisit later
-// Using .attrs to fool the type checker as @sanity/ui isn't prepared to style it
-// No worries, we're styling it here
-const ColorInput = styled(TextInput).attrs({ type: 'color' as 'text' })`
-flex: none;
-padding: 0;
-background: red
-
-&&[type="color"] {
-  ${({theme}) => {
-    console.log('theme from func', theme)
-    return `
-    --size-diff-positive: ${theme.sanity.color.solid.positive.enabled.bg};
-    --size-diff-negative: ${theme.sanity.color.solid.critical.enabled.bg};
-    --input-fg-color: ${theme.sanity.color.input.default.enabled.fg};
-    --input-placeholder-color: ${theme.sanity.color.input.default.enabled.placeholder};
-  `
-  }}
-	-webkit-appearance: none;
-	border: none;
-	width: 32px;
-	height: 32px;
-  padding: 1px;
-}
-& [type="color"]::-webkit-color-swatch-wrapper {
-	padding: 0;
-}
-& [type="color"]::-webkit-color-swatch {
-	border: none; 
-}
-`
-
-// */
-
-function roundToScale(value: number): number {
-  if (value < 75) {
-    return 50
-  }
-  if (value > 925) {
-    return 950
-  }
-
-  return Math.round(value / 100) * 100
 }

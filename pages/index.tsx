@@ -52,7 +52,8 @@ export default function Index() {
       const slug = initialParams.has('preset')
         ? initialParams.get('preset')
         : null
-      const inheritFrom = presets.find((preset) => preset.slug === slug) || defaultPreset
+      const inheritFrom =
+        presets.find((preset) => preset.slug === slug) || defaultPreset
       const searchParams = new URLSearchParams(inheritFrom.url)
       if (process.env.NODE_ENV === 'production') searchParams.set('min', '1')
 

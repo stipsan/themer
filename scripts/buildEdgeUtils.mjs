@@ -105,16 +105,20 @@ const buildTemplateString = async () => {
     return hex
   }
 
-  export const hues = process.env.__HUES__
+export const hues = process.env.__HUES__
   
-  export const theme = themeFromHues({
-    hues, 
+export function createTheme(_hues) {
+  return themeFromHues({
+    hues: _hues, 
     studioTheme,
     multiply,
     screen,
     rgba,
     createColorTheme,
   })
+}
+
+  export const theme = createTheme(hues)
   `,
     resolveDir,
     loader: 'ts',

@@ -49,58 +49,58 @@ const SynthWaveIcon = styled(MusicNoteIcon)`
 // @TODO React.lazy these icons
 const iconFromSlug = (slug: string) => {
   return slug === 'pink-synth-wave'
-  ? SynthWaveIcon
-  : slug === 'default'
-  ? MasterDetailIcon
-  : undefined
+    ? SynthWaveIcon
+    : slug === 'default'
+    ? MasterDetailIcon
+    : undefined
 }
-
 
 interface Props {
   onChange: (preset: ThemePreset) => void
   selected: ThemePreset
 }
-export default function PresetsMenu({selected, onChange}: Props) {
-  return <Card>
-  <Card paddingX={[4]} paddingBottom={2}>
-    <Label htmlFor="presets" size={0} muted>
-      Presets
-    </Label>
-    <Card paddingY={2}>
-      <MenuButton
-        button={
-          <Button
-            fontSize={1}
-            paddingY={2}
-            paddingX={3}
-            tone="default"
-            mode="ghost"
-            icon={selected.icon ?? iconFromSlug(selected.slug)}
-            text={selected.title}
+export default function PresetsMenu({ selected, onChange }: Props) {
+  return (
+    <Card>
+      <Card paddingX={[4]} paddingBottom={2}>
+        <Label htmlFor="presets" size={0} muted>
+          Presets
+        </Label>
+        <Card paddingY={2}>
+          <MenuButton
+            button={
+              <Button
+                fontSize={1}
+                paddingY={2}
+                paddingX={3}
+                tone="default"
+                mode="ghost"
+                icon={selected.icon ?? iconFromSlug(selected.slug)}
+                text={selected.title}
+              />
+            }
+            id="view"
+            menu={
+              <Menu>
+                {presets.map((_preset) => {
+                  const { slug, icon, title } = _preset
+                  return (
+                    <MenuItem
+                      key={slug}
+                      disabled={selected.slug === slug}
+                      icon={icon ?? iconFromSlug(slug)}
+                      text={title}
+                      onClick={() => void onChange(_preset)}
+                    />
+                  )
+                })}
+              </Menu>
+            }
+            placement="right"
+            popover={{ portal: true }}
           />
-        }
-        id="view"
-        menu={
-          <Menu>
-            {presets.map((_preset) => {
-              const {slug, icon, title} = _preset
-              return (
-                <MenuItem
-                  key={slug}
-                  disabled={selected.slug === slug}
-                  icon={icon ?? iconFromSlug(slug)
-                  }
-                  text={title}
-                  onClick={() => void onChange(_preset)}
-                />
-              )
-            })}
-          </Menu>
-        }
-        placement="right"
-        popover={{ portal: true }}
-      />
+        </Card>
+      </Card>
     </Card>
-  </Card>
-</Card>
+  )
 }

@@ -107,7 +107,7 @@ function assertValidColor(input: string) {
   }
   throw new ValidationError(`Invalid color: ${input}`)
 }
-const isColor = (input: string) =>
+export const isColor = (input: string) =>
   Boolean(input.match(/^#(?:[0-9a-f]{3}){1,2}$/i))
 
 function assertValidMidPoint(input: number): Hue['midPoint'] {

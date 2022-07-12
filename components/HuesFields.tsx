@@ -1,5 +1,18 @@
-import { COLOR_TINTS } from '@sanity/color'
-import { type CardTone, Card, Grid, Label, Text } from '@sanity/ui'
+import {
+  type ColorHueConfig,
+  type ColorTints,
+  COLOR_TINTS,
+} from '@sanity/color'
+import {
+  type CardTone,
+  Box,
+  Card,
+  Grid,
+  Label,
+  Text,
+  Tooltip,
+} from '@sanity/ui'
+import { mix } from 'polished'
 import {
   type TransitionStartFunction,
   memo,
@@ -109,159 +122,267 @@ const HueFields = memo(function HueFields({
   }
 
   return (
-    <Card paddingTop={4} paddingX={4} paddingBottom={2} tone={tone} shadow={1}>
-      <Text size={2} weight="medium" muted style={{textTransform: 'capitalize'}}>
-        {tone}
-      </Text>
-      <Grid columns={[1, 3]} paddingTop={4}>
-        <Card tone={tone} key="mid">
-          <Label muted size={0}>
-            Mid
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              name={`${tone}-mid`}
-              type="color"
-              style={colorStyle as any}
-              value={mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid}
-              onChange={(event) => {
-                const { value } = event.target
-
-                setMid(value)
-                prepareTransition()
-                startTransition(() => {
-                  if (isColor(value)) {
-                    setHue((hue) => ({ ...hue, mid: value }))
-                  }
-                })
-              }}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {hue.mid}
-            </Text>
-          </Card>
-        </Card>
-        <Card tone={tone} key="lightest">
-          <Label muted size={0}>
-            Lightest
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              type="color"
-              style={colorStyle as any}
-              value={
-                lightest.length === 4
-                  ? `${lightest}${lightest.replace(/^#/, '')}`
-                  : lightest
-              }
-              onChange={(event) => {
-                const { value } = event.target
-
-                setLightest(value)
-                prepareTransition()
-                startTransition(() => {
-                  if (isColor(value)) {
-                    setHue((hue) => ({ ...hue, lightest: value }))
-                  }
-                })
-              }}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {hue.lightest}
-            </Text>
-          </Card>
-        </Card>
-        <Card tone={tone} key="darkest">
-          <Label muted size={0}>
-            Darkest
-          </Label>
-          <Card paddingY={2} tone={tone}>
-            <input
-              name={`${tone}-darkest`}
-              type="color"
-              style={colorStyle as any}
-              value={
-                darkest.length === 4
-                  ? `${darkest}${darkest.replace(/^#/, '')}`
-                  : darkest
-              }
-              onChange={(event) => {
-                const { value } = event.target
-
-                setDarkest(value)
-                prepareTransition()
-                startTransition(() => {
-                  if (isColor(value)) {
-                    setHue((hue) => ({ ...hue, darkest: value }))
-                  }
-                })
-              }}
-            />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {hue.darkest}
-            </Text>
-          </Card>
-        </Card>
-      </Grid>
-      <Card tone={tone} paddingTop={3}>
-        <Label muted size={0}>
-          Mid point ({roundToScale(Number(midPoint))})
-        </Label>
-        <Card paddingY={2} tone={tone}>
-          <StyledRange
-            name={`${tone}-midPoint`}
-            // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
-            type="range"
-            min={50}
-            max={950}
-            value={midPoint}
-            list={midRangeId}
-            onChange={(event) => {
-              const { value } = event.target
-
-              setMidPoint(value)
-              prepareTransition()
-              startTransition(() => {
-                const nextMidPoint = roundToScale(Number(value))
-                if (!Number.isNaN(nextMidPoint) && isMidPoint(nextMidPoint)) {
-                  setHue((hue) => ({ ...hue, midPoint: value as any }))
+    <>
+      <Card
+        paddingTop={4}
+        paddingX={4}
+        paddingBottom={4}
+        tone={tone}
+        shadow={1}
+      >
+        <Text
+          size={2}
+          weight="medium"
+          muted
+          style={{ textTransform: 'capitalize' }}
+        >
+          {tone}
+        </Text>
+        <Grid columns={[1, 3]} paddingTop={4}>
+          <Card tone={tone} key="mid">
+            <Label muted size={0}>
+              Mid
+            </Label>
+            <Card paddingY={2} tone={tone}>
+              <input
+                name={`${tone}-mid`}
+                type="color"
+                style={colorStyle as any}
+                value={
+                  mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid
                 }
-              })
-            }}
-            onPointerUp={(event) => {
-              prepareTransition()
-              setMidPoint(roundToScale(event.currentTarget.value as any) as any)
-            }}
-            onBlur={(event) => {
-              prepareTransition()
-              setMidPoint(roundToScale(event.currentTarget.value as any) as any)
-            }}
-          />
-          <datalist id={midRangeId}>
-            {COLOR_TINTS.map((tint) => (
-              <option key={tint} value={tint} />
-            ))}
-          </datalist>
+                onChange={(event) => {
+                  const { value } = event.target
+
+                  setMid(value)
+                  prepareTransition()
+                  startTransition(() => {
+                    if (isColor(value)) {
+                      setHue((hue) => ({ ...hue, mid: value }))
+                    }
+                  })
+                }}
+              />
+              <Text
+                as="output"
+                muted
+                size={0}
+                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+              >
+                {hue.mid}
+              </Text>
+            </Card>
+          </Card>
+          <Card tone={tone} key="lightest">
+            <Label muted size={0}>
+              Lightest
+            </Label>
+            <Card paddingY={2} tone={tone}>
+              <input
+                type="color"
+                style={colorStyle as any}
+                value={
+                  lightest.length === 4
+                    ? `${lightest}${lightest.replace(/^#/, '')}`
+                    : lightest
+                }
+                onChange={(event) => {
+                  const { value } = event.target
+
+                  setLightest(value)
+                  prepareTransition()
+                  startTransition(() => {
+                    if (isColor(value)) {
+                      setHue((hue) => ({ ...hue, lightest: value }))
+                    }
+                  })
+                }}
+              />
+              <Text
+                as="output"
+                muted
+                size={0}
+                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+              >
+                {hue.lightest}
+              </Text>
+            </Card>
+          </Card>
+          <Card tone={tone} key="darkest">
+            <Label muted size={0}>
+              Darkest
+            </Label>
+            <Card paddingY={2} tone={tone}>
+              <input
+                name={`${tone}-darkest`}
+                type="color"
+                style={colorStyle as any}
+                value={
+                  darkest.length === 4
+                    ? `${darkest}${darkest.replace(/^#/, '')}`
+                    : darkest
+                }
+                onChange={(event) => {
+                  const { value } = event.target
+
+                  setDarkest(value)
+                  prepareTransition()
+                  startTransition(() => {
+                    if (isColor(value)) {
+                      setHue((hue) => ({ ...hue, darkest: value }))
+                    }
+                  })
+                }}
+              />
+              <Text
+                as="output"
+                muted
+                size={0}
+                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
+              >
+                {hue.darkest}
+              </Text>
+            </Card>
+          </Card>
+        </Grid>
+        <Card tone={tone} paddingTop={3} paddingBottom={2}>
+          <Label muted size={0}>
+            Mid point ({roundToScale(Number(midPoint))})
+          </Label>
+          <Card paddingY={2} tone={tone}>
+            <StyledRange
+              name={`${tone}-midPoint`}
+              // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
+              type="range"
+              min={50}
+              max={950}
+              value={midPoint}
+              list={midRangeId}
+              onChange={(event) => {
+                const { value } = event.target
+
+                setMidPoint(value)
+                prepareTransition()
+                startTransition(() => {
+                  const nextMidPoint = roundToScale(Number(value))
+                  if (!Number.isNaN(nextMidPoint) && isMidPoint(nextMidPoint)) {
+                    setHue((hue) => ({ ...hue, midPoint: value as any }))
+                  }
+                })
+              }}
+              onPointerUp={(event) => {
+                prepareTransition()
+                setMidPoint(
+                  roundToScale(event.currentTarget.value as any) as any
+                )
+              }}
+              onBlur={(event) => {
+                prepareTransition()
+                setMidPoint(
+                  roundToScale(event.currentTarget.value as any) as any
+                )
+              }}
+            />
+            <datalist id={midRangeId}>
+              {COLOR_TINTS.map((tint) => (
+                <option key={tint} value={tint} />
+              ))}
+            </datalist>
+          </Card>
+        </Card>
+        <Card tone={tone} shadow={1} radius={1}>
+          <Grid columns={11} style={{ gap: '1px' }}>
+            <ColorTintsPreview hue={hue} title={tone} />
+          </Grid>
         </Card>
       </Card>
-    </Card>
+    </>
   )
 })
+
+// https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L18-L58
+function getColorHex(config: ColorHueConfig, tint: string): string {
+  const tintNum = Number(tint)
+  const midPoint = config.midPoint || 500
+  const darkSize = 1000 - midPoint
+  const lightPosition = tintNum / midPoint
+  const darkPosition = (tintNum - midPoint) / darkSize
+
+  if (tintNum === midPoint) {
+    return config.mid.toLowerCase()
+  }
+
+  // light side of scale: x < midPoint
+  if (tintNum < midPoint) {
+    return mix(lightPosition, config.mid, config.lightest)
+  }
+
+  // dark side of scale: x > midPoint
+  return mix(darkPosition, config.darkest, config.mid)
+}
+
+// https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L42-L58
+export function createTintsFromHue(config: ColorHueConfig): ColorTints {
+  const initial = {} as ColorTints
+  const tints = COLOR_TINTS.reduce((acc, tint) => {
+    acc[tint] = {
+      title: `${config.title} ${tint}`,
+      hex: getColorHex(config, tint),
+    }
+
+    return acc
+  }, initial)
+
+  return tints
+}
+
+function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
+  const tints = createTintsFromHue({ ...hue, title })
+  return (
+    <>
+      {Object.entries(tints).map(([tint, color]) => (
+        <Tooltip
+          key={tint}
+          content={
+            <Card tone="default" key={tint} radius={2}>
+              <Card
+                padding={4}
+                radius={3}
+                style={{
+                  background: color.hex,
+                  borderBottomLeftRadius: '0px',
+                  borderBottomRightRadius: '0px',
+                }}
+              />
+              <Box padding={1} paddingTop={2}>
+                <Text size={0} muted>
+                  {tint}
+                </Text>
+              </Box>
+              <Box padding={1} paddingBottom={2}>
+                <Text size={0} style={{ minWidth: '56px' }}>
+                  {color.hex}
+                </Text>
+              </Box>
+            </Card>
+          }
+          fallbackPlacements={['right', 'left']}
+          placement="top"
+          portal
+        >
+          <Card
+            tone="default"
+            radius={1}
+            style={{
+              background: color.hex,
+            }}
+            paddingY={2}
+          />
+        </Tooltip>
+      ))}
+    </>
+  )
+}
 
 const StyledRange = styled.input`
   accent-color: var(--card-focus-ring-color, currentColor);

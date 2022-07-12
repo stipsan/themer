@@ -1470,13 +1470,11 @@ const SanityLogo = forwardRef(function SanityLogo(
   ref: Ref<SVGSVGElement>
 ) {
   return (
-    <svg
-      ref={ref}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 32 32"
-      {...props}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" {...props}>
       <path
+        // @TODO refactor to an actual <circle>
+        ref={ref as any}
+        style={{ transformOrigin: 'center' }}
         fillOpacity="0.652562"
         d="M30 16c0 7.731987-6.268013 14-14 14-7.731986 0-14-6.268013-14-14S8.268014 2 16 2c7.731987 0 14 6.268013 14 14Z"
       />
@@ -1495,6 +1493,8 @@ const Figure = styled.figure`
   height: 32px;
   width: 32px;
   margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
 `
 const StyledSanityLogo = styled(SanityLogo)`
   position: absolute;

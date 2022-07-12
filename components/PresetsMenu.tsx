@@ -13,6 +13,7 @@ import {
   Box,
   Button,
   Card,
+  Code,
   Dialog,
   Label,
   Menu,
@@ -52,7 +53,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
     false
   )
 
-  const shareLink = useMemo(() => {
+  const searchParams = useMemo(() => {
     const searchParams = new URLSearchParams()
     searchParams.set('preset', selected.slug)
     // default, primary, transparent, positive, caution, critical
@@ -111,13 +112,32 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
       )};darkest:${hues.critical.darkest.replace(/^#/, '')}`
     )
 
+    return searchParams
+  }, [hues, selected.slug])
+
+  const shareLink = useMemo(() => {
     const url = new URL(
       `/?${decodeURIComponent(searchParams.toString())}`,
       location.origin
     )
+    if (process.env.NODE_ENV === 'production') {
+      url.searchParams.set('min', '1')
+    }
 
     return url.toString()
-  }, [hues, selected.slug])
+  }, [searchParams])
+
+  const esmUrl = useMemo(() => {
+    const url = new URL(
+      `/api/hues?${decodeURIComponent(searchParams.toString())}`,
+      location.origin
+    )
+    if (process.env.NODE_ENV === 'production') {
+      url.searchParams.set('min', '1')
+    }
+
+    return url.toString()
+  }, [searchParams])
 
   return (
     <>
@@ -214,6 +234,89 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
         >
           <Box padding={4}>
             <Text>Todo</Text>
+          </Box>
+        </Dialog>
+      )}
+      {open === 'upload' && (
+        <Dialog
+          key="upload"
+          header="Upload"
+          id="dialog-upload-preset"
+          onClose={() => setOpen(false)}
+          zOffset={1000}
+        >
+          <Box padding={4}>
+            <Text>Todo</Text>
+          </Box>
+        </Dialog>
+      )}
+      {open === 'download' && (
+        <Dialog
+          key="download"
+          header="Download your theme"
+          id="dialog-download-preset"
+          onClose={() => setOpen(false)}
+          zOffset={1000}
+          width={1}
+        >
+          <Box padding={4}>
+            <Stack space={4}>
+              <Text>
+                The easiest way to add your new Studio Theme to your studios is
+                by using URL ESM Imports.
+              </Text>
+              <Text>
+                Luckily Sanity v3 uses Vite, thus you can just add this snippet
+                below, in your sanity.config.ts file, and add `theme` to one of
+                your workspaces.
+              </Text>
+
+              <Card
+                marginY={[4, 4, 5]}
+                overflow="auto"
+                padding={4}
+                radius={2}
+                shadow={1}
+              >
+                <Code language={'ts'} muted>
+                  {`// sanity.config.ts
+import { createConfig } from "sanity";
+import { deskTool } from "sanity/desk";
+
+const {theme} = await import(${JSON.stringify(esmUrl)})
+
+export default createConfig({
+  theme, // <-- add it here
+  plugins: [deskTool()],
+  projectId: "b5vzhxkv",
+  dataset: "production",
+  schema: {
+    types: [
+      {
+        type: "document",
+        name: "post",
+        title: "Post",
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            title: "Title",
+          },
+        ],
+      },
+    ],
+  },
+});`}
+                </Code>
+              </Card>
+              <Text>
+                If you want to iterate quickly on the design from the comfort of
+                your own Studio config it can be tedious to edit URLs. For that
+                you can import the createTheme function
+              </Text>
+              <TextInput readOnly value={esmUrl} />
+              <Button icon={LaunchIcon} as="a" href={esmUrl} text="Open" />
+            </Stack>
           </Box>
         </Dialog>
       )}

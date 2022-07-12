@@ -8,10 +8,12 @@ import {
   usePrefersDark,
 } from '@sanity/ui'
 import Head from 'components/Head'
-import Themer from 'components/Themer'
 import { useRouter } from 'next/router'
-import { Suspense, useEffect, useState } from 'react'
+import { lazy, startTransition, Suspense, useEffect, useState } from 'react'
 import { presets } from 'utils/presets'
+import { ThemePreset } from 'utils/types'
+
+const Themer = lazy(() => import('components/Themer'))
 
 const fallback = (
   <ThemeProvider scheme="light" theme={studioTheme}>
@@ -38,13 +40,13 @@ const fallback = (
 
 export default function Index() {
   const { isReady } = useRouter()
-  const [themeUrl, setThemeUrl] = useState<string>(null)
   const prefersDark = usePrefersDark()
+  const [preset, setPreset] = useState<ThemePreset>(null)
 
   // Wait with loading until we know if there are custom URL parameters, which happens after mounting
   useEffect(() => {
     // @TODO is it necessary to wait for isReady  when using URLSearchParams?
-    if (isReady && !themeUrl) {
+    if (isReady && !preset) {
       const searchParams = new URLSearchParams(
         process.env.NODE_ENV === 'production' ? '?min' : ''
       )
@@ -56,8 +58,9 @@ export default function Index() {
       if (maybePreset) {
         const preset = presets.find((preset) => preset.slug === maybePreset)
         if (preset) {
-          const url = new URL(preset.url, location.origin)
-          setThemeUrl(url.toString())
+          startTransition(() => {
+            setPreset(preset)
+          })
 
           return
         }
@@ -85,16 +88,22 @@ export default function Index() {
         `/api/hues?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
-      setThemeUrl(url.toString())
+      startTransition(() =>
+        setPreset({
+          title: 'Custom Theme',
+          slug: 'custom',
+          url: url.toString(),
+        })
+      )
     }
-  }, [isReady, themeUrl])
+  }, [isReady, preset])
 
-  if (!themeUrl) return fallback
+  if (!preset) return fallback
 
   return (
     <Suspense fallback={fallback}>
       <Themer
-        themeUrl={themeUrl}
+        initialPreset={preset}
         systemScheme={prefersDark ? 'dark' : 'light'}
       />
     </Suspense>

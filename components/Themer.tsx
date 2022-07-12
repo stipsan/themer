@@ -8,6 +8,7 @@ import {
   SunIcon,
 } from '@sanity/icons'
 import {
+  type CardTone,
   type ThemeColorSchemeKey,
   Button,
   Card,
@@ -15,6 +16,7 @@ import {
   Label,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   Text,
   ThemeProvider,
@@ -23,7 +25,6 @@ import {
 import Head from 'components/Head'
 import Logo from 'components/Logo'
 import { useMagicRouter } from 'hooks/useMagicRouter'
-import { useThemeFromHues } from 'hooks/useTheme'
 import {
   useCallback,
   useEffect,
@@ -37,9 +38,18 @@ import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
 import { config as blog } from 'studios/blog'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
-import type { Hue } from 'utils/types'
+import { presets } from 'utils/presets'
+import type { Hue, ThemePreset } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
+const RENDER_TONES = [
+  'default',
+  'primary',
+  'transparent',
+  'positive',
+  'caution',
+  'critical',
+] as const
 
 const SynthWaveIcon = styled(MusicNoteIcon)`
   width: 16px;
@@ -95,21 +105,23 @@ function SyncColorScheme({
 }
 
 interface Props {
-  // Format: https://themer.creativecody.dev/api/hues?
-  themeUrl: string
+  initialPreset: ThemePreset
   // The scheme detected from the usePrefersDark hook
   systemScheme: ThemeColorSchemeKey
 }
-export default function Themer({
-  systemScheme,
-  themeUrl: initialThemeUrl,
-}: Props) {
+export default function Themer({ systemScheme, initialPreset }: Props) {
+  const [{ url: initialThemeUrl }] = useState(() => initialPreset)
   const [transition, startTransition] = useTransition()
+
+  const [preset, setPreset] = useState<string>(() => initialPreset.slug)
   const [themeUrl, setThemeUrl] = useState(initialThemeUrl)
   console.log('Before suspense', new Date(), themeUrl)
   const magic = suspend(async () => {
-    const { hues, theme } = await import(/* webpackIgnore: true */ themeUrl)
-    return { hues, theme }
+    const [{ hues, theme }, { applyHues }] = await Promise.all([
+      import(/* webpackIgnore: true */ themeUrl),
+      import('utils/applyHues'),
+    ])
+    return { hues: applyHues(hues), theme }
   }, [themeUrl])
   console.log('After suspense', new Date(), magic)
   const [view, setView] = useState<'default' | 'split'>('default')
@@ -119,48 +131,6 @@ export default function Themer({
   )
   const scheme = forceScheme ?? systemScheme
 
-  const hues = useMemo(
-    () =>
-      ({
-        default: {
-          mid: '#8b6584',
-          midPoint: 500,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-        transparent: {
-          mid: '#503a4c',
-          midPoint: 500,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-        primary: {
-          mid: '#ec4899',
-          midPoint: 500,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-        positive: {
-          mid: '#10b981',
-          midPoint: 500,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-        caution: {
-          mid: '#fde047',
-          midPoint: 300,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-        critical: {
-          mid: '#fe3459',
-          midPoint: 500,
-          lightest: '#f7f2f5',
-          darkest: '#171721',
-        },
-      } as const),
-    []
-  )
   const history = useMagicRouter('/')
   const theme = useMemo(() => {
     return {
@@ -327,7 +297,9 @@ export default function Themer({
                                   : 'Switch back to default'
                               }
                               disabled={view === 'default'}
-                              onClick={() => setView('default')}
+                              onClick={() =>
+                                startTransition(() => setView('default'))
+                              }
                             />
                             <MenuItem
                               icon={SplitVerticalIcon}
@@ -337,7 +309,9 @@ export default function Themer({
                                   : 'Switch to split-screen'
                               }
                               disabled={view === 'split'}
-                              onClick={() => setView('split')}
+                              onClick={() =>
+                                startTransition(() => setView('split'))
+                              }
                             />
                           </Menu>
                         }
@@ -382,19 +356,25 @@ export default function Themer({
                               icon={DesktopIcon}
                               text="System"
                               disabled={forceScheme === null}
-                              onClick={() => setForceScheme(null)}
+                              onClick={() =>
+                                startTransition(() => setForceScheme(null))
+                              }
                             />
                             <MenuItem
                               icon={SunIcon}
                               text="Light"
                               disabled={forceScheme === 'light'}
-                              onClick={() => setForceScheme('light')}
+                              onClick={() =>
+                                startTransition(() => setForceScheme('light'))
+                              }
                             />
                             <MenuItem
                               icon={MoonIcon}
                               text="Dark"
                               disabled={forceScheme === 'dark'}
-                              onClick={() => setForceScheme('dark')}
+                              onClick={() =>
+                                startTransition(() => setForceScheme('dark'))
+                              }
                             />
                           </Menu>
                         }
@@ -405,7 +385,6 @@ export default function Themer({
                   </Card>
                 </Grid>
                 <Card>
-                  {' '}
                   <Card paddingX={[4]} paddingBottom={2}>
                     <Label htmlFor="presets" size={0} muted>
                       Presets
@@ -426,12 +405,37 @@ export default function Themer({
                         id="view"
                         menu={
                           <Menu>
-                            <MenuItem icon={MasterDetailIcon} text="Default" />
+                            {preset === 'custom' && <>
                             <MenuItem
-                              icon={<SynthWaveIcon />}
-                              text={'Synth Wave Pink'}
-                              disabled
+                              key="custom"
+                              icon={MasterDetailIcon}
+                              text="Custom"
                             />
+                            <MenuDivider />
+                            </>}
+                            {Object.values(presets).map(({slug, icon, title, url}) => (
+                              <MenuItem
+                                key={slug}
+                                disabled={preset === slug}
+                                // @TODO React.lazy these icons
+                                icon={
+                                  icon ??
+                                  slug === 'pink-synth-wave'
+                                    ? SynthWaveIcon
+                                    : slug === 'default'
+                                    ? MasterDetailIcon
+                                    : undefined
+                                }
+                                text={title}
+                                onClick={() => {
+                                  startTransition(() => {
+                                    setPreset(slug)
+                                    const themeUrl = new URL(url, location.origin)
+                                    setThemeUrl(themeUrl.toString())
+                                  })
+                                }}
+                              />
+                            ))}
                           </Menu>
                         }
                         placement="right"
@@ -440,20 +444,13 @@ export default function Themer({
                     </Card>
                   </Card>
                 </Card>
-                <Card height="fill" paddingY={1}>
-                  {[
-                    'Default',
-                    'Primary',
-                    'Transparent',
-                    'Positive',
-                    'Caution',
-                    'Critical',
-                  ].map((title) => {
+                <Card height="fill" paddingY={1} key={`hues-${preset}`}>
+                  {RENDER_TONES.map((key) => {
                     return (
                       <HueFields
-                        key={`${title}-${resetHueFields}`}
-                        config={hues[title.toLowerCase()]}
-                        title={title}
+                        key={key}
+                        config={magic.hues[key]}
+                        tone={key}
                       />
                     )
                   })}
@@ -542,7 +539,7 @@ export default function Themer({
   )
 }
 
-function HueFields({ config, title }: { config: Hue; title: string }) {
+function HueFields({ config, tone }: { config: Hue; tone: CardTone }) {
   /**
    * Default
   
@@ -550,7 +547,7 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
   50 100 200 ---- 800 900 950
    */
 
-  const midRangeId = `${title.toLowerCase()}-mid-range-${useId()}`
+  const midRangeId = `${name}-mid-range-${useId()}`
   const colorStyle = {
     boxSizing: 'border-box',
     background: 'var(--card-border-color)',
@@ -561,12 +558,10 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
     margin: 0,
   }
 
-  const tone = title.toLowerCase() as any
-
   return (
     <Card paddingTop={4} paddingX={4} paddingBottom={2} tone={tone} shadow={1}>
-      <Text size={2} weight="medium" muted>
-        {title}
+      <Text size={2} weight="medium" muted autoCapitalize="">
+        {tone}
       </Text>
       <Grid columns={[1, 3]} paddingTop={4}>
         <Card tone={tone}>
@@ -575,7 +570,7 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
           </Label>
           <Card paddingY={2} tone={tone}>
             <input
-              name={`${title.toLowerCase()}-lightest`}
+              name={`${tone}-lightest`}
               type="color"
               defaultValue={config.lightest}
               style={colorStyle as any}
@@ -596,7 +591,7 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
           </Label>
           <Card paddingY={2} tone={tone}>
             <input
-              name={`${title.toLowerCase()}-mid`}
+              name={`${tone}-mid`}
               type="color"
               defaultValue={config.mid}
               style={colorStyle as any}
@@ -617,7 +612,7 @@ function HueFields({ config, title }: { config: Hue; title: string }) {
           </Label>
           <Card paddingY={2} tone={tone}>
             <input
-              name={`${title.toLowerCase()}-darkest`}
+              name={`${tone}-darkest`}
               type="color"
               defaultValue={config.darkest}
               style={colorStyle as any}

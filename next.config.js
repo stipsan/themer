@@ -11,15 +11,11 @@ const nextConfig = {
   },
   compiler: {
     styledComponents: true,
-    removeConsole: process.env.NODE_ENV === 'production',
+    // removeConsole: process.env.NODE_ENV === 'production',
   },
   images: {
     domains: ['cdn.sanity.io', 'source.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
-  },
-  typescript: {
-    // @TODO: Remove this and fix the errors
-    ignoreBuildErrors: true,
   },
 }
 

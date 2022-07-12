@@ -2,7 +2,7 @@
 
 import type { ThemePreset } from 'utils/types'
 
-export const defaultTheme: ThemePreset = {
+export const defaultPreset: ThemePreset = {
   slug: 'default',
   title: 'Default Studio Theme',
   url: '/api/hues',
@@ -14,7 +14,7 @@ export const pinkSynthWave: ThemePreset = {
   url: '/api/hues?lightest=f7f2f5&darkest=171721&default=8b6584&primary=ec4899&transparent=503a4c&positive=10b981&caution=fde047;300&critical=fe3459',
 }
 
-export const presets: ThemePreset[] = [defaultTheme, pinkSynthWave]
+export const presets: ThemePreset[] = [defaultPreset, pinkSynthWave]
 
 // @TODO sort through these:
 /*
@@ -28,4 +28,6 @@ import {studioTheme} from 'https://themer.creativecody.dev/api/hues?lightest=e6e
 import {studioTheme} from 'https://themer.creativecody.dev/api/hues?caution=lightest:f8df79&critical=darkest:351716'
 // Changing just the midPoint for primary (darker blue)
 import {studioTheme} from 'https://themer.creativecody.dev/api/hues?primary=400'
+// http://localhost:3000/?lightest=f7f2f5&darkest=171721&default=8b6584&primary=ec4899&transparent=503a4c&positive=10b981&caution=fde047;300&critical=fe3459&preset
+// 
 // */

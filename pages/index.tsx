@@ -10,7 +10,7 @@ import {
 import Head from 'components/Head'
 import { useRouter } from 'next/router'
 import { lazy, startTransition, Suspense, useEffect, useState } from 'react'
-import { defaultTheme, presets } from 'utils/presets'
+import { defaultPreset, presets } from 'utils/presets'
 import { ThemePreset } from 'utils/types'
 
 const Themer = lazy(() => import('components/Themer'))
@@ -41,24 +41,20 @@ const fallback = (
 export default function Index() {
   const { isReady } = useRouter()
   const prefersDark = usePrefersDark()
-  const [preset, setPreset] = useState<ThemePreset>(null)
+  const [initialPreset, setPreset] = useState<ThemePreset>(null)
+  const readyToInit = isReady && !initialPreset
 
   // Wait with loading until we know if there are custom URL parameters, which happens after mounting
   useEffect(() => {
     // @TODO is it necessary to wait for isReady  when using URLSearchParams?
-    if (isReady && !preset) {
+    if (readyToInit) {
       const initialParams = new URLSearchParams(location.search)
-      let preset = defaultTheme
-      const maybePreset = initialParams.has('preset')
+      const slug = initialParams.has('preset')
         ? initialParams.get('preset')
         : null
-      if (maybePreset) {
-        const nextPreset = presets.find((preset) => preset.slug === maybePreset)
-        if (preset) preset = nextPreset
-      }
-      const searchParams = new URLSearchParams(preset.url)
-
-      if (process.env.NODE_ENV === 'production') searchParams.set('min', '')
+      const inheritFrom = presets.find((preset) => preset.slug === slug) || defaultPreset
+      const searchParams = new URLSearchParams(inheritFrom.url)
+      if (process.env.NODE_ENV === 'production') searchParams.set('min', '1')
 
       const paramsAllowlist = [
         'lightest',
@@ -72,7 +68,6 @@ export default function Index() {
         'min',
       ]
       for (const key of paramsAllowlist) {
-        console.log(key)
         if (initialParams.has(key)) {
           searchParams.set(key, initialParams.get(key))
         }
@@ -82,16 +77,16 @@ export default function Index() {
         `/api/hues?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
-      startTransition(() => setPreset({ ...preset, url: url.toString() }))
+      startTransition(() => setPreset({ ...inheritFrom, url: url.toString() }))
     }
-  }, [isReady, preset])
+  }, [readyToInit])
 
-  if (!preset) return fallback
+  if (!initialPreset) return fallback
 
   return (
     <Suspense fallback={fallback}>
       <Themer
-        initialPreset={preset}
+        initialPreset={initialPreset}
         systemScheme={prefersDark ? 'dark' : 'light'}
       />
     </Suspense>

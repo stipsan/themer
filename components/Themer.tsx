@@ -1,4 +1,3 @@
-import { MusicNoteIcon } from '@heroicons/react/outline'
 import { COLOR_TINTS } from '@sanity/color'
 import {
   DesktopIcon,
@@ -24,6 +23,7 @@ import {
 } from '@sanity/ui'
 import Head from 'components/Head'
 import Logo from 'components/Logo'
+import PresetsMenu from 'components/PresetsMenu'
 import { useMagicRouter } from 'hooks/useMagicRouter'
 import {
   useCallback,
@@ -51,10 +51,7 @@ const RENDER_TONES = [
   'critical',
 ] as const
 
-const SynthWaveIcon = styled(MusicNoteIcon)`
-  width: 16px;
-  stroke-width: 1.4;
-`
+
 
 // Trying to impress Snorre with my 1337 CSS haxxor
 const FixNavDrawerPosition = styled(Card)`
@@ -110,23 +107,18 @@ interface Props {
   systemScheme: ThemeColorSchemeKey
 }
 export default function Themer({ systemScheme, initialPreset }: Props) {
-  const [{ url: initialThemeUrl }] = useState(() => initialPreset)
+  const [preset, setPreset] = useState(() => initialPreset)
   const [transition, startTransition] = useTransition()
 
-  const [preset, setPreset] = useState<string>(() => initialPreset.slug)
-  const [themeUrl, setThemeUrl] = useState(initialThemeUrl)
-
-  console.log('Before suspense', new Date(), themeUrl)
-
   const magic = suspend(async () => {
+    const url = new URL(preset.url, location.origin)
     const [{ hues, theme }, { applyHues }] = await Promise.all([
-      import(/* webpackIgnore: true */ themeUrl),
+      import(/* webpackIgnore: true */ url.toString()),
       import('utils/applyHues'),
     ])
 
     return { hues: applyHues(hues), theme }
-  }, [themeUrl])
-  console.log('After suspense', new Date(), magic)
+  }, [preset.url])
 
   const [view, setView] = useState<'default' | 'split'>('default')
 
@@ -240,7 +232,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
         `/api/hues?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
-      startTransition(() => setThemeUrl(url.toString()))
+      // startTransition(() => setThemeUrlToBeRefactored(url.toString()))
     }
 
     if (typeof requestIdleCallback === 'function') {
@@ -433,73 +425,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                     </Card>
                   </Card>
                 </Grid>
-                <Card>
-                  <Card paddingX={[4]} paddingBottom={2}>
-                    <Label htmlFor="presets" size={0} muted>
-                      Presets
-                    </Label>
-                    <Card paddingY={2}>
-                      <MenuButton
-                        button={
-                          <Button
-                            fontSize={1}
-                            paddingY={2}
-                            paddingX={3}
-                            tone="default"
-                            mode="ghost"
-                            icon={SynthWaveIcon}
-                            text={'Synth Wave Pink'}
-                          />
-                        }
-                        id="view"
-                        menu={
-                          <Menu>
-                            {preset === 'custom' && (
-                              <>
-                                <MenuItem
-                                  key="custom"
-                                  icon={MasterDetailIcon}
-                                  text="Custom"
-                                />
-                                <MenuDivider />
-                              </>
-                            )}
-                            {Object.values(presets).map(
-                              ({ slug, icon, title, url }) => (
-                                <MenuItem
-                                  key={slug}
-                                  disabled={preset === slug}
-                                  // @TODO React.lazy these icons
-                                  icon={
-                                    icon ?? slug === 'pink-synth-wave'
-                                      ? SynthWaveIcon
-                                      : slug === 'default'
-                                      ? MasterDetailIcon
-                                      : undefined
-                                  }
-                                  text={title}
-                                  onClick={() => {
-                                    startTransition(() => {
-                                      setPreset(slug)
-                                      const themeUrl = new URL(
-                                        url,
-                                        location.origin
-                                      )
-                                      setThemeUrl(themeUrl.toString())
-                                    })
-                                  }}
-                                />
-                              )
-                            )}
-                          </Menu>
-                        }
-                        placement="right"
-                        popover={{ portal: true }}
-                      />
-                    </Card>
-                  </Card>
-                </Card>
-                <Card height="fill" paddingY={1} key={`hues-${preset}`}>
+                <PresetsMenu selected={preset} onChange={(nextPreset) => startTransition(() => setPreset(nextPreset))} />
+                <Card height="fill" paddingY={1}>
                   {RENDER_TONES.map((key) => {
                     return (
                       <HueFields

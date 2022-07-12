@@ -257,7 +257,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
           id="dialog-download-preset"
           onClose={() => setOpen(false)}
           zOffset={1000}
-          width={1}
+          width={2}
         >
           <Box padding={4}>
             <Stack space={4}>
@@ -270,9 +270,8 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
                 below, in your sanity.config.ts file, and add `theme` to one of
                 your workspaces.
               </Text>
-
               <Card
-                marginY={[4, 4, 5]}
+                marginY={[2, 2, 3]}
                 overflow="auto"
                 padding={4}
                 radius={2}
@@ -310,11 +309,97 @@ export default createConfig({
                 </Code>
               </Card>
               <Text>
-                If you want to iterate quickly on the design from the comfort of
-                your own Studio config it can be tedious to edit URLs. For that
-                you can import the createTheme function
+                If you want to quickly iterate on your theme from the comfort of
+                your Studio you don&quote;t have to constantly edit import URLs.
+                You can import `createTheme` and the `hues` input that were used
+                to create the `theme` export:
               </Text>
-              <TextInput readOnly value={esmUrl} />
+              <Card
+                marginY={[2, 2, 3]}
+                overflow="auto"
+                padding={4}
+                radius={2}
+                shadow={1}
+              >
+                <Code language={'ts'} muted>
+                  {`// sanity.config.ts
+import { createConfig } from "sanity";
+import { deskTool } from "sanity/desk";
+
+const {createTheme, hues} = await import(${JSON.stringify(esmUrl)})
+
+export default createConfig({
+  theme: createTheme({
+    ...hues, primary: {...hues.primary, mid: '#22fca8'} // <-- override just the bits you want to iterate on
+  }),
+  plugins: [deskTool()],
+  projectId: "b5vzhxkv",
+  dataset: "production",
+  schema: {
+    types: [
+      {
+        type: "document",
+        name: "post",
+        title: "Post",
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            title: "Title",
+          },
+        ],
+      },
+    ],
+  },
+});`}
+                </Code>
+              </Card>
+              <Text>
+                This also works in a Webpack bundled app, if you add a magic comment to the import:
+              </Text>
+              <Card
+                marginY={[2, 2, 3]}
+                overflow="auto"
+                padding={4}
+                radius={2}
+                shadow={1}
+              >
+                <Code language={'ts'} muted>
+                  {`// In create-react-app or similar
+const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
+`}
+                </Code>
+              </Card>
+              <Text>Please note that this only works if your Webpack application is outputting ESM code that are loaded using {`<script type="module">`} tags as browsers only supports import() in that mode.</Text>
+              <Text>Lastly, if you are using Next.js you can import these URLs with the same ease as node_modules by turning URL Imports in next.config.js:</Text>
+              <Card
+                marginY={[2, 2, 3]}
+                overflow="auto"
+                padding={4}
+                radius={2}
+                shadow={1}
+              >
+                <Code language={'ts'} muted>
+                  {`// next.config.js
+// @ts-check
+
+/**
+ * @type {import('next').NextConfig}
+ **/
+const nextConfig = {
+  experimental: {
+    urlImports: ['https://themer.creativecody.dev/'],
+  },
+}
+
+module.exports = nextConfig
+
+// Anywhere in your next application:
+import {theme} from ${JSON.stringify(esmUrl)}
+// Yay, no need for top-level async await or other complicated things, it's as if you npm-installed it :D
+`}
+                </Code>
+              </Card>
               <Button icon={LaunchIcon} as="a" href={esmUrl} text="Open" />
             </Stack>
           </Box>

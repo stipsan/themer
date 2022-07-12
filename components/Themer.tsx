@@ -2,6 +2,8 @@ import {
   DesktopIcon,
   MasterDetailIcon,
   MoonIcon,
+  RetrieveIcon,
+  SelectIcon,
   SplitVerticalIcon,
   SunIcon,
 } from '@sanity/icons'
@@ -228,7 +230,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   <Logo spin={spins} transition={transition} />
                   <Card paddingY={[3]} paddingX={[3]}>
                     <Text weight="semibold" muted style={{ flex: 2 }}>
-                      Themer for Sanity Studio v3
+                      Themer
                     </Text>
                   </Card>
                 </Card>
@@ -284,6 +286,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                                 ? MoonIcon
                                 : DesktopIcon
                             }
+                            iconRight={SelectIcon}
                             text={
                               forceScheme === 'light'
                                 ? 'Light'

@@ -57,6 +57,7 @@ export default function PresetsMenu({ selected, onChange }: Props) {
               icon={selected.icon ?? iconFromSlug(selected.slug)}
               iconRight={SelectIcon}
               text={selected.title}
+              
             />
           }
           id="presets"
@@ -71,7 +72,8 @@ export default function PresetsMenu({ selected, onChange }: Props) {
                 // icon={icon ?? iconFromSlug(slug)}
                 icon={UploadIcon}
                 text={'Upload'}
-                //onClick={() => void onChange(_preset)}
+                onClick={() => void setOpen('upload')}
+                
               />
               <MenuItem
                 fontSize={1}
@@ -82,6 +84,7 @@ export default function PresetsMenu({ selected, onChange }: Props) {
                 //disabled={selected.slug === slug}
                 // icon={icon ?? iconFromSlug(slug)}
                 text={'Share'}
+                onClick={() => void setOpen('share')}
                 //onClick={() => void onChange(_preset)}
               />
               <MenuItem
@@ -89,6 +92,7 @@ export default function PresetsMenu({ selected, onChange }: Props) {
                 paddingY={2}
                 paddingX={3}
                 icon={DownloadIcon}
+                onClick={() => void setOpen('download')}
                 //key={slug}
                 //disabled={selected.slug === slug}
                 // icon={icon ?? iconFromSlug(slug)}
@@ -124,8 +128,9 @@ export default function PresetsMenu({ selected, onChange }: Props) {
     {
   open === 'upload' && (
     <Dialog
-      header="Example"
-      id="dialog-example"
+    key="upload"
+      header="Upload"
+      id="dialog-upload-preset"
       onClose={() => setOpen(false)}
       zOffset={1000}
     >

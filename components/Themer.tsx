@@ -1,10 +1,11 @@
 import {
+  CollapseIcon,
   DesktopIcon,
-  MasterDetailIcon,
   MoonIcon,
   RetrieveIcon,
   SelectIcon,
   SplitVerticalIcon,
+  SquareIcon,
   SunIcon,
 } from '@sanity/icons'
 import {
@@ -230,14 +231,14 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   <Logo spin={spins} transition={transition} />
                   <Card paddingY={[3]} paddingX={[3]}>
                     <Text weight="semibold" muted style={{ flex: 2 }}>
-                      Themer
+                      Studio v3 Themer
                     </Text>
                   </Card>
                 </Card>
               </HeaderCard>
               <Card borderRight height="fill" tone="default">
-                <Grid columns={[2]}>
-                  <Card padding={[4]}>
+                <Grid columns={[2]} paddingBottom={2}>
+                  <Card paddingLeft={[4]} paddingTop={4}>
                     <Label htmlFor="view" size={0} muted>
                       View
                     </Label>
@@ -251,10 +252,10 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                         icon={
                           view === 'default'
                             ? SplitVerticalIcon
-                            : MasterDetailIcon
+                            : CollapseIcon
                         }
                         text={
-                          view === 'default' ? 'Split-screen' : 'Full-screen'
+                          view === 'default' ? 'Split-screen' : 'Collapse'
                         }
                         onClick={() =>
                           startTransition(() =>
@@ -266,7 +267,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                       />
                     </Card>
                   </Card>
-                  <Card padding={[4]}>
+                  <Card paddingTop={[4]}>
                     <Label htmlFor="scheme" size={0} muted>
                       Scheme
                     </Label>

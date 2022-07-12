@@ -115,15 +115,19 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
 
   const [preset, setPreset] = useState<string>(() => initialPreset.slug)
   const [themeUrl, setThemeUrl] = useState(initialThemeUrl)
+
   console.log('Before suspense', new Date(), themeUrl)
+
   const magic = suspend(async () => {
     const [{ hues, theme }, { applyHues }] = await Promise.all([
       import(/* webpackIgnore: true */ themeUrl),
       import('utils/applyHues'),
     ])
+
     return { hues: applyHues(hues), theme }
   }, [themeUrl])
   console.log('After suspense', new Date(), magic)
+
   const [view, setView] = useState<'default' | 'split'>('default')
 
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(

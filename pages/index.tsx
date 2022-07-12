@@ -10,7 +10,7 @@ import {
 import Head from 'components/Head'
 import { useRouter } from 'next/router'
 import { lazy, startTransition, Suspense, useEffect, useState } from 'react'
-import { presets } from 'utils/presets'
+import { defaultTheme, presets } from 'utils/presets'
 import { ThemePreset } from 'utils/types'
 
 const Themer = lazy(() => import('components/Themer'))
@@ -47,24 +47,18 @@ export default function Index() {
   useEffect(() => {
     // @TODO is it necessary to wait for isReady  when using URLSearchParams?
     if (isReady && !preset) {
-      const searchParams = new URLSearchParams(
-        process.env.NODE_ENV === 'production' ? '?min' : ''
-      )
       const initialParams = new URLSearchParams(location.search)
-
+      let preset = defaultTheme
       const maybePreset = initialParams.has('preset')
         ? initialParams.get('preset')
         : null
       if (maybePreset) {
-        const preset = presets.find((preset) => preset.slug === maybePreset)
-        if (preset) {
-          startTransition(() => {
-            setPreset(preset)
-          })
-
-          return
-        }
+        const nextPreset = presets.find((preset) => preset.slug === maybePreset)
+        if (preset) preset = nextPreset
       }
+      const searchParams = new URLSearchParams(preset.url)
+
+      if (process.env.NODE_ENV === 'production') searchParams.set('min', '')
 
       const paramsAllowlist = [
         'lightest',
@@ -88,13 +82,7 @@ export default function Index() {
         `/api/hues?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
-      startTransition(() =>
-        setPreset({
-          title: 'Custom Theme',
-          slug: 'custom',
-          url: url.toString(),
-        })
-      )
+      startTransition(() => setPreset({ ...preset, url: url.toString() }))
     }
   }, [isReady, preset])
 

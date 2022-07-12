@@ -1513,33 +1513,31 @@ function Logo({ spin, transition }: Props) {
   const logoRef = useRef(null)
 
   useEffect(() => {
-    if (wheelRef.current && spin) {
-      console.count('spin')
-      console.log(spin % 360)
-      const rotate = (spin * 391) % 720
-      animate(
-        wheelRef.current,
-        { rotate: transition ? -rotate : rotate },
-        { easing: spring({ stiffness: 70 }) }
-      )
-      // animate(ref.current, {rotate: [null, rotate]}, { duration: 3})
+    if (wheelRef.current) {
+      if (spin || transition) {
+        console.count('spin')
+        console.log(spin, { transition }, 'start')
+
+        const unit = 360 / 1.5
+        const rewind = unit + Math.random() * unit
+        const forward = unit + Math.random() * unit
+        const animation = animate(
+          wheelRef.current,
+          { rotate: transition ? -rewind : forward },
+          {
+            direction: transition ? 'alternate' : undefined,
+            repeat: transition ? Infinity : 0,
+            easing: spring({ stiffness: 70 }),
+          }
+        )
+        return () => {
+          if (transition) {
+            animation.stop()
+          }
+        }
+      }
     }
   }, [spin, transition])
-  useEffect(() => {
-    if (logoRef.current && transition) {
-      const animation = animate(
-        logoRef.current,
-        { opacity: [null, 0.9, 1], scale: [null, 0.9, 1] },
-        {
-          repeat: Infinity,
-          duration: 1,
-          direction: 'alternate',
-          easing: 'ease-out',
-        }
-      )
-      return () => animation.cancel()
-    }
-  }, [transition])
 
   return (
     <Figure>

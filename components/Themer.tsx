@@ -250,13 +250,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                         tone="default"
                         mode="ghost"
                         icon={
-                          view === 'default'
-                            ? SplitVerticalIcon
-                            : CollapseIcon
+                          view === 'default' ? SplitVerticalIcon : CollapseIcon
                         }
-                        text={
-                          view === 'default' ? 'Split-screen' : 'Collapse'
-                        }
+                        text={view === 'default' ? 'Split-screen' : 'Collapse'}
                         onClick={() =>
                           startTransition(() =>
                             setView((view) =>
@@ -342,6 +338,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   </Card>
                 </Grid>
                 <PresetsMenu
+                  hues={memoHues}
                   selected={preset}
                   onChange={(nextPreset) =>
                     startTransition(() => setPreset(nextPreset))

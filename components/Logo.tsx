@@ -1474,7 +1474,11 @@ const SanityLogo = forwardRef(function SanityLogo(
       <path
         // @TODO refactor to an actual <circle>
         ref={ref as any}
-        style={{ transformOrigin: 'center', clipPath: 'circle(48% at 50% 50%)', WebkitClipPath: 'circle(48% at 50% 50%)' }}
+        style={{
+          transformOrigin: 'center',
+          clipPath: 'circle(48% at 50% 50%)',
+          WebkitClipPath: 'circle(48% at 50% 50%)',
+        }}
         fillOpacity="0.652562"
         d="M30 16c0 7.731987-6.268013 14-14 14-7.731986 0-14-6.268013-14-14S8.268014 2 16 2c7.731987 0 14 6.268013 14 14Z"
       />

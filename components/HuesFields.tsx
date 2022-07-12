@@ -292,7 +292,10 @@ const HueFields = memo(function HueFields({
         </Card>
         <Card tone={tone} shadow={1} radius={1}>
           <Grid columns={11} style={{ gap: '1px' }}>
-            <ColorTintsPreview hue={{mid, midPoint, lightest, darkest}} title={tone} />
+            <ColorTintsPreview
+              hue={{ mid, midPoint: midPoint as any, lightest, darkest }}
+              title={tone}
+            />
           </Grid>
         </Card>
       </Card>

@@ -355,7 +355,8 @@ export default createConfig({
                 </Code>
               </Card>
               <Text>
-                This also works in a Webpack bundled app, if you add a magic comment to the import:
+                This also works in a Webpack bundled app, if you add a magic
+                comment to the import:
               </Text>
               <Card
                 marginY={[2, 2, 3]}
@@ -370,8 +371,17 @@ const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
 `}
                 </Code>
               </Card>
-              <Text>Please note that this only works if your Webpack application is outputting ESM code that are loaded using {`<script type="module">`} tags as browsers only supports import() in that mode.</Text>
-              <Text>Lastly, if you are using Next.js you can import these URLs with the same ease as node_modules by turning URL Imports in next.config.js:</Text>
+              <Text>
+                Please note that this only works if your Webpack application is
+                outputting ESM code that are loaded using{' '}
+                {`<script type="module">`} tags as browsers only supports
+                import() in that mode.
+              </Text>
+              <Text>
+                Lastly, if you are using Next.js you can import these URLs with
+                the same ease as node_modules by turning URL Imports in
+                next.config.js:
+              </Text>
               <Card
                 marginY={[2, 2, 3]}
                 overflow="auto"
@@ -397,10 +407,75 @@ module.exports = nextConfig
 // Anywhere in your next application:
 import {theme} from ${JSON.stringify(esmUrl)}
 // Yay, no need for top-level async await or other complicated things, it's as if you npm-installed it :D
+
+// If you want to do fancy things like running this as native ESM in the browser, at runtime, no prefetching or local caching of the theme, like below:
+const {createTheme, hues} = await import(/* webpackIgnore: true */${JSON.stringify(
+                    esmUrl
+                  )})
+// Then you'll, in addition to that webpackIgnore comment, will need to add these to your next.config
+module.exports = {
+  experimental: {
+    urlImports: ['https://themer.creativecody.dev/'],
+    browsersListForSwc: true,
+    legacyBrowsers: false,
+  },
+}
+// Fun fact, that's how this Next App is loading the theme for the Sanity Studio you're looking at right now while reading this 🤯
 `}
                 </Code>
               </Card>
+              <Text>
+                If URL ESM is not a viable option for you, copy paste the
+                contents of this URL, it is self-contained and you can use the
+                same imports as previously demonstrated:
+              </Text>
               <Button icon={LaunchIcon} as="a" href={esmUrl} text="Open" />
+              <Card
+                marginY={[2, 2, 3]}
+                overflow="auto"
+                padding={4}
+                radius={2}
+                shadow={1}
+              >
+                <Code language={'ts'} muted>
+                  {`// ./theme.js
+// copy-paste of this URL: ${JSON.stringify(esmUrl)}
+
+// sanity.config.ts
+import {theme} from './theme'
+
+// Easy usage as before, and you can still access
+import {hues, createTheme} from './theme'
+// Allowing you to tweak your theme as you wish
+// Without having to run back-and-forth between your studio and this app ;)
+
+export default createConfig({
+  theme,
+  // or
+  theme: createTheme({...hues, ...overrides}),
+  plugins: [deskTool()],
+  projectId: "b5vzhxkv",
+  dataset: "production",
+  schema: {
+    types: [
+      {
+        type: "document",
+        name: "post",
+        title: "Post",
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            title: "Title",
+          },
+        ],
+      },
+    ],
+  },
+})
+`}
+                </Code>
+              </Card>
             </Stack>
           </Box>
         </Dialog>

@@ -181,17 +181,62 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
         throw new Error('No form ref')
       }
 
+      const searchParams = new URLSearchParams()
       const formData = new FormData(formRef.current)
-      console.log(
-        'formData',
-        formData,
-        new URLSearchParams(formData).toString()
-      )
-      function parseHue(key: string, formData: FormData): Hue {
-        return {
-          mid: formData.get(`${key}-mid`) as string,
+
+      function createSearchParam(key: string, formData: FormData): string {
+        const parts = []
+
+        if (formData.has(`${key}-mid`)) {
+          const mid = formData.get(`${key}-mid`).toString().replace(/^#/, '')
+          parts.push(mid)
         }
+
+        if (formData.has(`${key}-midPoint`)) {
+          const midPoint = roundToScale(
+            Number(formData.get(`${key}-midPoint`).toString())
+          )
+          parts.push(midPoint)
+        }
+
+        if (formData.has(`${key}-lightest`)) {
+          const lightest = formData
+            .get(`${key}-lightest`)
+            .toString()
+            .replace(/^#/, 'lightest:')
+          parts.push(lightest)
+        }
+
+        if (formData.has(`${key}-darkest`)) {
+          const darkest = formData
+            .get(`${key}-darkest`)
+            .toString()
+            .replace(/^#/, 'darkest:')
+          parts.push(darkest)
+        }
+
+        return parts.join(';')
       }
+
+      const defaultParam = createSearchParam('default', formData)
+      const primaryParam = createSearchParam('primary', formData)
+      const transparentParam = createSearchParam('transparent', formData)
+      const positiveParam = createSearchParam('positive', formData)
+      const cautionParam = createSearchParam('caution', formData)
+      const negativeParam = createSearchParam('negative', formData)
+
+      if (defaultParam) searchParams.set('default', defaultParam)
+      if (primaryParam) searchParams.set('primary', primaryParam)
+      if (transparentParam) searchParams.set('transparent', transparentParam)
+      if (positiveParam) searchParams.set('positive', positiveParam)
+      if (cautionParam) searchParams.set('caution', cautionParam)
+      if (negativeParam) searchParams.set('negative', negativeParam)
+
+      const url = new URL(
+        `/api/hues?${decodeURIComponent(searchParams.toString())}`,
+        location.origin
+      )
+      startTransition(() => setThemeUrl(url.toString()))
     }
 
     if (typeof requestIdleCallback === 'function') {
@@ -640,6 +685,7 @@ function HueFields({ config, tone }: { config: Hue; tone: CardTone }) {
         </Label>
         <Card paddingY={2} tone={tone}>
           <StyledRange
+            name={`${tone}-midPoint`}
             // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
             type="range"
             min={50}

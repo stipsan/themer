@@ -1515,9 +1515,6 @@ function Logo({ spin, transition }: Props) {
   useEffect(() => {
     if (wheelRef.current && logoRef.current) {
       if (spin || transition) {
-        console.count('spin')
-        console.log(spin, { transition }, 'start')
-
         const unit = 360 / 1.5
         const rewind = unit + Math.random() * unit
         const forward = unit + Math.random() * unit
@@ -1531,7 +1528,7 @@ function Logo({ spin, transition }: Props) {
         )
         const animation2 = animate(
           logoRef.current,
-          { scale: transition ? 0.9 : 1 },
+          { scale: transition ? 1.08 : 1 },
           { easing: spring({ stiffness: 70 }) }
         )
         return () => {

@@ -176,7 +176,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
             id="presets"
             menu={
               <Menu>
-                <MenuItem
+                {false && <MenuItem
                   fontSize={1}
                   paddingY={2}
                   paddingX={3}
@@ -186,7 +186,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
                   icon={UploadIcon}
                   text={'Upload'}
                   onClick={() => void setOpen('upload')}
-                />
+                />}
                 <MenuItem
                   fontSize={1}
                   paddingY={2}

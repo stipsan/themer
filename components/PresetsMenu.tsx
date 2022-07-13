@@ -296,10 +296,11 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
 import { createConfig } from "sanity";
 import { deskTool } from "sanity/desk";
 
-const {theme} = await import(${JSON.stringify(esmUrl)})
+// Add this URL ESM import
+import { theme } from ${JSON.stringify(esmUrl)};
 
 export default createConfig({
-  theme, // <-- add it here
+  theme, // <-- add the theme here
   plugins: [deskTool()],
   projectId: "b5vzhxkv",
   dataset: "production",
@@ -340,11 +341,13 @@ export default createConfig({
 import { createConfig } from "sanity";
 import { deskTool } from "sanity/desk";
 
-const {createTheme, hues} = await import(${JSON.stringify(esmUrl)})
+// Add this URL ESM import
+import { createTheme, hues } from ${JSON.stringify(esmUrl)};
 
 export default createConfig({
   theme: createTheme({
-    ...hues, primary: {...hues.primary, mid: '#22fca8'} // <-- override just the bits you want to iterate on
+    // override just the bits you want to iterate on
+    ...hues, primary: { ...hues.primary, mid: '#22fca8' } 
   }),
   plugins: [deskTool()],
   projectId: "b5vzhxkv",

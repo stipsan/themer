@@ -41,7 +41,7 @@ const browserDefaults = {
   ..._defaults,
   // Target browsers that can use dynamic imports
   // https://caniuse.com/es6-module-dynamic-import
-  target: ['chrome63', 'firefox67', 'safari11'],
+  target: ['chrome63', 'firefox67', 'safari12'],
   platform: 'browser',
   // @TODO figure out how to support source maps
   // sourcemap: 'external',

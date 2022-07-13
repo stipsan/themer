@@ -176,17 +176,19 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
             id="presets"
             menu={
               <Menu>
-                {false && <MenuItem
-                  fontSize={1}
-                  paddingY={2}
-                  paddingX={3}
-                  //key={slug}
-                  //disabled={selected.slug === slug}
-                  // icon={icon ?? iconFromSlug(slug)}
-                  icon={UploadIcon}
-                  text={'Upload'}
-                  onClick={() => void setOpen('upload')}
-                />}
+                {false && (
+                  <MenuItem
+                    fontSize={1}
+                    paddingY={2}
+                    paddingX={3}
+                    //key={slug}
+                    //disabled={selected.slug === slug}
+                    // icon={icon ?? iconFromSlug(slug)}
+                    icon={UploadIcon}
+                    text={'Upload'}
+                    onClick={() => void setOpen('upload')}
+                  />
+                )}
                 <MenuItem
                   fontSize={1}
                   paddingY={2}

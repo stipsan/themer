@@ -141,7 +141,7 @@ const HueFields = memo(function HueFields({
         >
           {tone}
         </Text>
-        <Grid columns={[1, 3]} paddingTop={4}>
+        <Grid columns={3} paddingTop={4}>
           <Card tone={tone} key="mid">
             <Label muted size={0}>
               Mid

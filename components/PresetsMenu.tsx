@@ -15,12 +15,16 @@ import {
   Card,
   Code,
   Dialog,
+  Heading,
   Label,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
   Text,
   TextInput,
 } from '@sanity/ui'
@@ -28,6 +32,8 @@ import { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { presets } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
+
+import ImportFromImage from './ImportFromImage'
 
 const SynthWaveIcon = styled(MusicNoteIcon)`
   transform: translateX(-1px);
@@ -63,9 +69,7 @@ interface Props {
   hues: Hues
 }
 export default function PresetsMenu({ selected, onChange, hues }: Props) {
-  const [open, setOpen] = useState<'upload' | 'share' | 'download' | false>(
-    false
-  )
+  const [open, setOpen] = useState<'import' | 'share' | 'export' | false>(false)
 
   const searchParams = useMemo(() => {
     const searchParams = new URLSearchParams()
@@ -176,44 +180,6 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
             id="presets"
             menu={
               <Menu>
-                {false && (
-                  <MenuItem
-                    fontSize={1}
-                    paddingY={2}
-                    paddingX={3}
-                    //key={slug}
-                    //disabled={selected.slug === slug}
-                    // icon={icon ?? iconFromSlug(slug)}
-                    icon={UploadIcon}
-                    text={'Upload'}
-                    onClick={() => void setOpen('upload')}
-                  />
-                )}
-                <MenuItem
-                  fontSize={1}
-                  paddingY={2}
-                  paddingX={3}
-                  //key={slug}
-                  icon={PackageIcon}
-                  //disabled={selected.slug === slug}
-                  // icon={icon ?? iconFromSlug(slug)}
-                  text={'Share'}
-                  onClick={() => void setOpen('share')}
-                  //onClick={() => void onChange(_preset)}
-                />
-                <MenuItem
-                  fontSize={1}
-                  paddingY={2}
-                  paddingX={3}
-                  icon={DownloadIcon}
-                  onClick={() => void setOpen('download')}
-                  //key={slug}
-                  //disabled={selected.slug === slug}
-                  // icon={icon ?? iconFromSlug(slug)}
-                  text={'Download'}
-                  //onClick={() => void onChange(_preset)}
-                />
-                <MenuDivider />
                 {presets.map((_preset) => {
                   const { slug, icon, title } = _preset
                   const active = selected.slug === slug
@@ -235,41 +201,60 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
                 })}
               </Menu>
             }
-            placement="right"
+            placement="bottom-start"
             popover={{ portal: true }}
           />
         </Card>
       </Card>
-      {open === 'upload' && (
-        <Dialog
-          key="upload"
-          header="Upload"
-          id="dialog-upload-preset"
-          onClose={() => setOpen(false)}
-          zOffset={1000}
+      <Card paddingX={[4]} paddingBottom={2}>
+        <Label size={0} muted>
+          Tools
+        </Label>
+        <Card paddingY={2}>
+          <TabList space={2}>
+            <Tab
+              fontSize={1}
+              aria-controls="import-panel"
+              icon={UploadIcon}
+              id="import-tab"
+              label="Import"
+              onClick={() => setOpen('import')}
+              selected={open === 'import'}
+            />
+            <Tab
+              fontSize={1}
+              aria-controls="share-panel"
+              icon={PackageIcon}
+              id="share-tab"
+              label="Share"
+              onClick={() => setOpen('share')}
+              selected={open === 'share'}
+            />
+            <Tab
+              fontSize={1}
+              aria-controls="export-panel"
+              icon={DownloadIcon}
+              id="export-tab"
+              label="Export"
+              onClick={() => setOpen('export')}
+              selected={open === 'export'}
+            />
+          </TabList>
+        </Card>
+        <TabPanel
+          aria-labelledby="import-tab"
+          hidden={open !== 'import'}
+          id="import-panel"
         >
-          <Box padding={4}>
-            <Text>Todo</Text>
-          </Box>
-        </Dialog>
-      )}
-      {open === 'upload' && (
+          <Card marginY={2}>
+            <ImportFromImage />
+          </Card>
+        </TabPanel>
+      </Card>
+      {open === 'export' && (
         <Dialog
-          key="upload"
-          header="Upload"
-          id="dialog-upload-preset"
-          onClose={() => setOpen(false)}
-          zOffset={1000}
-        >
-          <Box padding={4}>
-            <Text>Todo</Text>
-          </Box>
-        </Dialog>
-      )}
-      {open === 'download' && (
-        <Dialog
-          key="download"
-          header="Download your theme"
+          key="export"
+          header="Export your theme"
           id="dialog-download-preset"
           onClose={() => setOpen(false)}
           zOffset={1000}

@@ -18,6 +18,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  Select,
   Text,
   ThemeProvider,
   useElementRect,
@@ -407,7 +408,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                             />
                           </Menu>
                         }
-                        placement="right"
+                        placement="bottom-start"
                         popover={{ portal: true }}
                       />
                     </Card>

@@ -389,7 +389,7 @@ function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
               </Box>
             </Card>
           }
-          fallbackPlacements={['right', 'left']}
+          fallbackPlacements={['top-end', 'top-start']}
           placement="top"
           portal
         >

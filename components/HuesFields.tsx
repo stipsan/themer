@@ -137,11 +137,12 @@ const HueFields = memo(function HueFields({
           size={2}
           weight="medium"
           muted
-          style={{ textTransform: 'capitalize' }}
+          style={{ textTransform: 'capitalize',paddingLeft: 'env(safe-area-inset-left)' }}
+          
         >
           {tone}
         </Text>
-        <Grid columns={3} paddingTop={4}>
+        <Grid columns={3} paddingTop={4} style={{paddingLeft: 'env(safe-area-inset-left)'}}>
           <Card tone={tone} key="mid">
             <Label muted size={0}>
               Mid
@@ -248,7 +249,7 @@ const HueFields = memo(function HueFields({
             </Card>
           </Card>
         </Grid>
-        <Card tone={tone} paddingTop={3} paddingBottom={2}>
+        <Card tone={tone} paddingTop={3} paddingBottom={2} style={{paddingLeft: 'env(safe-area-inset-left)'}}>
           <Label muted size={0}>
             Mid point ({roundToScale(Number(midPoint))})
           </Label>
@@ -293,7 +294,7 @@ const HueFields = memo(function HueFields({
             </datalist>
           </Card>
         </Card>
-        <Card tone={tone} shadow={1} radius={1}>
+        <Card tone={tone} shadow={1} radius={1} style={{marginLeft: 'env(safe-area-inset-left)'}}>
           <Grid columns={11} style={{ gap: '1px' }}>
             <ColorTintsPreview
               hue={{ mid, midPoint: midPoint as any, lightest, darkest }}

@@ -277,17 +277,19 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
               style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
             >
               <HeaderCard
-                paddingLeft={[3]}
+                paddingLeft={[4]}
                 paddingY={[2]}
                 scheme="dark"
                 shadow={scheme === 'dark' ? 1 : undefined}
               >
                 <Card
+                  
+                  
                   borderRight
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '32px 1fr',
-                    alignItems: 'center',
+                    alignItems: 'center',paddingLeft: 'env(safe-area-inset-left)'
                   }}
                 >
                   <Logo spin={spins} transition={transition} />
@@ -299,7 +301,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                 </Card>
               </HeaderCard>
               <Card borderRight height="fill" tone="default">
-                <Grid columns={[2]} paddingBottom={2}>
+                <Grid columns={[2]} paddingBottom={2} style={{paddingLeft: 'env(safe-area-inset-left)'}}>
                   <Card paddingLeft={[4]} paddingTop={4}>
                     <Label htmlFor="view" size={0} muted>
                       View

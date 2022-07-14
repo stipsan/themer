@@ -153,8 +153,7 @@ const buildThemeFromHuesTemplate = async () => {
     outfile: path.resolve(resolveDir, 'edge-utils/themeFromHuesTemplate.mjs'),
     stdin: {
       contents: `
-import prettier from "prettier/esm/standalone.mjs";
-import parserBabel from "prettier/esm/parser-babel.mjs";
+import JSON5 from "json5/dist/index.mjs";
 
 export function themeFromHuesTemplate(hues, minified) {
   const template = minified ? ${JSON.stringify(
@@ -167,7 +166,7 @@ export function themeFromHuesTemplate(hues, minified) {
       )}
   return "// Generated " + new Date().toJSON() + "\\n" + tip + "\\n\\n" + template.replace(
     'process.env.__HUES__',
-    JSON.stringify(hues, null, minified ? 0 : 2)
+    JSON5.stringify(hues, null, minified ? 0 : 2),
   )
 }
 `,

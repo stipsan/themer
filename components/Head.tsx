@@ -1,13 +1,22 @@
 import NextHead from 'next/head'
 import png from 'public/favicon.png'
 import svg from 'public/favicon.svg'
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
+
+const title = 'Themer | Create Sanity Studio v3 themes 🪄'
 
 interface Props {
   lightest: string
   darkest: string
 }
 function Head({ lightest, darkest }: Props) {
+  // @TODO find a better way to override the page title
+  useEffect(() => {
+    if (document.title !== title) {
+      document.title = title
+    }
+  })
+
   return (
     <NextHead>
       <title>Themer | Create Sanity Studio v3 themes 🪄</title>

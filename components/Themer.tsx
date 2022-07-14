@@ -257,14 +257,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     }
   }, [])
 
-  // @TODO find a better way to override the page title
-  useEffect(() => {
-    const title = 'Themer | Create Sanity Studio v3 themes 🪄'
-    if (document.title !== title) {
-      document.title = title
-    }
-  })
-
   return (
     <>
       <Head

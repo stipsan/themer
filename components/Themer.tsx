@@ -366,7 +366,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               paddingX={3}
                               icon={DesktopIcon}
                               text="System"
-                              disabled={forceScheme === null}
+                              selected={forceScheme === null}
+                              tone={forceScheme === null ? 'primary' : 'default'}
                               onClick={() =>
                                 startTransition(() => setForceScheme(null))
                               }
@@ -377,7 +378,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               paddingX={3}
                               icon={SunIcon}
                               text="Light"
-                              disabled={forceScheme === 'light'}
+                              selected={forceScheme === 'light'}
+                              tone={forceScheme === 'light' ? 'primary' : 'default'}
                               onClick={() =>
                                 startTransition(() => setForceScheme('light'))
                               }
@@ -388,7 +390,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               paddingX={3}
                               icon={MoonIcon}
                               text="Dark"
-                              disabled={forceScheme === 'dark'}
+                              selected={forceScheme === 'dark'}
+                              tone={forceScheme === 'dark' ? 'primary' : 'default'}
                               onClick={() =>
                                 startTransition(() => setForceScheme('dark'))
                               }

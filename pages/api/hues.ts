@@ -17,8 +17,8 @@ const headers = (timing) => ({
   'server-timing': timing,
 })
 
+const handlerStart = Date.now()
 export default async function handler(req: NextRequest) {
-  const handlerStart = Date.now()
   const { searchParams } = new URL(req.url)
 
   try {

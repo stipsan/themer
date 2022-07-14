@@ -417,6 +417,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                 <PresetsMenu
                   hues={memoHues}
                   selected={preset}
+                  prepareTransition={spin}
+                  startTransition={startTransition}
                   onChange={(nextPreset) =>
                     startTransition(() => setPreset(nextPreset))
                   }

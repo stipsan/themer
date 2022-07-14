@@ -28,7 +28,7 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
-import { useMemo, useState } from 'react'
+import { type TransitionStartFunction, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { presets } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
@@ -64,11 +64,19 @@ const iconFromSlug = (slug: string) => {
 }
 
 interface Props {
+  startTransition: TransitionStartFunction
+  prepareTransition: () => void
   onChange: (preset: ThemePreset) => void
   selected: ThemePreset
   hues: Hues
 }
-export default function PresetsMenu({ selected, onChange, hues }: Props) {
+export default function PresetsMenu({
+  selected,
+  onChange,
+  hues,
+  prepareTransition,
+  startTransition,
+}: Props) {
   const [open, setOpen] = useState<'import' | 'share' | 'export' | false>(false)
 
   const searchParams = useMemo(() => {
@@ -247,7 +255,10 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
           id="import-panel"
         >
           <Card marginY={2}>
-            <ImportFromImage />
+            <ImportFromImage
+              prepareTransition={prepareTransition}
+              startTransition={startTransition}
+            />
           </Card>
         </TabPanel>
       </Card>

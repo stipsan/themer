@@ -19,7 +19,7 @@ function Head({ lightest, darkest }: Props) {
 
   return (
     <NextHead>
-      <meta name="viewport" content="width=device-width, viewport-fit=cover"/>
+      <meta name="viewport" content="width=device-width, viewport-fit=cover" />
       <title>Themer | Create Sanity Studio v3 themes 🪄</title>
       <meta name="theme-color" content={lightest} />
       <meta

@@ -154,7 +154,7 @@ export default function PresetsMenu({ selected, onChange, hues }: Props) {
   }, [searchParams])
 
   return (
-    <Card style={{paddingLeft: 'env(safe-area-inset-left)'}}>
+    <Card style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
       <Card paddingX={[4]} paddingBottom={2}>
         <Label htmlFor="presets" size={0} muted>
           Presets

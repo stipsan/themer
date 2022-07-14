@@ -283,13 +283,12 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                 shadow={scheme === 'dark' ? 1 : undefined}
               >
                 <Card
-                  
-                  
                   borderRight
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '32px 1fr',
-                    alignItems: 'center',paddingLeft: 'env(safe-area-inset-left)'
+                    alignItems: 'center',
+                    paddingLeft: 'env(safe-area-inset-left)',
                   }}
                 >
                   <Logo spin={spins} transition={transition} />
@@ -301,7 +300,11 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                 </Card>
               </HeaderCard>
               <Card borderRight height="fill" tone="default">
-                <Grid columns={[2]} paddingBottom={2} style={{paddingLeft: 'env(safe-area-inset-left)'}}>
+                <Grid
+                  columns={[2]}
+                  paddingBottom={2}
+                  style={{ paddingLeft: 'env(safe-area-inset-left)' }}
+                >
                   <Card paddingLeft={[4]} paddingTop={4}>
                     <Label htmlFor="view" size={0} muted>
                       View
@@ -367,7 +370,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               icon={DesktopIcon}
                               text="System"
                               selected={forceScheme === null}
-                              tone={forceScheme === null ? 'primary' : 'default'}
+                              tone={
+                                forceScheme === null ? 'primary' : 'default'
+                              }
                               onClick={() =>
                                 startTransition(() => setForceScheme(null))
                               }
@@ -379,7 +384,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               icon={SunIcon}
                               text="Light"
                               selected={forceScheme === 'light'}
-                              tone={forceScheme === 'light' ? 'primary' : 'default'}
+                              tone={
+                                forceScheme === 'light' ? 'primary' : 'default'
+                              }
                               onClick={() =>
                                 startTransition(() => setForceScheme('light'))
                               }
@@ -391,7 +398,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                               icon={MoonIcon}
                               text="Dark"
                               selected={forceScheme === 'dark'}
-                              tone={forceScheme === 'dark' ? 'primary' : 'default'}
+                              tone={
+                                forceScheme === 'dark' ? 'primary' : 'default'
+                              }
                               onClick={() =>
                                 startTransition(() => setForceScheme('dark'))
                               }

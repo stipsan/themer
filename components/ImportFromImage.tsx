@@ -131,7 +131,6 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
           />
         )}
         <Card
-          open
           as="details"
           tone="transparent"
           muted

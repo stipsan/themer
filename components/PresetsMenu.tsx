@@ -220,15 +220,17 @@ export default function PresetsMenu({
         </Label>
         <Card paddingY={2}>
           <TabList space={2}>
-            <Tab
-              fontSize={1}
-              aria-controls="import-panel"
-              icon={UploadIcon}
-              id="import-tab"
-              label="Import"
-              onClick={() => setOpen('import')}
-              selected={open === 'import'}
-            />
+            {process.env.NODE_ENV !== 'production' && (
+              <Tab
+                fontSize={1}
+                aria-controls="import-panel"
+                icon={UploadIcon}
+                id="import-tab"
+                label="Import"
+                onClick={() => setOpen('import')}
+                selected={open === 'import'}
+              />
+            )}
             <Tab
               fontSize={1}
               aria-controls="share-panel"

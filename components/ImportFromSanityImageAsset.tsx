@@ -265,10 +265,6 @@ function ImportFromSanityImageAsset({
                   'default',
                   `${mid.replace(/^#/, '')};${midPoint}`
                 )
-                searchParams.set(
-                  'transparent',
-                  `${mid.replace(/^#/, '')};${midPoint}`
-                )
                 const primary =
                   data.dominant.background === data.vibrant.background
                     ? data.lightVibrant.background

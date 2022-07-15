@@ -1,10 +1,29 @@
-import { Card, Heading, Stack, Text, TextInput } from '@sanity/ui'
-import { type TransitionStartFunction, memo, useId, useState } from 'react'
+import { WarningOutlineIcon } from '@sanity/icons'
+import {
+  Box,
+  Button,
+  Card,
+  Grid,
+  Heading,
+  Label,
+  Stack,
+  Text,
+  TextInput,
+} from '@sanity/ui'
+import {
+  type TransitionStartFunction,
+  memo,
+  useId,
+  useMemo,
+  useState,
+} from 'react'
+
+import ImportFromSanityImageAsset from './ImportFromSanityImageAsset'
 
 const exampleUrl =
   'https://cdn.sanity.io/images/rkndubl4/themes/ed9f0a5c8d40ff7d7d23ba6ba32a00ac79eb8b00-500x750.png'
 const validationMessages = {
-  patternMismatch: `Only Sanity Image URLs are supported, for example: ${exampleUrl}`,
+  patternMismatch: `Only Sanity Image URLs are supported`,
 }
 
 interface Props {
@@ -18,6 +37,16 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
   const [touched, setTouched] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [validationMessage, setValidationMessage] = useState('')
+  const asset = useMemo(() => {
+    try {
+      const url = new URL(imageUrl)
+      const [, , projectId, dataset, _id] = url.pathname.split('/')
+      const id = `image-${_id.split('.').join('-')}`
+      return { projectId, dataset, id }
+    } catch {
+      return { projectId: '', dataset: '', id: '' }
+    }
+  }, [imageUrl])
 
   return (
     <>
@@ -71,6 +100,36 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
           }}
           onBlur={() => setTouched(true)}
         />
+        {validationMessage && (
+          <Card tone="caution">
+            <Grid
+              paddingX={1}
+              paddingY={3}
+              columns={2}
+              style={{ alignItems: 'center', gridTemplateColumns: '22px 1fr' }}
+            >
+              <WarningOutlineIcon />
+              <Text size={0} style={{ wordBreak: 'break-word' }}>
+                {validationMessage}
+              </Text>
+            </Grid>
+          </Card>
+        )}
+        {!imageUrl && (
+          <Button
+            fontSize={1}
+            paddingY={2}
+            paddingX={3}
+            text="Demo"
+            tone="primary"
+            onClick={() => {
+              setUrl(exampleUrl)
+              prepareTransition()
+              setValidationMessage('')
+              startTransition(() => setImageUrl(exampleUrl))
+            }}
+          />
+        )}
         <Card
           open
           as="details"
@@ -94,10 +153,30 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
               Debug info
             </Text>
           </summary>
-          <Text>url: {url}</Text>
-          <Text>validationMessage: {validationMessage}</Text>
-          <Text>imageUrl: {imageUrl}</Text>
+          <Stack space={1} paddingY={2}>
+            <Label size={0}>URL</Label>
+            <TextInput fontSize={0} readOnly value={imageUrl} />
+            <Grid columns={2} paddingY={1} gap={1}>
+              <Stack space={1}>
+                <Label size={0}>Project ID</Label>
+                <TextInput fontSize={0} readOnly value={asset.projectId} />
+              </Stack>
+              <Stack space={1}>
+                <Label size={0}>Dataset</Label>
+                <TextInput fontSize={0} readOnly value={asset.dataset} />
+              </Stack>
+            </Grid>
+            <Label size={0}>Image Asset Ref</Label>
+            <TextInput fontSize={0} readOnly value={asset.id} />
+          </Stack>
         </Card>
+        {asset.projectId && asset.dataset && asset.id && (
+          <ImportFromSanityImageAsset
+            projectId={asset.projectId}
+            dataset={asset.dataset}
+            id={asset.id}
+          />
+        )}
       </Stack>
     </>
   )

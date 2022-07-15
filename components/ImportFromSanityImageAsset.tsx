@@ -19,6 +19,13 @@ interface Props {
 }
 function ImportFromSanityImageAsset({ projectId, dataset, id }: Props) {
   const data = suspend(async () => {
+    const url = new URL(
+      `/api/palette/${projectId}/${dataset}/${id}`,
+      location.origin
+    )
+    const res = await fetch(url)
+    const palette = await res.json()
+    /*
     const { default: createClient } = await import('@sanity/client')
     const client = createClient({
       projectId,
@@ -27,10 +34,11 @@ function ImportFromSanityImageAsset({ projectId, dataset, id }: Props) {
       useCdn: true,
     })
     const palette = await client.fetch(
-      /* groq */ `*[ _type == "sanity.imageAsset" && _id == $id ][0].metadata.palette`,
+      `*[ _type == "sanity.imageAsset" && _id == $id ][0].metadata.palette`,
       { id }
-    )
-    console.debug({ palette })
+      )
+      console.debug({ palette })
+      // */
     return palette
   }, [projectId, dataset, id])
 

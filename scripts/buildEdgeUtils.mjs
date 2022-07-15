@@ -138,6 +138,26 @@ export function createTheme(_hues) {
   })
 }
 
+const buildSanityClient = async () => {
+  /**
+   * @type {import('esbuild').BuildOptions['stdin']}
+   **/
+
+  await esbuild.build({
+    ...browserDefaults,
+    outfile: path.resolve(resolveDir, 'edge-utils/sanityClient.mjs'),
+    stdin: {
+      contents: `
+globalThis.exports = {};
+import createClient from './node_modules/@sanity/client/dist/sanityClient.browser.mjs'
+export {createClient}
+    `,
+      resolveDir,
+      loader: 'ts',
+    },
+  })
+}
+
 const buildThemeFromHuesTemplate = async () => {
   const prebuiltFromEsbuild = await fs.readFile(
     path.resolve(resolveDir, 'edge-utils/themeFromHues.mjs'),
@@ -177,6 +197,9 @@ export function themeFromHuesTemplate(hues, minified) {
 
 // Start by building the contents of the template string
 await buildTemplateString()
+
+// Next we need an edge-compatible version of the sanity client
+await buildSanityClient()
 
 // Now we build the util used by the edge APIs that outputs ESM that can by dynamically imported
 await buildThemeFromHuesTemplate()

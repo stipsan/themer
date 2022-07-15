@@ -11,12 +11,15 @@ import {
   TextInput,
 } from '@sanity/ui'
 import {
+  type Dispatch,
+  type SetStateAction,
   type TransitionStartFunction,
   memo,
   useId,
   useMemo,
   useState,
 } from 'react'
+import type { ThemePreset } from 'utils/types'
 
 import ImportFromSanityImageAsset from './ImportFromSanityImageAsset'
 
@@ -28,9 +31,14 @@ const validationMessages = {
 
 interface Props {
   startTransition: TransitionStartFunction
+  setPreset: Dispatch<SetStateAction<ThemePreset>>
   prepareTransition: () => void
 }
-function ImportFromImage({ prepareTransition, startTransition }: Props) {
+function ImportFromImage({
+  prepareTransition,
+  startTransition,
+  setPreset,
+}: Props) {
   const id = useId()
   const inputId = `${id}-url`
   const [url, setUrl] = useState('')
@@ -149,7 +157,7 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
                 left: '1rem',
               }}
             >
-              Debug info
+              Parsed URL
             </Text>
           </summary>
           <Stack space={1} paddingY={2}>
@@ -174,6 +182,8 @@ function ImportFromImage({ prepareTransition, startTransition }: Props) {
             projectId={asset.projectId}
             dataset={asset.dataset}
             id={asset.id}
+            startTransition={startTransition}
+            setPreset={setPreset}
           />
         )}
       </Stack>

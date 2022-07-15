@@ -419,6 +419,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   selected={preset}
                   prepareTransition={spin}
                   startTransition={startTransition}
+                  setPreset={setPreset}
                   onChange={(nextPreset) =>
                     startTransition(() => setPreset(nextPreset))
                   }

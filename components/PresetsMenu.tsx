@@ -28,7 +28,13 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
-import { type TransitionStartFunction, useMemo, useState } from 'react'
+import {
+  type Dispatch,
+  type SetStateAction,
+  type TransitionStartFunction,
+  useMemo,
+  useState,
+} from 'react'
 import styled from 'styled-components'
 import { presets } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
@@ -65,6 +71,7 @@ const iconFromSlug = (slug: string) => {
 
 interface Props {
   startTransition: TransitionStartFunction
+  setPreset: Dispatch<SetStateAction<ThemePreset>>
   prepareTransition: () => void
   onChange: (preset: ThemePreset) => void
   selected: ThemePreset
@@ -76,6 +83,7 @@ export default function PresetsMenu({
   hues,
   prepareTransition,
   startTransition,
+  setPreset,
 }: Props) {
   const [open, setOpen] = useState<'import' | 'share' | 'export' | false>(false)
 
@@ -220,17 +228,15 @@ export default function PresetsMenu({
         </Label>
         <Card paddingY={2}>
           <TabList space={2}>
-            {process.env.NODE_ENV !== 'production' && (
-              <Tab
-                fontSize={1}
-                aria-controls="import-panel"
-                icon={UploadIcon}
-                id="import-tab"
-                label="Import"
-                onClick={() => setOpen('import')}
-                selected={open === 'import'}
-              />
-            )}
+            <Tab
+              fontSize={1}
+              aria-controls="import-panel"
+              icon={UploadIcon}
+              id="import-tab"
+              label="Import"
+              onClick={() => setOpen('import')}
+              selected={open === 'import'}
+            />
             <Tab
               fontSize={1}
               aria-controls="share-panel"
@@ -260,6 +266,7 @@ export default function PresetsMenu({
             <ImportFromImage
               prepareTransition={prepareTransition}
               startTransition={startTransition}
+              setPreset={setPreset}
             />
           </Card>
         </TabPanel>

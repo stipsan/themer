@@ -20,7 +20,13 @@ export const twCyan: ThemePreset = {
   url: '/api/hues?default=677389;500;lightest:f9fafb;darkest:101728&primary=51b4d0;500;lightest:effefe;darkest:264d61&transparent=6b727f;500;lightest:f8fafb;darkest:131826&positive=55b785;500;lightest:eefdf5;darkest:214d3b&caution=e2b53e;500;lightest:fefbea;darkest:69411b&critical=e14f62;500;lightest:fdf2f2;darkest:7d2037&min=1',
 }
 
-export const presets: ThemePreset[] = [defaultPreset, pinkSynth, twCyan]
+export const technoRed: ThemePreset = {
+  slug: 'techno-red',
+  title: 'Techno Red',
+  url: '/api/hues?default=ac585c;500;lightest:fbf9f9;darkest:0c0f15&primary=e90522;500;lightest:fbf9f9;darkest:0c0f15&transparent=2c364c;600;lightest:fbf9f9;darkest:0c0f15&positive=10b981;400;lightest:fbf9f9;darkest:0c0f15&caution=fde047;200;lightest:fbf9f9;darkest:0c0f15&critical=fe349f;500;lightest:fbf9f9;darkest:0c0f15&min=1',
+}
+
+export const presets: ThemePreset[] = [defaultPreset, pinkSynth, twCyan, technoRed]
 
 // @TODO sort through these:
 /*

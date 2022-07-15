@@ -64,9 +64,7 @@ const iconFromSlug = (slug: string) => {
     ? SynthWaveIcon
     : slug === 'tw-cyan'
     ? TwLogo
-    : slug === 'default'
-    ? MasterDetailIcon
-    : undefined
+    : MasterDetailIcon
 }
 
 interface Props {

@@ -8,6 +8,7 @@ import {
   Text,
   TextArea,
 } from '@sanity/ui'
+import { setLightness } from 'polished'
 import {
   type Dispatch,
   type SetStateAction,
@@ -16,7 +17,9 @@ import {
 } from 'react'
 import { suspend } from 'suspend-react'
 import { getMidPointFromLuminance } from 'utils/getMidPointFromLuminance'
+import { parseHuesFromSearchParams } from 'utils/parseHuesFromSearchParams'
 import type { ThemePreset } from 'utils/types'
+import { widenColorHue } from 'utils/widenColorHue'
 
 const colorStyle = {
   boxSizing: 'border-box',
@@ -76,7 +79,9 @@ function ImportFromSanityImageAsset({
         paddingX={2}
         paddingY={1}
       >
-        <summary style={{ position: 'relative' }}>
+        <summary
+          style={{ position: 'relative', color: 'var(--card-muted-fg-color)' }}
+        >
           <Text
             size={1}
             muted
@@ -274,6 +279,111 @@ function ImportFromSanityImageAsset({
                   'primary',
                   `${primary.replace(/^#/, '')};${primaryMidPoint}`
                 )
+                searchParams.set(
+                  'darkest',
+                  setLightness(0.066, mid).replace(/^#/, '')
+                )
+                searchParams.set(
+                  'lightest',
+                  setLightness(0.98, mid).replace(/^#/, '')
+                )
+
+                return {
+                  ...prev,
+                  url: `${pathname}?${searchParams.toString()}`,
+                }
+              })
+            )
+          }}
+        />
+        <Button
+          fontSize={1}
+          paddingY={2}
+          paddingX={3}
+          text="Muted"
+          tone="primary"
+          onClick={() => {
+            startTransition(() =>
+              setPreset((prev) => {
+                const { pathname, searchParams } = new URL(
+                  prev.url,
+                  location.origin
+                )
+                const hues = parseHuesFromSearchParams(searchParams)
+
+                const mid = data.muted.background
+                const transparentMid = data.darkMuted.background
+                const primaryMid = data.vibrant?.background
+                const positiveMid = widenColorHue(
+                  hues.positive.mid,
+                  primaryMid,
+                  12,
+                  12
+                )
+                const cautionMid = widenColorHue(
+                  hues.caution.mid,
+                  primaryMid,
+                  12,
+                  12
+                )
+                const criticalMid = widenColorHue(
+                  hues.critical.mid,
+                  primaryMid,
+                  12,
+                  12
+                )
+
+                const midPoint = getMidPointFromLuminance(mid)
+                searchParams.set(
+                  'default',
+                  `${mid.replace(/^#/, '')};${midPoint}`
+                )
+                searchParams.set(
+                  'primary',
+                  `${primaryMid.replace(/^#/, '')};${getMidPointFromLuminance(
+                    primaryMid
+                  )}`
+                )
+                searchParams.set(
+                  'transparent',
+                  `${transparentMid.replace(
+                    /^#/,
+                    ''
+                  )};${getMidPointFromLuminance(transparentMid)}`
+                )
+                searchParams.set(
+                  'positive',
+                  `${positiveMid.replace(/^#/, '')};${getMidPointFromLuminance(
+                    positiveMid
+                  )}`
+                )
+                searchParams.set(
+                  'caution',
+                  `${cautionMid.replace(/^#/, '')};${getMidPointFromLuminance(
+                    cautionMid
+                  )}`
+                )
+                searchParams.set(
+                  'critical',
+                  `${criticalMid.replace(/^#/, '')};${getMidPointFromLuminance(
+                    criticalMid
+                  )}`
+                )
+                searchParams.set(
+                  'lightest',
+                  `${setLightness(0.98, data.lightMuted.background).replace(
+                    /^#/,
+                    ''
+                  )}`
+                )
+                searchParams.set(
+                  'darkest',
+                  `${setLightness(0.066, data.darkMuted.background).replace(
+                    /^#/,
+                    ''
+                  )}`
+                )
+
                 return {
                   ...prev,
                   url: `${pathname}?${searchParams.toString()}`,

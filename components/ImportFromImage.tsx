@@ -146,7 +146,12 @@ function ImportFromImage({
           paddingX={2}
           paddingY={1}
         >
-          <summary style={{ position: 'relative' }}>
+          <summary
+            style={{
+              position: 'relative',
+              color: 'var(--card-muted-fg-color)',
+            }}
+          >
             <Text
               size={1}
               muted

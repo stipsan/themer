@@ -24,9 +24,15 @@ export const technoRed: ThemePreset = {
   slug: 'techno-red',
   title: 'Techno Red',
   url: '/api/hues?default=ac585c;500;lightest:fbf9f9;darkest:0c0f15&primary=e90522;500;lightest:fbf9f9;darkest:0c0f15&transparent=2c364c;600;lightest:fbf9f9;darkest:0c0f15&positive=10b981;400;lightest:fbf9f9;darkest:0c0f15&caution=fde047;200;lightest:fbf9f9;darkest:0c0f15&critical=fe349f;500;lightest:fbf9f9;darkest:0c0f15&min=1',
+  // https://cdn.sanity.io/images/32a3sayd/blog/943d7e10ee953baac50b56da07898ef20d848262-800x1185.png?h=400&fit=max
 }
 
-export const presets: ThemePreset[] = [defaultPreset, pinkSynth, twCyan, technoRed]
+export const presets: ThemePreset[] = [
+  defaultPreset,
+  pinkSynth,
+  twCyan,
+  technoRed,
+]
 
 // @TODO sort through these:
 /*

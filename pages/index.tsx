@@ -9,9 +9,9 @@ import {
 } from '@sanity/ui'
 import Head from 'components/Head'
 import { useRouter } from 'next/router'
-import { lazy, startTransition, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { defaultPreset, presets } from 'utils/presets'
-import { ThemePreset } from 'utils/types'
+import type { ThemePreset } from 'utils/types'
 
 const Themer = lazy(() => import('components/Themer'))
 
@@ -82,7 +82,7 @@ export default function Index() {
         `${pathname}?${decodeURIComponent(searchParams.toString())}`,
         location.origin
       )
-      startTransition(() => setPreset({ ...inheritFrom, url: url.toString() }))
+      setPreset({ ...inheritFrom, url: url.toString() })
     }
   }, [readyToInit])
 

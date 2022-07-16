@@ -2,6 +2,7 @@ import type { PartialDeep } from 'type-fest'
 import { isMidPoint } from 'utils/isMidPoint'
 import type { Hue, Hues } from 'utils/types'
 import { ValidationError } from 'utils/ValidationError'
+
 import { roundMidPointToScale } from './roundMidPointToScale'
 
 export function parseHuesFromSearchParams(

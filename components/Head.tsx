@@ -21,8 +21,14 @@ function Head({ lightest, darkest }: Props) {
     <NextHead>
       <meta name="viewport" content="width=device-width, viewport-fit=cover" />
       <title>Themer | Create Sanity Studio v3 themes 🪄</title>
-      <meta name="theme-color" content={lightest} />
       <meta
+        key="theme-color-light"
+        name="theme-color"
+        content={lightest}
+        media="(prefers-color-scheme: light)"
+      />
+      <meta
+        key="theme-color-dark"
         name="theme-color"
         content={darkest}
         media="(prefers-color-scheme: dark)"

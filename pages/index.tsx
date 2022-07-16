@@ -1,42 +1,11 @@
-import {
-  Card,
-  Flex,
-  Spinner,
-  studioTheme,
-  Text,
-  ThemeProvider,
-  usePrefersDark,
-} from '@sanity/ui'
-import Head from 'components/Head'
+import { usePrefersDark } from '@sanity/ui'
+import ThemerFallback from 'components/ThemerFallback'
 import { useRouter } from 'next/router'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { defaultPreset, presets } from 'utils/presets'
 import type { ThemePreset } from 'utils/types'
 
 const Themer = lazy(() => import('components/Themer'))
-
-const fallback = (
-  <ThemeProvider scheme="light" theme={studioTheme}>
-    <Head
-      lightest={studioTheme.color.light.default.base.bg}
-      darkest={studioTheme.color.dark.default.base.bg}
-    />
-    <Card height="fill" tone="transparent">
-      <Flex
-        align="center"
-        direction="column"
-        gap={4}
-        justify="center"
-        padding={6}
-        sizing="border"
-        height="fill"
-      >
-        <Text muted>Loading…</Text>
-        <Spinner muted />
-      </Flex>
-    </Card>
-  </ThemeProvider>
-)
 
 export default function Index() {
   const { isReady } = useRouter()
@@ -86,10 +55,10 @@ export default function Index() {
     }
   }, [readyToInit])
 
-  if (!initialPreset) return fallback
+  if (!initialPreset) return <ThemerFallback />
 
   return (
-    <Suspense fallback={fallback}>
+    <Suspense fallback={<ThemerFallback />}>
       <Themer
         initialPreset={initialPreset}
         systemScheme={prefersDark ? 'dark' : 'light'}

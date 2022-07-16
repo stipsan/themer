@@ -250,9 +250,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     }
 
     if (typeof requestIdleCallback === 'function') {
-      throttleRef.current = requestIdleCallback(scheduledUpdate, {
-        timeout: 1000,
-      })
+      throttleRef.current = requestIdleCallback(scheduledUpdate)
     } else {
       throttleRef.current = requestAnimationFrame(scheduledUpdate)
     }

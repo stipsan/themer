@@ -2,10 +2,8 @@ import {
   CollapseIcon,
   DesktopIcon,
   MoonIcon,
-  RetrieveIcon,
   SelectIcon,
   SplitVerticalIcon,
-  SquareIcon,
   SunIcon,
 } from '@sanity/icons'
 import {
@@ -18,7 +16,6 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  Select,
   Text,
   ThemeProvider,
   useElementRect,
@@ -27,6 +24,7 @@ import Head from 'components/Head'
 import HuesFields from 'components/HuesFields'
 import Logo from 'components/Logo'
 import PresetsMenu from 'components/PresetsMenu'
+import StudioPreview from 'components/StudioPreview'
 import { useMagicRouter } from 'hooks/useMagicRouter'
 import {
   useCallback,
@@ -36,8 +34,7 @@ import {
   useState,
   useTransition,
 } from 'react'
-import { StudioLayout, StudioProvider, useColorScheme } from 'sanity'
-import { config as blog } from 'studios/blog'
+import { config } from 'studios'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
 import { roundMidPointToScale } from 'utils/roundMidPointToScale'
@@ -74,24 +71,6 @@ const HeaderCard = styled(Card)`
   top: 0;
   z-index: 101;
 `
-
-// @TODO workaround the fact that the Studio doesn't respect the scheme prop on the top level, the usePrefersDark hook overrides it
-function SyncColorScheme({
-  forceScheme,
-}: {
-  forceScheme: ThemeColorSchemeKey
-}) {
-  const { scheme, setScheme } = useColorScheme()
-
-  useEffect(() => {
-    if (scheme !== forceScheme) {
-      console.log('Force syncing scheme')
-      setScheme(forceScheme)
-    }
-  }, [scheme, forceScheme, setScheme])
-
-  return null
-}
 
 interface Props {
   initialPreset: ThemePreset
@@ -220,10 +199,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
             ],
     }
   }, [themeFromHues, view])
-  const blogConfig = useMemo(
-    () => ({ ...blog, theme: previewTheme, scheme }),
-    [previewTheme, scheme]
-  )
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)
 
@@ -468,46 +443,21 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                   overflow: 'auto',
                 }}
               >
-                <StudioProvider
+                <StudioPreview
                   key="default"
-                  config={blogConfig}
-                  unstable_noAuthBoundary
-                  unstable_history={history}
+                  config={config}
                   scheme={view === 'split' ? 'light' : scheme}
-                  // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
-                  // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
-                >
-                  <SyncColorScheme
-                    forceScheme={view === 'split' ? 'light' : scheme}
-                  />
-                  <ThemeProvider
-                    // Workaround media queries not updating by changing the key
-                    // key={view === 'split' ? 'light' : 'default'}
-                    theme={previewTheme}
-                    scheme={view === 'split' ? 'light' : scheme}
-                  >
-                    <StudioLayout />
-                  </ThemeProvider>
-                </StudioProvider>
+                  theme={previewTheme}
+                  unstable_history={history}
+                />
                 {view === 'split' && (
-                  <StudioProvider
+                  <StudioPreview
                     key="split"
-                    config={blogConfig}
-                    unstable_noAuthBoundary
-                    unstable_history={history}
+                    config={config}
                     scheme="dark"
-                    // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround
-                    // onSchemeChange={(nextScheme) => setForceScheme(nextScheme)}
-                  >
-                    <SyncColorScheme forceScheme="dark" />
-                    <ThemeProvider
-                      key="dark"
-                      theme={previewTheme}
-                      scheme="dark"
-                    >
-                      <StudioLayout />
-                    </ThemeProvider>
-                  </StudioProvider>
+                    theme={previewTheme}
+                    unstable_history={history}
+                  />
                 )}
               </Grid>
             </FixNavDrawerPosition>

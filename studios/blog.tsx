@@ -91,9 +91,11 @@ const authorType = defineType({
 const types = [postType, authorType]
 
 export const config: WorkspaceOptions = {
+  name: 'blog',
+  title: 'Blog',
+  basePath: '/blog',
   projectId,
   dataset,
   plugins: [deskTool()],
-  name: 'blog',
   schema: { types },
 }

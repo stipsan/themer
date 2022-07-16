@@ -18,14 +18,12 @@ import {
   MenuItem,
   Text,
   ThemeProvider,
-  useElementRect,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import HuesFields from 'components/HuesFields'
 import Logo from 'components/Logo'
 import PresetsMenu from 'components/PresetsMenu'
-import StudioPreview from 'components/StudioPreview'
-import { useMagicRouter } from 'hooks/useMagicRouter'
+import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
 import {
   useCallback,
   useEffect,
@@ -41,18 +39,6 @@ import { roundMidPointToScale } from 'utils/roundMidPointToScale'
 import type { Hue, ThemePreset } from 'utils/types'
 
 const SIDEBAR_WIDTH = 300
-
-// Trying to impress Snorre with my 1337 CSS haxxor
-const FixNavDrawerPosition = styled(Card)`
-  position: relative;
-
-  & [data-ui='Navbar'] + div {
-    top: calc(100vh - var(--ugly-hack-height, 0));
-    top: calc(100dvh - var(--ugly-hack-height, 0));
-    left: calc(100vw - var(--ugly-hack-width, 0));
-    left: calc(100dvw - var(--ugly-hack-width, 0));
-  }
-`
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
 const StyledGrid = styled(Grid)`
@@ -79,7 +65,6 @@ interface Props {
 }
 export default function Themer({ systemScheme, initialPreset }: Props) {
   const [preset, setPreset] = useState(() => initialPreset)
-  const [transition, startTransition] = useTransition()
 
   const { createTheme, initialHues } = suspend(async () => {
     const url = new URL(preset.url, location.origin)
@@ -92,6 +77,9 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   }, [preset.url])
   // used by useMemoHues, is updated by local state when syncing
   const [huesState, setHuesState] = useState(initialHues)
+
+  const [transition, startTransition] = useTransition()
+  const { view, toggleView } = useStudioViewer({ startTransition })
 
   // Reset the Hues state when loading a preset on demand
   useEffect(() => {
@@ -168,13 +156,11 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
     window.history.replaceState({}, '', decodeURIComponent(url.href))
   }, [memoHues, preset.slug])
 
-  const [view, setView] = useState<'default' | 'split'>('default')
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(
     null
   )
   const scheme = forceScheme ?? systemScheme
 
-  const history = useMagicRouter('/')
   const previewTheme = useMemo(() => {
     return {
       ...themeFromHues,
@@ -199,8 +185,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
             ],
     }
   }, [themeFromHues, view])
-  const uglyHackRef = useRef(null)
-  const uglyHackRect = useElementRect(uglyHackRef.current)
 
   const [spins, setSpin] = useState(1)
   const spin = useCallback(
@@ -294,13 +278,7 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                           view === 'default' ? SplitVerticalIcon : CollapseIcon
                         }
                         text={view === 'default' ? 'Split-screen' : 'Collapse'}
-                        onClick={() =>
-                          startTransition(() =>
-                            setView((view) =>
-                              view === 'default' ? 'split' : 'default'
-                            )
-                          )
-                        }
+                        onClick={toggleView}
                       />
                     </Card>
                   </Card>
@@ -407,60 +385,12 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
                 </Card>
               </Card>
             </Card>
-            <FixNavDrawerPosition
-              ref={uglyHackRef}
-              style={{
-                ['--ugly-hack-width' as any]:
-                  uglyHackRef?.current && uglyHackRect?.width
-                    ? `${uglyHackRect.width}px`
-                    : undefined,
-                ['--ugly-hack-height' as any]:
-                  uglyHackRef?.current && uglyHackRect?.height
-                    ? `${
-                        /*view === 'split'
-                          ? uglyHackRect.height / 2
-                          : */ uglyHackRect.height
-                      }px`
-                    : undefined,
-              }}
-            >
-              <Grid
-                height="fill"
-                columns={[1, view === 'split' ? 2 : 1]}
-                // @TODO fix rows layout
-                // rows={[view === 'split' ? 2 : 1, 1]}
-                /*
-                  style={{
-                    height: view === 'split' ? '200dvh' : '100dvh',
-                    maxHeight:  view === 'split' ? '200vh' :'100vh',
-                    overflow: 'auto',
-                  }}
-                  // */
-                // @TODO fix scroll on mobile split view
-                style={{
-                  height: '100dvh',
-                  maxHeight: '100vh',
-                  overflow: 'auto',
-                }}
-              >
-                <StudioPreview
-                  key="default"
-                  config={config}
-                  scheme={view === 'split' ? 'light' : scheme}
-                  theme={previewTheme}
-                  unstable_history={history}
-                />
-                {view === 'split' && (
-                  <StudioPreview
-                    key="split"
-                    config={config}
-                    scheme="dark"
-                    theme={previewTheme}
-                    unstable_history={history}
-                  />
-                )}
-              </Grid>
-            </FixNavDrawerPosition>
+            <StudioViewer
+              config={config}
+              scheme={scheme}
+              theme={previewTheme}
+              view={view}
+            />
           </StyledGrid>
         </Card>
       </ThemeProvider>

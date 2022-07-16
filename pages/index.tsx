@@ -1,6 +1,5 @@
 import { usePrefersDark } from '@sanity/ui'
 import ThemerFallback from 'components/ThemerFallback'
-import { useRouter } from 'next/router'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { defaultPreset, presets } from 'utils/presets'
 import type { ThemePreset } from 'utils/types'
@@ -8,15 +7,12 @@ import type { ThemePreset } from 'utils/types'
 const Themer = lazy(() => import('components/Themer'))
 
 export default function Index() {
-  const { isReady } = useRouter()
   const prefersDark = usePrefersDark()
   const [initialPreset, setPreset] = useState<ThemePreset>(null)
-  const readyToInit = isReady && !initialPreset
 
   // Wait with loading until we know if there are custom URL parameters, which happens after mounting
   useEffect(() => {
-    // @TODO is it necessary to wait for isReady  when using URLSearchParams?
-    if (readyToInit) {
+    if (!initialPreset) {
       const initialParams = new URLSearchParams(location.search)
       const slug = initialParams.has('preset')
         ? initialParams.get('preset')
@@ -53,7 +49,7 @@ export default function Index() {
       )
       setPreset({ ...inheritFrom, url: url.toString() })
     }
-  }, [readyToInit])
+  }, [initialPreset])
 
   if (!initialPreset) return <ThemerFallback />
 

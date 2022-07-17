@@ -57,6 +57,7 @@ export default function Index() {
     <Suspense fallback={<ThemerFallback />}>
       <Themer
         initialPreset={initialPreset}
+        sidebarWidth={300}
         systemScheme={prefersDark ? 'dark' : 'light'}
       />
     </Suspense>

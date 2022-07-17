@@ -10,6 +10,7 @@ import {
   type TransitionStartFunction,
   memo,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -21,19 +22,39 @@ type View = 'default' | 'split'
 interface Props {
   config: WorkspaceOptions[]
   scheme: ThemeColorSchemeKey
+  sidebarWidth: number
   theme: WorkspaceOptions['theme']
   view: View
 }
 export const StudioViewer = memo(function StudioViewer({
   config,
   scheme,
-  theme,
+  sidebarWidth,
+  theme: _theme,
   view,
 }: Props) {
   const history = useMagicRouter('hash')
 
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)
+
+  const theme = useMemo(
+    () => ({
+      ..._theme, // Adjust media queries to fit the sidebar
+      media:
+        view === 'split'
+          ? [
+              360 * 2 + sidebarWidth,
+              600 * 2 + sidebarWidth,
+              900 * 1.5 + sidebarWidth,
+              1200 + sidebarWidth,
+              1800 + sidebarWidth / 2,
+              2400,
+            ]
+          : [360 + sidebarWidth, 600 + sidebarWidth / 2, 900, 1200, 1800, 2400],
+    }),
+    [_theme, sidebarWidth, view]
+  )
 
   return (
     // @TODO replace this ThemeProvider scheme hack with just a Card and a Grid
@@ -71,7 +92,7 @@ export const StudioViewer = memo(function StudioViewer({
         }}
       >
         <StudioPreview
-        // updating the key with the view forces the updated media queries to apply
+          // updating the key with the view forces the updated media queries to apply
           key={view}
           config={config}
           scheme={scheme}

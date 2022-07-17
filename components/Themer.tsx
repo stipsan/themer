@@ -32,13 +32,13 @@ import {
   useState,
   useTransition,
 } from 'react'
+import type { StudioTheme } from 'sanity'
 import { config } from 'studios'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
+import type { PartialDeep } from 'type-fest'
 import { roundMidPointToScale } from 'utils/roundMidPointToScale'
-import type { Hue, ThemePreset } from 'utils/types'
-
-const SIDEBAR_WIDTH = 300
+import type { Hue, Hues, ThemePreset } from 'utils/types'
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
 const StyledGrid = styled(Grid)`
@@ -46,7 +46,10 @@ const StyledGrid = styled(Grid)`
     gap-row: 1px;
 
     && {
-      grid-template-columns: ${SIDEBAR_WIDTH}px 1fr;
+      grid-template-columns: ${
+          // @ts-expect-error
+          ({ sidebarWidth }) => sidebarWidth
+        }px 1fr;
     }
   }
 `
@@ -60,10 +63,15 @@ const HeaderCard = styled(Card)`
 
 interface Props {
   initialPreset: ThemePreset
+  sidebarWidth: number
   // The scheme detected from the usePrefersDark hook
   systemScheme: ThemeColorSchemeKey
 }
-export default function Themer({ systemScheme, initialPreset }: Props) {
+export default function Themer({
+  sidebarWidth,
+  systemScheme,
+  initialPreset,
+}: Props) {
   const [preset, setPreset] = useState(() => initialPreset)
 
   const { createTheme, initialHues } = suspend(async () => {
@@ -73,7 +81,10 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
         import(/* webpackIgnore: true */ url.toString()),
         import('utils/applyHues'),
       ])
-    return { createTheme, initialHues: applyHues(partialHues) }
+    return {
+      createTheme: createTheme as (hues: PartialDeep<Hues>) => StudioTheme,
+      initialHues: applyHues(partialHues),
+    }
   }, [preset.url])
   // used by useMemoHues, is updated by local state when syncing
   const [huesState, setHuesState] = useState(initialHues)
@@ -161,31 +172,6 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   )
   const scheme = forceScheme ?? systemScheme
 
-  const previewTheme = useMemo(() => {
-    return {
-      ...themeFromHues,
-      // Adjust media queries to fit the sidebar
-      media:
-        view === 'split'
-          ? [
-              360 * 2 + SIDEBAR_WIDTH,
-              600 * 2 + SIDEBAR_WIDTH,
-              900 * 1.5 + SIDEBAR_WIDTH,
-              1200 + SIDEBAR_WIDTH,
-              1800 + SIDEBAR_WIDTH / 2,
-              2400,
-            ]
-          : [
-              360 + SIDEBAR_WIDTH,
-              600 + SIDEBAR_WIDTH / 2,
-              900,
-              1200,
-              1800,
-              2400,
-            ],
-    }
-  }, [themeFromHues, view])
-
   const [spins, setSpin] = useState(1)
   const spin = useCallback(
     () => startTransition(() => setSpin((spins) => ++spins)),
@@ -216,14 +202,19 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   }, [])
 
   return (
-    <ThemeProvider theme={previewTheme} scheme={scheme}>
+    <ThemeProvider theme={themeFromHues} scheme={scheme}>
       <Head />
       <Card
         height="fill"
         tone="transparent"
         style={{ ['color-scheme' as any]: scheme }}
       >
-        <StyledGrid columns={[1, 1]} height="fill">
+        <StyledGrid
+          columns={[1, 1]}
+          height="fill"
+          // @ts-expect-error
+          sidebarWidth={sidebarWidth}
+        >
           <Card
             height="fill"
             overflow="auto"
@@ -382,7 +373,8 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
           <StudioViewer
             config={config}
             scheme={scheme}
-            theme={previewTheme}
+            sidebarWidth={sidebarWidth}
+            theme={themeFromHues}
             view={view}
           />
         </StyledGrid>

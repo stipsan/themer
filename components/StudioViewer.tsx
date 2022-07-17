@@ -71,7 +71,8 @@ export const StudioViewer = memo(function StudioViewer({
         }}
       >
         <StudioPreview
-          key="default"
+        // updating the key with the view forces the updated media queries to apply
+          key={view}
           config={config}
           scheme={scheme}
           theme={theme}
@@ -79,7 +80,7 @@ export const StudioViewer = memo(function StudioViewer({
         />
         {view === 'split' && (
           <StudioPreview
-            key="split"
+            key="aside"
             config={config}
             scheme={scheme === 'dark' ? 'light' : 'dark'}
             theme={theme}

@@ -2,7 +2,7 @@ import { useRootTheme } from '@sanity/ui'
 import NextHead from 'next/head'
 import png from 'public/favicon.png'
 import svg from 'public/favicon.svg'
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 
 const title = 'Themer | Create Sanity Studio v3 themes 🪄'
 
@@ -22,7 +22,7 @@ function Head() {
   return (
     <NextHead>
       <meta name="viewport" content="width=device-width, viewport-fit=cover" />
-      <title>Themer | Create Sanity Studio v3 themes 🪄</title>
+      <title>{title}</title>
       <meta
         key="theme-color-light"
         name="theme-color"

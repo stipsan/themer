@@ -1509,8 +1509,8 @@ const Figure = styled.figure`
 `
 
 interface Props {
-  spin?: number
-  transition?: boolean
+  spin: number
+  transition: boolean
 }
 function Logo({ spin, transition }: Props) {
   const wheelRef = useRef(null)

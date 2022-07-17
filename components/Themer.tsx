@@ -16,22 +16,14 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  Text,
   ThemeProvider,
 } from '@sanity/ui'
 import Head from 'components/Head'
+import { HeaderCard, useHeaderCard } from 'components/HeaderCard'
 import HuesFields from 'components/HuesFields'
-import Logo from 'components/Logo'
 import PresetsMenu from 'components/PresetsMenu'
 import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { StudioTheme } from 'sanity'
 import { config } from 'studios'
 import styled from 'styled-components'
@@ -52,13 +44,6 @@ const StyledGrid = styled(Grid)`
         }px 1fr;
     }
   }
-`
-
-// @TODO find a better z-index than 101
-const HeaderCard = styled(Card)`
-  position: sticky;
-  top: 0;
-  z-index: 101;
 `
 
 interface Props {
@@ -89,13 +74,14 @@ export default function Themer({
   // used by useMemoHues, is updated by local state when syncing
   const [huesState, setHuesState] = useState(initialHues)
 
-  const [transition, startTransition] = useTransition()
+  const { spin, spins, transition, startTransition } = useHeaderCard()
+
   const { view, toggleView } = useStudioViewer({ startTransition })
 
   // Reset the Hues state when loading a preset on demand
   useEffect(() => {
     startTransition(() => setHuesState(initialHues))
-  }, [initialHues])
+  }, [initialHues, startTransition])
   // Properly memoize the hues state before passing it to the theme creator
   // const memoHues = useMemoHues(huesState)
   // Test if the JSON stringify and parsing is too costly
@@ -172,34 +158,31 @@ export default function Themer({
   )
   const scheme = forceScheme ?? systemScheme
 
-  const [spins, setSpin] = useState(1)
-  const spin = useCallback(
-    () => startTransition(() => setSpin((spins) => ++spins)),
-    []
-  )
-
   // startTransition alone is not enough, so we use a combo of requestIdleCallback if available, with a fallback to requestAnimationFrame
   // This is to avoid as much main thread jank as we can, while keeping the color picking experience as fast and delightful as the hardware allows
   const throttleRef = useRef(0)
 
-  const onHuesChange = useCallback((tone: CardTone, hue: Hue) => {
-    if (typeof cancelIdleCallback === 'function') {
-      cancelIdleCallback(throttleRef.current)
-    } else {
-      cancelAnimationFrame(throttleRef.current)
-    }
-    const scheduledUpdate = () => {
-      startTransition(() => {
-        setHuesState((prev) => ({ ...prev, [tone]: hue }))
-      })
-    }
+  const onHuesChange = useCallback(
+    (tone: CardTone, hue: Hue) => {
+      if (typeof cancelIdleCallback === 'function') {
+        cancelIdleCallback(throttleRef.current)
+      } else {
+        cancelAnimationFrame(throttleRef.current)
+      }
+      const scheduledUpdate = () => {
+        startTransition(() => {
+          setHuesState((prev) => ({ ...prev, [tone]: hue }))
+        })
+      }
 
-    if (typeof requestIdleCallback === 'function') {
-      throttleRef.current = requestIdleCallback(scheduledUpdate)
-    } else {
-      throttleRef.current = requestAnimationFrame(scheduledUpdate)
-    }
-  }, [])
+      if (typeof requestIdleCallback === 'function') {
+        throttleRef.current = requestIdleCallback(scheduledUpdate)
+      } else {
+        throttleRef.current = requestAnimationFrame(scheduledUpdate)
+      }
+    },
+    [startTransition]
+  )
 
   return (
     <ThemeProvider theme={themeFromHues} scheme={scheme}>
@@ -221,29 +204,7 @@ export default function Themer({
             scheme={scheme}
             style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
           >
-            <HeaderCard
-              paddingLeft={[4]}
-              paddingY={[2]}
-              scheme="dark"
-              shadow={scheme === 'dark' ? 1 : undefined}
-            >
-              <Card
-                borderRight
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '32px 1fr',
-                  alignItems: 'center',
-                  paddingLeft: 'env(safe-area-inset-left)',
-                }}
-              >
-                <Logo spin={spins} transition={transition} />
-                <Card paddingY={[3]} paddingX={[3]}>
-                  <Text weight="semibold" muted style={{ flex: 2 }}>
-                    Studio v3 Themer
-                  </Text>
-                </Card>
-              </Card>
-            </HeaderCard>
+            <HeaderCard scheme={scheme} spins={spins} transition={transition} />
             <Card borderRight height="fill" tone="default">
               <Grid
                 columns={[2]}

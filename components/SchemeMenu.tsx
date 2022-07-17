@@ -1,10 +1,20 @@
 import { DesktopIcon, MoonIcon, SelectIcon, SunIcon } from '@sanity/icons'
-import {type ThemeColorSchemeKey,Button,Card,Label,Menu,MenuButton,MenuItem,} from '@sanity/ui'
+import {
+  type ThemeColorSchemeKey,
+  Button,
+  Card,
+  Label,
+  Menu,
+  MenuButton,
+  MenuItem,
+} from '@sanity/ui'
 import {
   type Dispatch,
   type SetStateAction,
   type TransitionStartFunction,
   memo,
+  useCallback,
+  useState,
 } from 'react'
 
 interface Props {
@@ -17,6 +27,14 @@ const SchemeMenu = ({
   startTransition,
   setForceScheme,
 }: Props) => {
+  const [scheme, setScheme] = useState<ThemeColorSchemeKey>(forceScheme)
+  const updateScheme = useCallback(
+    (nextScheme: ThemeColorSchemeKey) => {
+      setScheme(nextScheme)
+      startTransition(() => setForceScheme(nextScheme))
+    },
+    [setForceScheme, startTransition]
+  )
   return (
     <>
       <Label htmlFor="scheme" size={0} muted>
@@ -32,17 +50,17 @@ const SchemeMenu = ({
               tone="default"
               mode="ghost"
               icon={
-                forceScheme === 'light'
+                scheme === 'light'
                   ? SunIcon
-                  : forceScheme === 'dark'
+                  : scheme === 'dark'
                   ? MoonIcon
                   : DesktopIcon
               }
               iconRight={SelectIcon}
               text={
-                forceScheme === 'light'
+                scheme === 'light'
                   ? 'Light'
-                  : forceScheme === 'dark'
+                  : scheme === 'dark'
                   ? 'Dark'
                   : 'System'
               }
@@ -57,9 +75,9 @@ const SchemeMenu = ({
                 paddingX={3}
                 icon={DesktopIcon}
                 text="System"
-                selected={forceScheme === null}
-                tone={forceScheme === null ? 'primary' : 'default'}
-                onClick={() => startTransition(() => setForceScheme(null))}
+                selected={scheme === null}
+                tone={scheme === null ? 'primary' : 'default'}
+                onClick={() => updateScheme(null)}
               />
               <MenuItem
                 fontSize={1}
@@ -67,9 +85,9 @@ const SchemeMenu = ({
                 paddingX={3}
                 icon={SunIcon}
                 text="Light"
-                selected={forceScheme === 'light'}
-                tone={forceScheme === 'light' ? 'primary' : 'default'}
-                onClick={() => startTransition(() => setForceScheme('light'))}
+                selected={scheme === 'light'}
+                tone={scheme === 'light' ? 'primary' : 'default'}
+                onClick={() => updateScheme('light')}
               />
               <MenuItem
                 fontSize={1}
@@ -77,9 +95,9 @@ const SchemeMenu = ({
                 paddingX={3}
                 icon={MoonIcon}
                 text="Dark"
-                selected={forceScheme === 'dark'}
-                tone={forceScheme === 'dark' ? 'primary' : 'default'}
-                onClick={() => startTransition(() => setForceScheme('dark'))}
+                selected={scheme === 'dark'}
+                tone={scheme === 'dark' ? 'primary' : 'default'}
+                onClick={() => updateScheme('dark')}
               />
             </Menu>
           }

@@ -17,7 +17,7 @@ import {
 import { type WorkspaceOptions } from 'sanity'
 import styled from 'styled-components'
 
-type View = 'default' | 'split'
+export type View = 'default' | 'split'
 
 interface Props {
   config: WorkspaceOptions[]

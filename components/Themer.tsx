@@ -1,11 +1,4 @@
-import {
-  CollapseIcon,
-  DesktopIcon,
-  MoonIcon,
-  SelectIcon,
-  SplitVerticalIcon,
-  SunIcon,
-} from '@sanity/icons'
+import { DesktopIcon, MoonIcon, SelectIcon, SunIcon } from '@sanity/icons'
 import {
   type CardTone,
   type ThemeColorSchemeKey,
@@ -23,6 +16,7 @@ import { HeaderCard, useHeaderCard } from 'components/HeaderCard'
 import HuesFields from 'components/HuesFields'
 import PresetsMenu from 'components/PresetsMenu'
 import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
+import ToggleView from 'components/ToggleView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { StudioTheme } from 'sanity'
 import { config } from 'studios'
@@ -212,25 +206,6 @@ export default function Themer({
                 style={{ paddingLeft: 'env(safe-area-inset-left)' }}
               >
                 <Card paddingLeft={[4]} paddingTop={4}>
-                  <Label htmlFor="view" size={0} muted>
-                    View
-                  </Label>
-                  <Card paddingY={2}>
-                    <Button
-                      fontSize={1}
-                      paddingY={2}
-                      paddingX={3}
-                      tone="default"
-                      mode="ghost"
-                      icon={
-                        view === 'default' ? SplitVerticalIcon : CollapseIcon
-                      }
-                      text={view === 'default' ? 'Split-screen' : 'Collapse'}
-                      onClick={toggleView}
-                    />
-                  </Card>
-                </Card>
-                <Card paddingTop={[4]}>
                   <Label htmlFor="scheme" size={0} muted>
                     Scheme
                   </Label>
@@ -309,6 +284,9 @@ export default function Themer({
                       popover={{ portal: true }}
                     />
                   </Card>
+                </Card>
+                <Card paddingTop={[4]}>
+                  <ToggleView toggleView={toggleView} view={view} />
                 </Card>
               </Grid>
               <PresetsMenu

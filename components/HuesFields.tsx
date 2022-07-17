@@ -3,16 +3,8 @@ import {
   type ColorTints,
   COLOR_TINTS,
 } from '@sanity/color'
-import {
-  type CardTone,
-  Box,
-  Card,
-  Grid,
-  Label,
-  Text,
-  Tooltip,
-} from '@sanity/ui'
-import { useRouter } from 'next/router'
+import { type CardTone, Box, Card, Grid, Text, Tooltip } from '@sanity/ui'
+import { ColorInput, Label } from 'components/Sidebar.styles'
 import { mix } from 'polished'
 import {
   type TransitionStartFunction,
@@ -22,7 +14,6 @@ import {
   useState,
 } from 'react'
 import styled from 'styled-components'
-import { backupState } from 'utils/backupState'
 import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import type { Hue, Hues } from 'utils/types'
@@ -82,7 +73,6 @@ const HueFields = memo(function HueFields({
   startTransition: TransitionStartFunction
   prepareTransition: () => void
 }) {
-  const router = useRouter()
   // Fast state for intenral use, for inputs, range drags, the color picker etc
   const [lightest, setLightest] = useState(() => initialHue.lightest)
   const [mid, setMid] = useState(() => initialHue.mid)
@@ -106,23 +96,7 @@ const HueFields = memo(function HueFields({
     onChange(tone, hue)
   }, [tone, hue, onChange])
 
-  /**
-   * Default
-  
-  Tones preview
-  50 100 200 ---- 800 900 950
-   */
-
   const midRangeId = `${tone}-mid-range-${useId()}`
-  const colorStyle = {
-    boxSizing: 'border-box',
-    background: 'var(--card-border-color)',
-    border: '1px solid var(--card-border-color)',
-    borderRadius: '2px',
-    padding: '0px 2px',
-    appearance: 'none',
-    margin: 0,
-  }
 
   return (
     <>
@@ -134,9 +108,8 @@ const HueFields = memo(function HueFields({
         shadow={1}
       >
         <Text
-          size={2}
+          size={1}
           weight="medium"
-          muted
           style={{
             textTransform: 'capitalize',
             paddingLeft: 'env(safe-area-inset-left)',
@@ -150,14 +123,9 @@ const HueFields = memo(function HueFields({
           style={{ paddingLeft: 'env(safe-area-inset-left)' }}
         >
           <Card tone={tone} key="mid">
-            <Label muted size={0}>
-              Mid
-            </Label>
+            <Label>Mid</Label>
             <Card paddingY={2} tone={tone}>
-              <input
-                name={`${tone}-mid`}
-                type="color"
-                style={colorStyle as any}
+              <ColorInput
                 value={
                   mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid
                 }
@@ -184,13 +152,9 @@ const HueFields = memo(function HueFields({
             </Card>
           </Card>
           <Card tone={tone} key="lightest">
-            <Label muted size={0}>
-              Lightest
-            </Label>
+            <Label>Lightest</Label>
             <Card paddingY={2} tone={tone}>
-              <input
-                type="color"
-                style={colorStyle as any}
+              <ColorInput
                 value={
                   lightest.length === 4
                     ? `${lightest}${lightest.replace(/^#/, '')}`
@@ -219,14 +183,9 @@ const HueFields = memo(function HueFields({
             </Card>
           </Card>
           <Card tone={tone} key="darkest">
-            <Label muted size={0}>
-              Darkest
-            </Label>
+            <Label>Darkest</Label>
             <Card paddingY={2} tone={tone}>
-              <input
-                name={`${tone}-darkest`}
-                type="color"
-                style={colorStyle as any}
+              <ColorInput
                 value={
                   darkest.length === 4
                     ? `${darkest}${darkest.replace(/^#/, '')}`
@@ -261,9 +220,7 @@ const HueFields = memo(function HueFields({
           paddingBottom={2}
           style={{ paddingLeft: 'env(safe-area-inset-left)' }}
         >
-          <Label muted size={0}>
-            Mid point ({roundToScale(Number(midPoint))})
-          </Label>
+          <Label>Mid point ({roundToScale(Number(midPoint))})</Label>
           <Card paddingY={2} tone={tone}>
             <StyledRange
               name={`${tone}-midPoint`}
@@ -309,9 +266,10 @@ const HueFields = memo(function HueFields({
           tone={tone}
           shadow={1}
           radius={1}
+          overflow="hidden"
           style={{ marginLeft: 'env(safe-area-inset-left)' }}
         >
-          <Grid columns={11} style={{ gap: '1px' }}>
+          <Grid columns={11} style={{ gap: '0px' }}>
             <ColorTintsPreview
               hue={{ mid, midPoint: midPoint as any, lightest, darkest }}
               title={tone}
@@ -370,7 +328,7 @@ function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
             <Card tone="default" key={tint} radius={2}>
               <Card
                 padding={4}
-                radius={3}
+                radius={2}
                 style={{
                   background: color.hex,
                   borderBottomLeftRadius: '0px',
@@ -393,11 +351,10 @@ function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
           placement="top"
           portal
         >
-          <Card
-            tone="default"
-            radius={1}
+          <Box
             style={{
               background: color.hex,
+              boxShadow: 'var(--card-shadow-outline-color) -1px 0px 0 0',
             }}
             paddingY={2}
           />

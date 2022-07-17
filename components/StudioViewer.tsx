@@ -30,7 +30,7 @@ export const StudioViewer = memo(function StudioViewer({
   theme,
   view,
 }: Props) {
-  const history = useMagicRouter('/')
+  const history = useMagicRouter('hash')
 
   const uglyHackRef = useRef(null)
   const uglyHackRect = useElementRect(uglyHackRef.current)

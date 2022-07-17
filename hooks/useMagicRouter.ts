@@ -1,17 +1,26 @@
-import { type Listener, createMemoryHistory } from 'history'
+import {
+  type History,
+  type Listener,
+  type MemoryHistory,
+  createHashHistory,
+  createMemoryHistory,
+} from 'history'
 import { useMemo } from 'react'
 
-export function useMagicRouter(initial: string) {
-  const history = useMemo((): ReturnType<typeof createMemoryHistory> => {
-    const history = createMemoryHistory({
-      initialEntries: [initial],
-    })
+export function useMagicRouter(type: 'memory' | 'hash' = 'memory') {
+  const history = useMemo<History>(() => {
+    const history =
+      type === 'hash'
+        ? createHashHistory()
+        : createMemoryHistory({
+            initialEntries: ['/'],
+          })
     return {
       get action() {
         return history.action
       },
       get index() {
-        return history.index
+        return type === 'hash' ? 0 : (history as MemoryHistory).index
       },
       get location() {
         return history.location
@@ -20,7 +29,9 @@ export function useMagicRouter(initial: string) {
         return history.createHref
       },
       get push() {
-        return history.push
+        // @TODO make this behavior configurable
+        // don't add to the history array on studio nav as color vars aren't in sync beyond initial page load
+        return type === 'hash' ? history.replace : history.push
       },
       get replace() {
         return history.replace
@@ -46,7 +57,7 @@ export function useMagicRouter(initial: string) {
         })
       },
     }
-  }, [initial])
+  }, [type])
 
   return history
 }

@@ -112,14 +112,11 @@ export const useStudioViewer = ({
 const ViewerGrid = styled(Grid)`
   position: relative;
   gap: 1px;
-  background-color: ${({ theme }) => {
-    console.log({ theme }, theme.sanity.color)
-    return theme.sanity.color.base.border
-  }};
+  background-color: ${({ theme }) => theme.sanity.color.base.border};
 
-  /* @TODO investigate if it's safe to set overflow: hidden on these */
   & [data-ui='ToolScreen'] {
-    overflow: hidden;
+    /* @TODO investigate if it's safe to set overflow: hidden on these */
+    overflow: ${({ columns }) => (columns[1] === 1 ? 'visible' : 'hidden')};
   }
 
   & [data-ui='Navbar'] + div {

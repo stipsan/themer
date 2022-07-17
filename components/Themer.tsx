@@ -216,184 +216,177 @@ export default function Themer({ systemScheme, initialPreset }: Props) {
   }, [])
 
   return (
-    <>
-      <Head
-        lightest={previewTheme.color.light.default.base.bg}
-        darkest={previewTheme.color.dark.default.base.bg}
-      />
-      <ThemeProvider theme={previewTheme} scheme={scheme}>
-        <Card
-          height="fill"
-          tone="transparent"
-          style={{ ['color-scheme' as any]: scheme }}
-        >
-          <StyledGrid columns={[1, 1]} height="fill">
-            <Card
-              height="fill"
-              overflow="auto"
-              scheme={scheme}
-              style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
+    <ThemeProvider theme={previewTheme} scheme={scheme}>
+      <Head />
+      <Card
+        height="fill"
+        tone="transparent"
+        style={{ ['color-scheme' as any]: scheme }}
+      >
+        <StyledGrid columns={[1, 1]} height="fill">
+          <Card
+            height="fill"
+            overflow="auto"
+            scheme={scheme}
+            style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
+          >
+            <HeaderCard
+              paddingLeft={[4]}
+              paddingY={[2]}
+              scheme="dark"
+              shadow={scheme === 'dark' ? 1 : undefined}
             >
-              <HeaderCard
-                paddingLeft={[4]}
-                paddingY={[2]}
-                scheme="dark"
-                shadow={scheme === 'dark' ? 1 : undefined}
+              <Card
+                borderRight
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '32px 1fr',
+                  alignItems: 'center',
+                  paddingLeft: 'env(safe-area-inset-left)',
+                }}
               >
-                <Card
-                  borderRight
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '32px 1fr',
-                    alignItems: 'center',
-                    paddingLeft: 'env(safe-area-inset-left)',
-                  }}
-                >
-                  <Logo spin={spins} transition={transition} />
-                  <Card paddingY={[3]} paddingX={[3]}>
-                    <Text weight="semibold" muted style={{ flex: 2 }}>
-                      Studio v3 Themer
-                    </Text>
+                <Logo spin={spins} transition={transition} />
+                <Card paddingY={[3]} paddingX={[3]}>
+                  <Text weight="semibold" muted style={{ flex: 2 }}>
+                    Studio v3 Themer
+                  </Text>
+                </Card>
+              </Card>
+            </HeaderCard>
+            <Card borderRight height="fill" tone="default">
+              <Grid
+                columns={[2]}
+                paddingBottom={2}
+                style={{ paddingLeft: 'env(safe-area-inset-left)' }}
+              >
+                <Card paddingLeft={[4]} paddingTop={4}>
+                  <Label htmlFor="view" size={0} muted>
+                    View
+                  </Label>
+                  <Card paddingY={2}>
+                    <Button
+                      fontSize={1}
+                      paddingY={2}
+                      paddingX={3}
+                      tone="default"
+                      mode="ghost"
+                      icon={
+                        view === 'default' ? SplitVerticalIcon : CollapseIcon
+                      }
+                      text={view === 'default' ? 'Split-screen' : 'Collapse'}
+                      onClick={toggleView}
+                    />
                   </Card>
                 </Card>
-              </HeaderCard>
-              <Card borderRight height="fill" tone="default">
-                <Grid
-                  columns={[2]}
-                  paddingBottom={2}
-                  style={{ paddingLeft: 'env(safe-area-inset-left)' }}
-                >
-                  <Card paddingLeft={[4]} paddingTop={4}>
-                    <Label htmlFor="view" size={0} muted>
-                      View
-                    </Label>
-                    <Card paddingY={2}>
-                      <Button
-                        fontSize={1}
-                        paddingY={2}
-                        paddingX={3}
-                        tone="default"
-                        mode="ghost"
-                        icon={
-                          view === 'default' ? SplitVerticalIcon : CollapseIcon
-                        }
-                        text={view === 'default' ? 'Split-screen' : 'Collapse'}
-                        onClick={toggleView}
-                      />
-                    </Card>
-                  </Card>
-                  <Card paddingTop={[4]}>
-                    <Label htmlFor="scheme" size={0} muted>
-                      Scheme
-                    </Label>
-                    <Card paddingY={2}>
-                      <MenuButton
-                        button={
-                          <Button
+                <Card paddingTop={[4]}>
+                  <Label htmlFor="scheme" size={0} muted>
+                    Scheme
+                  </Label>
+                  <Card paddingY={2}>
+                    <MenuButton
+                      button={
+                        <Button
+                          fontSize={1}
+                          paddingY={2}
+                          paddingX={3}
+                          tone="default"
+                          mode="ghost"
+                          icon={
+                            forceScheme === 'light'
+                              ? SunIcon
+                              : forceScheme === 'dark'
+                              ? MoonIcon
+                              : DesktopIcon
+                          }
+                          iconRight={SelectIcon}
+                          text={
+                            forceScheme === 'light'
+                              ? 'Light'
+                              : forceScheme === 'dark'
+                              ? 'Dark'
+                              : 'System'
+                          }
+                        />
+                      }
+                      id="scheme"
+                      menu={
+                        <Menu>
+                          <MenuItem
                             fontSize={1}
                             paddingY={2}
                             paddingX={3}
-                            tone="default"
-                            mode="ghost"
-                            icon={
-                              forceScheme === 'light'
-                                ? SunIcon
-                                : forceScheme === 'dark'
-                                ? MoonIcon
-                                : DesktopIcon
-                            }
-                            iconRight={SelectIcon}
-                            text={
-                              forceScheme === 'light'
-                                ? 'Light'
-                                : forceScheme === 'dark'
-                                ? 'Dark'
-                                : 'System'
+                            icon={DesktopIcon}
+                            text="System"
+                            selected={forceScheme === null}
+                            tone={forceScheme === null ? 'primary' : 'default'}
+                            onClick={() =>
+                              startTransition(() => setForceScheme(null))
                             }
                           />
-                        }
-                        id="scheme"
-                        menu={
-                          <Menu>
-                            <MenuItem
-                              fontSize={1}
-                              paddingY={2}
-                              paddingX={3}
-                              icon={DesktopIcon}
-                              text="System"
-                              selected={forceScheme === null}
-                              tone={
-                                forceScheme === null ? 'primary' : 'default'
-                              }
-                              onClick={() =>
-                                startTransition(() => setForceScheme(null))
-                              }
-                            />
-                            <MenuItem
-                              fontSize={1}
-                              paddingY={2}
-                              paddingX={3}
-                              icon={SunIcon}
-                              text="Light"
-                              selected={forceScheme === 'light'}
-                              tone={
-                                forceScheme === 'light' ? 'primary' : 'default'
-                              }
-                              onClick={() =>
-                                startTransition(() => setForceScheme('light'))
-                              }
-                            />
-                            <MenuItem
-                              fontSize={1}
-                              paddingY={2}
-                              paddingX={3}
-                              icon={MoonIcon}
-                              text="Dark"
-                              selected={forceScheme === 'dark'}
-                              tone={
-                                forceScheme === 'dark' ? 'primary' : 'default'
-                              }
-                              onClick={() =>
-                                startTransition(() => setForceScheme('dark'))
-                              }
-                            />
-                          </Menu>
-                        }
-                        placement="bottom-start"
-                        popover={{ portal: true }}
-                      />
-                    </Card>
+                          <MenuItem
+                            fontSize={1}
+                            paddingY={2}
+                            paddingX={3}
+                            icon={SunIcon}
+                            text="Light"
+                            selected={forceScheme === 'light'}
+                            tone={
+                              forceScheme === 'light' ? 'primary' : 'default'
+                            }
+                            onClick={() =>
+                              startTransition(() => setForceScheme('light'))
+                            }
+                          />
+                          <MenuItem
+                            fontSize={1}
+                            paddingY={2}
+                            paddingX={3}
+                            icon={MoonIcon}
+                            text="Dark"
+                            selected={forceScheme === 'dark'}
+                            tone={
+                              forceScheme === 'dark' ? 'primary' : 'default'
+                            }
+                            onClick={() =>
+                              startTransition(() => setForceScheme('dark'))
+                            }
+                          />
+                        </Menu>
+                      }
+                      placement="bottom-start"
+                      popover={{ portal: true }}
+                    />
                   </Card>
-                </Grid>
-                <PresetsMenu
-                  hues={memoHues}
-                  selected={preset}
-                  prepareTransition={spin}
-                  startTransition={startTransition}
-                  setPreset={setPreset}
-                  onChange={(nextPreset) =>
-                    startTransition(() => setPreset(nextPreset))
-                  }
-                />
-                <Card height="fill" paddingY={1}>
-                  <HuesFields
-                    initialHues={initialHues}
-                    startTransition={startTransition}
-                    prepareTransition={spin}
-                    onChange={onHuesChange}
-                  />
                 </Card>
+              </Grid>
+              <PresetsMenu
+                hues={memoHues}
+                selected={preset}
+                prepareTransition={spin}
+                startTransition={startTransition}
+                setPreset={setPreset}
+                onChange={(nextPreset) =>
+                  startTransition(() => setPreset(nextPreset))
+                }
+              />
+              <Card height="fill" paddingY={1}>
+                <HuesFields
+                  initialHues={initialHues}
+                  startTransition={startTransition}
+                  prepareTransition={spin}
+                  onChange={onHuesChange}
+                />
               </Card>
             </Card>
-            <StudioViewer
-              config={config}
-              scheme={scheme}
-              theme={previewTheme}
-              view={view}
-            />
-          </StyledGrid>
-        </Card>
-      </ThemeProvider>
-    </>
+          </Card>
+          <StudioViewer
+            config={config}
+            scheme={scheme}
+            theme={previewTheme}
+            view={view}
+          />
+        </StyledGrid>
+      </Card>
+    </ThemeProvider>
   )
 }

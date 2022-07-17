@@ -11,10 +11,7 @@ import { memo } from 'react'
 
 const ThemerFallback = () => (
   <ThemeProvider scheme="light" theme={studioTheme}>
-    <Head
-      lightest={studioTheme.color.light.default.base.bg}
-      darkest={studioTheme.color.dark.default.base.bg}
-    />
+    <Head />
     <Card height="fill" tone="transparent">
       <Flex
         align="center"

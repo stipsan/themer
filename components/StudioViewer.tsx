@@ -1,7 +1,7 @@
 import {
   type ThemeColorSchemeKey,
-  Card,
   Grid,
+  ThemeProvider,
   useElementRect,
 } from '@sanity/ui'
 import StudioPreview from 'components/StudioPreview'
@@ -36,24 +36,10 @@ export const StudioViewer = memo(function StudioViewer({
   const uglyHackRect = useElementRect(uglyHackRef.current)
 
   return (
-    <FixNavDrawerPosition
-      ref={uglyHackRef}
-      style={{
-        ['--ugly-hack-width' as any]:
-          uglyHackRef?.current && uglyHackRect?.width
-            ? `${uglyHackRect.width}px`
-            : undefined,
-        ['--ugly-hack-height' as any]:
-          uglyHackRef?.current && uglyHackRect?.height
-            ? `${
-                /*view === 'split'
-              ? uglyHackRect.height / 2
-              : */ uglyHackRect.height
-              }px`
-            : undefined,
-      }}
-    >
-      <Grid
+    // @TODO replace this ThemeProvider scheme hack with just a Card and a Grid
+    <ThemeProvider scheme="dark">
+      <ViewerGrid
+        ref={uglyHackRef}
         height="fill"
         columns={[1, view === 'split' ? 2 : 1]}
         // @TODO fix rows layout
@@ -70,12 +56,24 @@ export const StudioViewer = memo(function StudioViewer({
           height: '100dvh',
           maxHeight: '100vh',
           overflow: 'auto',
+          ['--ugly-hack-width' as any]:
+            uglyHackRef?.current && uglyHackRect?.width
+              ? `${uglyHackRect.width}px`
+              : undefined,
+          ['--ugly-hack-height' as any]:
+            uglyHackRef?.current && uglyHackRect?.height
+              ? `${
+                  /*view === 'split'
+              ? uglyHackRect.height / 2
+              : */ uglyHackRect.height
+                }px`
+              : undefined,
         }}
       >
         <StudioPreview
           key="default"
           config={config}
-          scheme={view === 'split' ? 'light' : scheme}
+          scheme={scheme}
           theme={theme}
           unstable_history={history}
         />
@@ -83,13 +81,13 @@ export const StudioViewer = memo(function StudioViewer({
           <StudioPreview
             key="split"
             config={config}
-            scheme="dark"
+            scheme={scheme === 'dark' ? 'light' : 'dark'}
             theme={theme}
             unstable_history={history}
           />
         )}
-      </Grid>
-    </FixNavDrawerPosition>
+      </ViewerGrid>
+    </ThemeProvider>
   )
 })
 
@@ -111,8 +109,18 @@ export const useStudioViewer = ({
 }
 
 // Trying to impress Snorre with my 1337 CSS haxxor
-const FixNavDrawerPosition = styled(Card)`
+const ViewerGrid = styled(Grid)`
   position: relative;
+  gap: 1px;
+  background-color: ${({ theme }) => {
+    console.log({ theme }, theme.sanity.color)
+    return theme.sanity.color.base.border
+  }};
+
+  /* @TODO investigate if it's safe to set overflow: hidden on these */
+  & [data-ui='ToolScreen'] {
+    overflow: hidden;
+  }
 
   & [data-ui='Navbar'] + div {
     top: calc(100vh - var(--ugly-hack-height, 0));

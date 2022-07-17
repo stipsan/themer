@@ -1,20 +1,15 @@
-import { DesktopIcon, MoonIcon, SelectIcon, SunIcon } from '@sanity/icons'
 import {
   type CardTone,
   type ThemeColorSchemeKey,
-  Button,
   Card,
   Grid,
-  Label,
-  Menu,
-  MenuButton,
-  MenuItem,
   ThemeProvider,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import { HeaderCard, useHeaderCard } from 'components/HeaderCard'
 import HuesFields from 'components/HuesFields'
 import PresetsMenu from 'components/PresetsMenu'
+import SchemeMenu from 'components/SchemeMenu'
 import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
 import ToggleView from 'components/ToggleView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -206,84 +201,11 @@ export default function Themer({
                 style={{ paddingLeft: 'env(safe-area-inset-left)' }}
               >
                 <Card paddingLeft={[4]} paddingTop={4}>
-                  <Label htmlFor="scheme" size={0} muted>
-                    Scheme
-                  </Label>
-                  <Card paddingY={2}>
-                    <MenuButton
-                      button={
-                        <Button
-                          fontSize={1}
-                          paddingY={2}
-                          paddingX={3}
-                          tone="default"
-                          mode="ghost"
-                          icon={
-                            forceScheme === 'light'
-                              ? SunIcon
-                              : forceScheme === 'dark'
-                              ? MoonIcon
-                              : DesktopIcon
-                          }
-                          iconRight={SelectIcon}
-                          text={
-                            forceScheme === 'light'
-                              ? 'Light'
-                              : forceScheme === 'dark'
-                              ? 'Dark'
-                              : 'System'
-                          }
-                        />
-                      }
-                      id="scheme"
-                      menu={
-                        <Menu>
-                          <MenuItem
-                            fontSize={1}
-                            paddingY={2}
-                            paddingX={3}
-                            icon={DesktopIcon}
-                            text="System"
-                            selected={forceScheme === null}
-                            tone={forceScheme === null ? 'primary' : 'default'}
-                            onClick={() =>
-                              startTransition(() => setForceScheme(null))
-                            }
-                          />
-                          <MenuItem
-                            fontSize={1}
-                            paddingY={2}
-                            paddingX={3}
-                            icon={SunIcon}
-                            text="Light"
-                            selected={forceScheme === 'light'}
-                            tone={
-                              forceScheme === 'light' ? 'primary' : 'default'
-                            }
-                            onClick={() =>
-                              startTransition(() => setForceScheme('light'))
-                            }
-                          />
-                          <MenuItem
-                            fontSize={1}
-                            paddingY={2}
-                            paddingX={3}
-                            icon={MoonIcon}
-                            text="Dark"
-                            selected={forceScheme === 'dark'}
-                            tone={
-                              forceScheme === 'dark' ? 'primary' : 'default'
-                            }
-                            onClick={() =>
-                              startTransition(() => setForceScheme('dark'))
-                            }
-                          />
-                        </Menu>
-                      }
-                      placement="bottom-start"
-                      popover={{ portal: true }}
-                    />
-                  </Card>
+                  <SchemeMenu
+                    forceScheme={forceScheme}
+                    setForceScheme={setForceScheme}
+                    startTransition={startTransition}
+                  />
                 </Card>
                 <Card paddingTop={[4]}>
                   <ToggleView toggleView={toggleView} view={view} />

@@ -1,6 +1,8 @@
 import { mix } from 'polished'
 import type { Hue } from 'utils/types'
 
+console.warn('Loaded getColorHex')
+
 // https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L18-L58
 export function getColorHex(
   hue: Omit<Hue, 'midPoint'> & { title?: string; midPoint: number },

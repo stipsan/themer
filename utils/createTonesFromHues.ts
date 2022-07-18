@@ -2,8 +2,10 @@ import { type ColorTints, COLOR_TINTS } from '@sanity/color'
 import { getColorHex } from 'utils/getColorHex'
 import type { Hue, Hues } from 'utils/types'
 
+console.warn('Loaded createTintsFromHue')
+
 // https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L42-L58
-function createTintsFromHue(hue: Hue, title: string): ColorTints {
+export function createTintsFromHue(hue: Hue, title: string): ColorTints {
   const initial = {} as ColorTints
   const tints = COLOR_TINTS.reduce((acc, tint) => {
     acc[tint] = {

@@ -1,14 +1,11 @@
-import {
-  type ColorHueConfig,
-  type ColorTints,
-  COLOR_TINTS,
-} from '@sanity/color'
-import { type CardTone, Box, Card, Grid, Text, Tooltip } from '@sanity/ui'
+import { COLOR_TINTS } from '@sanity/color'
+import { type CardTone, Card, Grid, Skeleton, Text } from '@sanity/ui'
 import { ColorInput, Label } from 'components/Sidebar.styles'
-import { mix } from 'polished'
 import {
   type TransitionStartFunction,
+  lazy,
   memo,
+  Suspense,
   useEffect,
   useId,
   useState,
@@ -18,6 +15,7 @@ import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import type { Hue, Hues } from 'utils/types'
 
+// @TODO move into shared utils
 const RENDER_TONES = [
   'default',
   'primary',
@@ -26,6 +24,8 @@ const RENDER_TONES = [
   'caution',
   'critical',
 ] as const
+
+const ColorTintsPreview = lazy(() => import('components/ColorTintsPreview'))
 
 interface Props {
   // Needs to be stable or it'll reset
@@ -269,100 +269,19 @@ const HueFields = memo(function HueFields({
           overflow="hidden"
           style={{ marginLeft: 'env(safe-area-inset-left)' }}
         >
-          <Grid columns={11} style={{ gap: '0px' }}>
-            <ColorTintsPreview
-              hue={{ mid, midPoint: midPoint as any, lightest, darkest }}
-              title={tone}
-            />
-          </Grid>
+          <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
+            <Grid columns={11} style={{ gap: '0px' }}>
+              <ColorTintsPreview
+                hue={{ mid, midPoint: midPoint as any, lightest, darkest }}
+                title={tone}
+              />
+            </Grid>
+          </Suspense>
         </Card>
       </Card>
     </>
   )
 })
-
-// https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L18-L58
-function getColorHex(config: ColorHueConfig, tint: string): string {
-  const tintNum = Number(tint)
-  const midPoint = config.midPoint || 500
-  const darkSize = 1000 - midPoint
-  const lightPosition = tintNum / midPoint
-  const darkPosition = (tintNum - midPoint) / darkSize
-
-  if (tintNum === midPoint) {
-    return config.mid.toLowerCase()
-  }
-
-  // light side of scale: x < midPoint
-  if (tintNum < midPoint) {
-    return mix(lightPosition, config.mid, config.lightest)
-  }
-
-  // dark side of scale: x > midPoint
-  return mix(darkPosition, config.darkest, config.mid)
-}
-
-// https://github.com/sanity-io/design/blob/804bf73dffb1c0ecb1c2e6758135784502768bfe/packages/%40sanity/color/scripts/generate.ts#L42-L58
-export function createTintsFromHue(config: ColorHueConfig): ColorTints {
-  const initial = {} as ColorTints
-  const tints = COLOR_TINTS.reduce((acc, tint) => {
-    acc[tint] = {
-      title: `${config.title} ${tint}`,
-      hex: getColorHex(config, tint),
-    }
-
-    return acc
-  }, initial)
-
-  return tints
-}
-
-function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
-  const tints = createTintsFromHue({ ...hue, title })
-  return (
-    <>
-      {Object.entries(tints).map(([tint, color]) => (
-        <Tooltip
-          key={tint}
-          content={
-            <Card tone="default" key={tint} radius={2}>
-              <Card
-                padding={4}
-                radius={2}
-                style={{
-                  background: color.hex,
-                  borderBottomLeftRadius: '0px',
-                  borderBottomRightRadius: '0px',
-                }}
-              />
-              <Box padding={1} paddingTop={2}>
-                <Text size={0} muted>
-                  {tint}
-                </Text>
-              </Box>
-              <Box padding={1} paddingBottom={2}>
-                <Text size={0} style={{ minWidth: '56px' }}>
-                  {color.hex}
-                </Text>
-              </Box>
-            </Card>
-          }
-          fallbackPlacements={['top-end', 'top-start']}
-          placement="top"
-          portal
-        >
-          <Box
-            style={{
-              background: color.hex,
-              boxShadow: 'var(--card-shadow-outline-color) -1px 0px 0 0',
-            }}
-            paddingY={2}
-          />
-        </Tooltip>
-      ))}
-    </>
-  )
-}
 
 const StyledRange = styled.input`
   accent-color: var(--card-focus-ring-color, currentColor);
@@ -376,41 +295,6 @@ const StyledRange = styled.input`
     background-color: var(--card-focus-ring-color, currentColor);
   }
 `
-
-/*
-// @TODO revisit later
-// Using .attrs to fool the type checker as @sanity/ui isn't prepared to style it
-// No worries, we're styling it here
-const ColorInput = styled(TextInput).attrs({ type: 'color' as 'text' })`
-flex: none;
-padding: 0;
-background: red
-
-&&[type="color"] {
-  ${({theme}) => {
-    console.log('theme from func', theme)
-    return `
-    --size-diff-positive: ${theme.sanity.color.solid.positive.enabled.bg};
-    --size-diff-negative: ${theme.sanity.color.solid.critical.enabled.bg};
-    --input-fg-color: ${theme.sanity.color.input.default.enabled.fg};
-    --input-placeholder-color: ${theme.sanity.color.input.default.enabled.placeholder};
-  `
-  }}
-	-webkit-appearance: none;
-	border: none;
-	width: 32px;
-	height: 32px;
-  padding: 1px;
-}
-& [type="color"]::-webkit-color-swatch-wrapper {
-	padding: 0;
-}
-& [type="color"]::-webkit-color-swatch {
-	border: none; 
-}
-`
-
-// */
 
 function roundToScale(value: number): number {
   if (value < 75) {

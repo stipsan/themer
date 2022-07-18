@@ -1,5 +1,13 @@
 import 'style.css'
 
-import App from 'next/app'
+import CounterSnippet from 'components/CounterSnippet'
+import type { AppProps } from 'next/app'
 
-export default App
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <Component {...pageProps} />
+      {process.env.NEXT_PUBLIC_COUNTER_DEV && <CounterSnippet />}
+    </>
+  )
+}

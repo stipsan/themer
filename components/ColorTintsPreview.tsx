@@ -22,9 +22,9 @@ function ColorTintsPreview({ mid, midPoint, lightest, darkest, tone }: Props) {
                 <Text size={0} weight="medium">
                   {tint}
                 </Text>
-                <HexText size={0} muted>
+                <Text size={0} muted>
                   {color.hex}
-                </HexText>
+                </Text>
               </Stack>
             </Card>
           }
@@ -52,15 +52,12 @@ function ColorTintsPreview({ mid, midPoint, lightest, darkest, tone }: Props) {
 const SwatchPreview = styled(Box).attrs({ paddingTop: 3, paddingBottom: 4 })`
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
+  min-width: 52px;
 `
 
 const SwatchThumb = styled(Box).attrs({ paddingY: 2 })`
   cursor: pointer;
   box-shadow: var(--card-shadow-outline-color) -1px 0px 0 0;
-`
-
-const HexText = styled(Text)`
-  font-feature-settings: 'tnum';
 `
 
 export default memo(ColorTintsPreview)

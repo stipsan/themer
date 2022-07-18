@@ -1,6 +1,7 @@
-import { Card, Stack, Text } from '@sanity/ui'
+import { Stack, Text } from '@sanity/ui'
 import { ColorInput, Label } from 'components/Sidebar.styles'
-import { type ChangeEventHandler, memo } from 'react'
+import { type ChangeEventHandler, memo, useId } from 'react'
+import styled from 'styled-components'
 
 interface Props {
   label: string
@@ -9,20 +10,19 @@ interface Props {
   value: string
 }
 const HueColorInput = ({ label, onChange, value }: Props) => {
+  const id = useId()
+
   return (
     <Stack space={2}>
-      <Label>{label}</Label>
-      <Card>
-        <ColorInput value={value} onChange={onChange} />
-        <Text
-          as="output"
-          muted
-          size={0}
-          style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-        >
+      <label htmlFor={id}>
+        <Label>{label}</Label>
+      </label>
+      <ColorInput id={id} value={value} onChange={onChange} />
+      <output htmlFor={id}>
+        <Text muted size={0}>
           {value}
         </Text>
-      </Card>
+      </output>
     </Stack>
   )
 }

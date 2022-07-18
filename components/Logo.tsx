@@ -15,7 +15,7 @@ const ConicRainbow = styled.div`
   bottom: 0;
   left: 0;
   transform-origin: center;
-  opacity: 0.9;
+  opacity: 0.8;
 `
 
 const DarkCircle = styled.div`
@@ -32,13 +32,13 @@ const DarkCircle = styled.div`
 
 const Figure = styled.figure`
   display: block;
-  /* clip-path: circle(16px); */
   border-radius: 16px;
   overflow: hidden;
   height: 32px;
   margin: 0;
   position: relative;
   width: 32px;
+  contain: strict;
 `
 
 interface Props {
@@ -46,22 +46,21 @@ interface Props {
   transition: boolean
 }
 function Logo({ spin, transition }: Props) {
-  const wheelRef = useRef(null)
-  const circleRef = useRef(null)
+  const conicRainbowRef = useRef(null)
+  const darkCircleRef = useRef(null)
 
   useEffect(() => {
-    if (wheelRef.current && circleRef.current) {
+    if (conicRainbowRef.current && darkCircleRef.current) {
       if (spin || transition) {
         const unit = 360 / 1.5
         const rewind = unit + Math.random() * unit
         const forward = unit + Math.random() * unit
         const easing = spring({ stiffness: 70 })
         const animation = animate(
-          wheelRef.current,
+          conicRainbowRef.current,
           {
-            opacity: transition ? 1 : 0.9,
+            opacity: transition ? 1 : 0.8,
             rotate: transition ? -rewind : forward,
-            scale: 1.4,
           },
           {
             // direction: transition ? 'alternate' : undefined,
@@ -70,9 +69,9 @@ function Logo({ spin, transition }: Props) {
         )
 
         const animation2 = animate(
-          circleRef.current,
+          darkCircleRef.current,
           {
-            opacity: transition ? 0.8 : 0.6,
+            opacity: transition ? 0.7 : 0.6,
             scale: transition ? 1.08 : 1,
           },
           { easing }
@@ -89,8 +88,8 @@ function Logo({ spin, transition }: Props) {
 
   return (
     <Figure>
-      <ConicRainbow ref={wheelRef} />
-      <DarkCircle ref={circleRef} />
+      <ConicRainbow ref={conicRainbowRef} />
+      <DarkCircle ref={darkCircleRef} />
       <Svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
         <g fill="#fff">
           <path d="M9.950524 8.587852c0 2.68311 1.663111 4.293297 4.987729 5.132069l3.528298.819527c3.140184.726509 5.064712 2.521129 5.064712 5.448013.025584 1.276035-.388969 2.521965-1.173963 3.528298 0-2.918866-1.51075-4.490563-5.152916-5.452826l-3.456128-.777826c-2.776129-.64151-4.917164-2.113772-4.917164-5.292448-.012943-1.227906.381899-2.425406 1.12264-3.404807" />

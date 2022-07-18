@@ -55,6 +55,7 @@ const SwatchPreview = styled(Box).attrs({ paddingTop: 3, paddingBottom: 4 })`
   min-width: 52px;
 `
 
+// @TODO these should now be <Button> now that they have click events
 const SwatchThumb = styled(Box).attrs({ paddingY: 2 })`
   cursor: pointer;
   box-shadow: var(--card-shadow-outline-color) -1px 0px 0 0;

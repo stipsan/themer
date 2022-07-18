@@ -68,7 +68,7 @@ function ImportFromImage({
           type="url"
           muted
           pattern="^https://cdn.sanity.io/images/.+"
-          fontSize={1}
+          fontSize={[2, 2, 1]}
           value={url}
           onFocus={() => setTouched(false)}
           onChange={(event) => {

@@ -5,15 +5,16 @@ import styled from 'styled-components'
 const Svg = styled.svg`
   position: relative;
   z-index: 1;
+  will-change: transform;
 `
 
 const ConicRainbow = styled.div`
   background: conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
   transform-origin: center;
   opacity: 0.8;
 `

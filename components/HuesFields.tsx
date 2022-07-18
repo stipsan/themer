@@ -1,11 +1,13 @@
 import { COLOR_TINTS } from '@sanity/color'
-import { type CardTone, Card, Grid, Skeleton, Text } from '@sanity/ui'
+import { type CardTone, Card, Grid, Skeleton, Stack, Text } from '@sanity/ui'
 import { ColorInput, Label, RangeInput } from 'components/Sidebar.styles'
 import {
+  type ChangeEventHandler,
   type TransitionStartFunction,
   lazy,
   memo,
   Suspense,
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -15,6 +17,8 @@ import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import { roundMidPoint } from 'utils/roundMidPoint'
 import type { Hue, Hues } from 'utils/types'
+
+import HueColorInput from './HueColorInput'
 
 // @TODO move into shared utils
 const RENDER_TONES = [
@@ -103,17 +107,58 @@ const HueFields = memo(function HueFields({
     onChange(tone, hue)
   }, [tone, hue, onChange])
 
+  const midChangeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (event) => {
+      const { value } = event.target
+
+      setMid(value)
+      prepareTransition()
+      startTransition(() => {
+        if (isColor(value)) {
+          setHue((hue) => ({ ...hue, mid: value }))
+        }
+      })
+    },
+    [prepareTransition, startTransition]
+  )
+  const lightestChangeHandler = useCallback<
+    ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
+      const { value } = event.target
+
+      setLightest(value)
+      prepareTransition()
+      startTransition(() => {
+        if (isColor(value)) {
+          setHue((hue) => ({ ...hue, lightest: value }))
+        }
+      })
+    },
+    [prepareTransition, startTransition]
+  )
+  const darkestChangeHandler = useCallback<
+    ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
+      const { value } = event.target
+
+      setDarkest(value)
+      prepareTransition()
+      startTransition(() => {
+        if (isColor(value)) {
+          setHue((hue) => ({ ...hue, darkest: value }))
+        }
+      })
+    },
+    [prepareTransition, startTransition]
+  )
+
   const midRangeId = `${tone}-mid-range-${useId()}`
 
   return (
-    <>
-      <Card
-        paddingTop={4}
-        paddingX={4}
-        paddingBottom={4}
-        tone={tone}
-        shadow={1}
-      >
+    <Card padding={4} tone={tone} shadow={1}>
+      <Stack space={4}>
         <Text
           size={1}
           weight="medium"
@@ -124,109 +169,35 @@ const HueFields = memo(function HueFields({
         >
           {tone}
         </Text>
-        <Grid
-          columns={3}
-          paddingTop={4}
-          style={{ paddingLeft: 'env(safe-area-inset-left)' }}
-        >
-          <Card tone={tone} key="mid">
-            <Label>Mid</Label>
-            <Card paddingY={2} tone={tone}>
-              <ColorInput
-                value={
-                  mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid
-                }
-                onChange={(event) => {
-                  const { value } = event.target
-
-                  setMid(value)
-                  prepareTransition()
-                  startTransition(() => {
-                    if (isColor(value)) {
-                      setHue((hue) => ({ ...hue, mid: value }))
-                    }
-                  })
-                }}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {hue.mid}
-              </Text>
-            </Card>
-          </Card>
-          <Card tone={tone} key="lightest">
-            <Label>Lightest</Label>
-            <Card paddingY={2} tone={tone}>
-              <ColorInput
-                value={
-                  lightest.length === 4
-                    ? `${lightest}${lightest.replace(/^#/, '')}`
-                    : lightest
-                }
-                onChange={(event) => {
-                  const { value } = event.target
-
-                  setLightest(value)
-                  prepareTransition()
-                  startTransition(() => {
-                    if (isColor(value)) {
-                      setHue((hue) => ({ ...hue, lightest: value }))
-                    }
-                  })
-                }}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {hue.lightest}
-              </Text>
-            </Card>
-          </Card>
-          <Card tone={tone} key="darkest">
-            <Label>Darkest</Label>
-            <Card paddingY={2} tone={tone}>
-              <ColorInput
-                value={
-                  darkest.length === 4
-                    ? `${darkest}${darkest.replace(/^#/, '')}`
-                    : darkest
-                }
-                onChange={(event) => {
-                  const { value } = event.target
-
-                  setDarkest(value)
-                  prepareTransition()
-                  startTransition(() => {
-                    if (isColor(value)) {
-                      setHue((hue) => ({ ...hue, darkest: value }))
-                    }
-                  })
-                }}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {hue.darkest}
-              </Text>
-            </Card>
-          </Card>
+        <Grid columns={3} style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
+          <HueColorInput
+            key="mid"
+            label="Mid"
+            onChange={midChangeHandler}
+            value={mid.length === 4 ? `${mid}${mid.replace(/^#/, '')}` : mid}
+          />
+          <HueColorInput
+            key="lightest"
+            label="Lightest"
+            onChange={lightestChangeHandler}
+            value={
+              lightest.length === 4
+                ? `${lightest}${lightest.replace(/^#/, '')}`
+                : lightest
+            }
+          />
+          <HueColorInput
+            key="darkest"
+            label="Darkest"
+            onChange={darkestChangeHandler}
+            value={
+              darkest.length === 4
+                ? `${darkest}${darkest.replace(/^#/, '')}`
+                : darkest
+            }
+          />
         </Grid>
-        <Card
-          tone={tone}
-          paddingTop={3}
-          paddingBottom={2}
-          style={{ paddingLeft: 'env(safe-area-inset-left)' }}
-        >
+        <Card tone={tone} style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
           <Label>Mid point ({midPointRounded})</Label>
           <Card paddingY={2} tone={tone}>
             <RangeInput
@@ -263,28 +234,28 @@ const HueFields = memo(function HueFields({
               ))}
             </datalist>
           </Card>
+          <Card
+            tone="inherit"
+            shadow={1}
+            radius={1}
+            marginTop={2}
+            overflow="hidden"
+          >
+            <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
+              <Grid columns={11} style={{ gap: '0px' }}>
+                <ColorTintsPreview
+                  tone={tone}
+                  mid={mid}
+                  // Use midPoint instead of midPointRounded as it looks and feels better when dragging the mid point slider
+                  midPoint={midPoint as any}
+                  lightest={lightest}
+                  darkest={darkest}
+                />
+              </Grid>
+            </Suspense>
+          </Card>
         </Card>
-        <Card
-          tone={tone}
-          shadow={1}
-          radius={1}
-          overflow="hidden"
-          style={{ marginLeft: 'env(safe-area-inset-left)' }}
-        >
-          <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
-            <Grid columns={11} style={{ gap: '0px' }}>
-              <ColorTintsPreview
-                tone={tone}
-                mid={mid}
-                // Use midPoint instead of midPointRounded as it looks and feels better when dragging the mid point slider
-                midPoint={midPoint as any}
-                lightest={lightest}
-                darkest={darkest}
-              />
-            </Grid>
-          </Suspense>
-        </Card>
-      </Card>
-    </>
+      </Stack>
+    </Card>
   )
 })

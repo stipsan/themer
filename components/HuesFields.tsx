@@ -1,6 +1,6 @@
 import { COLOR_TINTS } from '@sanity/color'
 import { type CardTone, Card, Grid, Skeleton, Stack, Text } from '@sanity/ui'
-import { ColorInput, Label, RangeInput } from 'components/Sidebar.styles'
+import { Label, RangeInput } from 'components/Sidebar.styles'
 import {
   type ChangeEventHandler,
   type TransitionStartFunction,
@@ -13,6 +13,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import styled from 'styled-components'
 import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import { roundMidPoint } from 'utils/roundMidPoint'
@@ -154,21 +155,25 @@ const HueFields = memo(function HueFields({
     [prepareTransition, startTransition]
   )
 
-  const midRangeId = `${tone}-mid-range-${useId()}`
+  useEffect(() => {
+    prepareTransition()
+    startTransition(() => {
+      setHue((hue) => {
+        if (hue.midPoint !== midPointRounded) {
+          return { ...hue, midPoint: midPointRounded }
+        }
+        return hue
+      })
+    })
+  }, [midPointRounded, prepareTransition, startTransition])
+
+  const midRangeId = useId()
+  const midRangeListId = useId()
 
   return (
     <Card padding={4} tone={tone} shadow={1}>
       <Stack space={4}>
-        <Text
-          size={1}
-          weight="medium"
-          style={{
-            textTransform: 'capitalize',
-            paddingLeft: 'env(safe-area-inset-left)',
-          }}
-        >
-          {tone}
-        </Text>
+        <Legend>{tone}</Legend>
         <Grid columns={3} style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
           <HueColorInput
             key="mid"
@@ -197,65 +202,92 @@ const HueFields = memo(function HueFields({
             }
           />
         </Grid>
-        <Card tone={tone} style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
-          <Label>Mid point ({midPointRounded})</Label>
-          <Card paddingY={2} tone={tone}>
-            <RangeInput
-              name={`${tone}-midPoint`}
-              // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
-              min={50}
-              max={950}
-              value={midPoint}
-              list={midRangeId}
-              onChange={(event) => {
-                const { value } = event.target
-
-                setMidPoint(value)
-                prepareTransition()
-                startTransition(() => {
-                  const nextMidPoint = roundMidPoint(Number(value))
-                  if (!Number.isNaN(nextMidPoint) && isMidPoint(nextMidPoint)) {
-                    setHue((hue) => ({ ...hue, midPoint: value as any }))
+        <Stack style={{ paddingLeft: 'env(safe-area-inset-left)' }} space={2}>
+          <label htmlFor={midRangeId}>
+            <Label>Mid point ({midPointRounded})</Label>
+          </label>
+          <RangeInput
+            min={50}
+            max={950}
+            step={1}
+            value={midPoint}
+            id={midRangeId}
+            list={midRangeListId}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+                event.preventDefault()
+                setMidPoint((midPoint) => {
+                  const midPointRounded = roundMidPoint(Number(midPoint))
+                  if (midPointRounded === 100) {
+                    return '50'
                   }
+                  if (midPointRounded === 950) {
+                    return '900'
+                  }
+                  if (midPointRounded > 100) {
+                    return `${midPointRounded - 100}`
+                  }
+
+                  return midPoint
                 })
-              }}
-              onPointerUp={() => {
-                prepareTransition()
-                setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
-              }}
-              onBlur={() => {
-                prepareTransition()
-                setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
-              }}
-            />
-            <datalist id={midRangeId}>
-              {COLOR_TINTS.map((tint) => (
-                <option key={tint} value={tint} />
-              ))}
-            </datalist>
-          </Card>
-          <Card
-            tone="inherit"
-            shadow={1}
-            radius={1}
-            marginTop={2}
-            overflow="hidden"
-          >
-            <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
-              <Grid columns={11} style={{ gap: '0px' }}>
-                <ColorTintsPreview
-                  tone={tone}
-                  mid={mid}
-                  // Use midPoint instead of midPointRounded as it looks and feels better when dragging the mid point slider
-                  midPoint={midPoint as any}
-                  lightest={lightest}
-                  darkest={darkest}
-                />
-              </Grid>
-            </Suspense>
-          </Card>
+              }
+              if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+                event.preventDefault()
+                setMidPoint((midPoint) => {
+                  const midPointRounded = roundMidPoint(Number(midPoint))
+                  if (midPointRounded === 50) {
+                    return '100'
+                  }
+                  if (midPointRounded === 900) {
+                    return '950'
+                  }
+                  if (midPointRounded < 900) {
+                    return `${midPointRounded + 100}`
+                  }
+
+                  return midPoint
+                })
+              }
+            }}
+            onChange={(event) => {
+              prepareTransition()
+              setMidPoint(event.target.value)
+            }}
+            onPointerUp={() => {
+              prepareTransition()
+              setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
+            }}
+            onBlur={() => {
+              prepareTransition()
+              setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
+            }}
+          />
+          <datalist id={midRangeListId}>
+            {COLOR_TINTS.map((tint) => (
+              <option key={tint} value={tint} label={tint} />
+            ))}
+          </datalist>
+        </Stack>
+        <Card tone="inherit" shadow={1} radius={1} overflow="hidden">
+          <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
+            <Grid columns={11}>
+              <ColorTintsPreview
+                tone={tone}
+                mid={mid}
+                // Use midPoint instead of midPointRounded as it looks and feels better when dragging the mid point slider
+                midPoint={midPoint as any}
+                lightest={lightest}
+                darkest={darkest}
+              />
+            </Grid>
+          </Suspense>
         </Card>
       </Stack>
     </Card>
   )
 })
+
+const Legend = styled(Text).attrs({ size: 1, weight: 'medium' })`
+  text-transform: capitalize;
+  padding-left: env(safe-area-inset-left);
+`

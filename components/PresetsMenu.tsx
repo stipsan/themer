@@ -74,6 +74,7 @@ interface Props {
   onChange: (preset: ThemePreset) => void
   selected: ThemePreset
   hues: Hues
+  unstable_showParsedUrl: boolean
 }
 export default function PresetsMenu({
   selected,
@@ -82,6 +83,7 @@ export default function PresetsMenu({
   prepareTransition,
   startTransition,
   setPreset,
+  unstable_showParsedUrl,
 }: Props) {
   const [open, setOpen] = useState<'import' | 'share' | 'export' | false>(false)
 
@@ -265,6 +267,7 @@ export default function PresetsMenu({
               prepareTransition={prepareTransition}
               startTransition={startTransition}
               setPreset={setPreset}
+              unstable_showParsedUrl={unstable_showParsedUrl}
             />
           </Card>
         </TabPanel>

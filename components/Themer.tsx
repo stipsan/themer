@@ -58,12 +58,14 @@ interface Props extends Pick<StudioProviderProps, 'unstable_noAuthBoundary'> {
   sidebarWidth: number
   // The scheme detected from the usePrefersDark hook
   systemScheme: ThemeColorSchemeKey
+  unstable_showParsedUrl?: boolean
 }
 export default function Themer({
   sidebarWidth,
   systemScheme,
   initialPreset,
   unstable_noAuthBoundary,
+  unstable_showParsedUrl,
 }: Props) {
   const [preset, setPreset] = useState(() => initialPreset)
 
@@ -240,6 +242,7 @@ export default function Themer({
                     onChange={(nextPreset) =>
                       startTransition(() => setPreset(nextPreset))
                     }
+                    unstable_showParsedUrl={unstable_showParsedUrl}
                   />
                   <Card height="fill" paddingY={1}>
                     <HuesFields

@@ -1,6 +1,5 @@
 import { WarningOutlineIcon } from '@sanity/icons'
 import {
-  Box,
   Button,
   Card,
   Grid,
@@ -33,11 +32,13 @@ interface Props {
   startTransition: TransitionStartFunction
   setPreset: Dispatch<SetStateAction<ThemePreset>>
   prepareTransition: () => void
+  unstable_showParsedUrl: boolean
 }
 function ImportFromImage({
   prepareTransition,
   startTransition,
   setPreset,
+  unstable_showParsedUrl,
 }: Props) {
   const id = useId()
   const inputId = `${id}-url`
@@ -138,50 +139,52 @@ function ImportFromImage({
             }}
           />
         )}
-        <Card
-          as="details"
-          tone="transparent"
-          muted
-          radius={2}
-          paddingX={2}
-          paddingY={1}
-        >
-          <summary
-            style={{
-              position: 'relative',
-              color: 'var(--card-muted-fg-color)',
-            }}
+        {unstable_showParsedUrl && (
+          <Card
+            as="details"
+            tone="transparent"
+            muted
+            radius={2}
+            paddingX={2}
+            paddingY={1}
           >
-            <Text
-              size={1}
-              muted
+            <summary
               style={{
-                display: 'inline-block',
-                position: 'absolute',
-                top: '0.25rem',
-                left: '1rem',
+                position: 'relative',
+                color: 'var(--card-muted-fg-color)',
               }}
             >
-              Parsed URL
-            </Text>
-          </summary>
-          <Stack space={1} paddingY={2}>
-            <Label size={0}>URL</Label>
-            <TextInput fontSize={0} readOnly value={imageUrl} />
-            <Grid columns={2} paddingY={1} gap={1}>
-              <Stack space={1}>
-                <Label size={0}>Project ID</Label>
-                <TextInput fontSize={0} readOnly value={asset.projectId} />
-              </Stack>
-              <Stack space={1}>
-                <Label size={0}>Dataset</Label>
-                <TextInput fontSize={0} readOnly value={asset.dataset} />
-              </Stack>
-            </Grid>
-            <Label size={0}>Image Asset Ref</Label>
-            <TextInput fontSize={0} readOnly value={asset.id} />
-          </Stack>
-        </Card>
+              <Text
+                size={1}
+                muted
+                style={{
+                  display: 'inline-block',
+                  position: 'absolute',
+                  top: '0.25rem',
+                  left: '1rem',
+                }}
+              >
+                Parsed URL
+              </Text>
+            </summary>
+            <Stack space={1} paddingY={2}>
+              <Label size={0}>URL</Label>
+              <TextInput fontSize={0} readOnly value={imageUrl} />
+              <Grid columns={2} paddingY={1} gap={1}>
+                <Stack space={1}>
+                  <Label size={0}>Project ID</Label>
+                  <TextInput fontSize={0} readOnly value={asset.projectId} />
+                </Stack>
+                <Stack space={1}>
+                  <Label size={0}>Dataset</Label>
+                  <TextInput fontSize={0} readOnly value={asset.dataset} />
+                </Stack>
+              </Grid>
+              <Label size={0}>Image Asset Ref</Label>
+              <TextInput fontSize={0} readOnly value={asset.id} />
+            </Stack>
+          </Card>
+        )}
         {asset.projectId && asset.dataset && asset.id && (
           <ImportFromSanityImageAsset
             projectId={asset.projectId}

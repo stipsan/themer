@@ -61,6 +61,7 @@ export default function Index() {
         sidebarWidth={300}
         systemScheme={prefersDark ? 'dark' : 'light'}
         unstable_noAuthBoundary={unstable_noAuthBoundary}
+        unstable_showParsedUrl={process.env.NODE_ENV === 'development'}
       />
     </Suspense>
   )

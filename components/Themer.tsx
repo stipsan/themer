@@ -25,15 +25,26 @@ import type { Hue, Hues, ThemePreset } from 'utils/types'
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
 const StyledGrid = styled(Grid)`
+  row-gap: 1px;
   @media screen and (min-width: 600px) {
-    gap-row: 1px;
-
     && {
       grid-template-columns: ${
           // @ts-expect-error
           ({ sidebarWidth }) => sidebarWidth
         }px 1fr;
     }
+  }
+`
+
+const Sidebar = styled(Card)`
+  /* the z-index is necessary to overlay the mobile off-canvas menu */
+  z-index: 200;
+  height: calc(50vh - 1px);
+  max-height: calc(50dvh - 1px);
+
+  @media (min-width: ${({ theme }) => theme.sanity.media[1]}px) {
+    height: 100vh;
+    max-height: 100dvh;
   }
 `
 
@@ -191,18 +202,13 @@ export default function Themer({
       >
         <StyledGrid
           columns={[1, 1]}
-          height="fill"
+          height="stretch"
           // @ts-expect-error
           sidebarWidth={sidebarWidth}
         >
           <ToastProvider paddingY={7} zOffset={Z_OFFSET.toast}>
             <LayerProvider>
-              <Card
-                height="fill"
-                overflow="auto"
-                scheme={scheme}
-                style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
-              >
+              <Sidebar height="fill" overflow="auto" scheme={scheme}>
                 <HeaderCard
                   scheme={scheme}
                   spins={spins}
@@ -244,7 +250,7 @@ export default function Themer({
                     />
                   </Card>
                 </Card>
-              </Card>
+              </Sidebar>
             </LayerProvider>
           </ToastProvider>
           <StudioViewer

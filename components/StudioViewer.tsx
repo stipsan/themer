@@ -75,9 +75,6 @@ export const StudioViewer = memo(function StudioViewer({
       // */
         // @TODO fix scroll on mobile split view
         style={{
-          height: '100dvh',
-          maxHeight: '100vh',
-          overflow: 'auto',
           ['--ugly-hack-width' as any]:
             uglyHackRef?.current && uglyHackRect?.width
               ? `${uglyHackRect.width}px`
@@ -138,6 +135,14 @@ const ViewerGrid = styled(Grid)`
   position: relative;
   gap: 1px;
   background-color: ${({ theme }) => theme.sanity.color.base.border};
+  overflow: auto;
+  height: 50vh;
+  max-height: 50dvh;
+
+  @media (min-width: ${({ theme }) => theme.sanity.media[1]}px) {
+    height: 100vh;
+    max-height: 100dvh;
+  }
 
   & [data-ui='ToolScreen'] {
     /* @TODO investigate if it's safe to set overflow: hidden on these */

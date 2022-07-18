@@ -13,7 +13,7 @@ import SchemeMenu from 'components/SchemeMenu'
 import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
 import ToggleView from 'components/ToggleView'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { StudioTheme } from 'sanity'
+import type { StudioProviderProps, StudioTheme } from 'sanity'
 import { config } from 'studios'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
@@ -35,7 +35,7 @@ const StyledGrid = styled(Grid)`
   }
 `
 
-interface Props {
+interface Props extends Pick<StudioProviderProps, 'unstable_noAuthBoundary'> {
   initialPreset: ThemePreset
   sidebarWidth: number
   // The scheme detected from the usePrefersDark hook
@@ -45,6 +45,7 @@ export default function Themer({
   sidebarWidth,
   systemScheme,
   initialPreset,
+  unstable_noAuthBoundary,
 }: Props) {
   const [preset, setPreset] = useState(() => initialPreset)
 
@@ -236,6 +237,7 @@ export default function Themer({
             scheme={scheme}
             sidebarWidth={sidebarWidth}
             theme={themeFromHues}
+            unstable_noAuthBoundary={unstable_noAuthBoundary}
             view={view}
           />
         </StyledGrid>

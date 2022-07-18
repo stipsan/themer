@@ -11,7 +11,11 @@ import {
   StudioProvider,
 } from 'sanity'
 
-interface Props extends Pick<StudioProviderProps, 'unstable_history'> {
+interface Props
+  extends Pick<
+    StudioProviderProps,
+    'unstable_history' | 'unstable_noAuthBoundary'
+  > {
   config: WorkspaceOptions[]
   scheme: ThemeColorSchemeKey
   theme: WorkspaceOptions['theme']
@@ -21,6 +25,7 @@ const StudioPreview = ({
   scheme,
   theme,
   unstable_history,
+  unstable_noAuthBoundary,
 }: Props) => {
   // It's necessary to add the theme to each workspace as it's used for toast notifications and more
   const config = useMemo(
@@ -30,8 +35,8 @@ const StudioPreview = ({
 
   return (
     <StudioProvider
-      unstable_noAuthBoundary
       config={config}
+      unstable_noAuthBoundary={unstable_noAuthBoundary}
       unstable_history={unstable_history}
       scheme={scheme}
       // @TODO onSchemeChange doesn't work properly when using the SyncColorScheme workaround

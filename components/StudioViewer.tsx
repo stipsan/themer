@@ -14,12 +14,12 @@ import {
   useRef,
   useState,
 } from 'react'
-import { type WorkspaceOptions } from 'sanity'
+import { type StudioProviderProps, type WorkspaceOptions } from 'sanity'
 import styled from 'styled-components'
 
 export type View = 'default' | 'split'
 
-interface Props {
+interface Props extends Pick<StudioProviderProps, 'unstable_noAuthBoundary'> {
   config: WorkspaceOptions[]
   scheme: ThemeColorSchemeKey
   sidebarWidth: number
@@ -31,6 +31,7 @@ export const StudioViewer = memo(function StudioViewer({
   scheme,
   sidebarWidth,
   theme: _theme,
+  unstable_noAuthBoundary,
   view,
 }: Props) {
   const history = useMagicRouter('hash')
@@ -98,6 +99,7 @@ export const StudioViewer = memo(function StudioViewer({
           scheme={scheme}
           theme={theme}
           unstable_history={history}
+          unstable_noAuthBoundary={unstable_noAuthBoundary}
         />
         {view === 'split' && (
           <StudioPreview
@@ -106,6 +108,7 @@ export const StudioViewer = memo(function StudioViewer({
             scheme={scheme === 'dark' ? 'light' : 'dark'}
             theme={theme}
             unstable_history={history}
+            unstable_noAuthBoundary={unstable_noAuthBoundary}
           />
         )}
       </ViewerGrid>

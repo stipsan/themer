@@ -1,53 +1,66 @@
-import { Box, Card, Text, Tooltip } from '@sanity/ui'
+import { Box, Card, Stack, Text, Tooltip, useToast } from '@sanity/ui'
 import { memo } from 'react'
+import styled from 'styled-components'
 import { createTintsFromHue } from 'utils/createTonesFromHues'
 import type { Hue } from 'utils/types'
 
-function ColorTintsPreview({ hue, title }: { hue: Hue; title: string }) {
-  const tints = createTintsFromHue(hue, title)
+interface Props extends Hue {
+  tone: string
+}
+function ColorTintsPreview({ mid, midPoint, lightest, darkest, tone }: Props) {
+  const { push: pushToast } = useToast()
+  const tints = createTintsFromHue({ mid, midPoint, lightest, darkest }, tone)
   return (
     <>
       {Object.entries(tints).map(([tint, color]) => (
         <Tooltip
           key={tint}
           content={
-            <Card tone="default" key={tint} radius={2}>
-              <Card
-                padding={4}
-                radius={2}
-                style={{
-                  background: color.hex,
-                  borderBottomLeftRadius: '0px',
-                  borderBottomRightRadius: '0px',
-                }}
-              />
-              <Box padding={1} paddingTop={2}>
-                <Text size={0} muted>
+            <Card key={tint} radius={2}>
+              <SwatchPreview style={{ background: color.hex }} />
+              <Stack space={2} padding={2}>
+                <Text size={0} weight="medium">
                   {tint}
                 </Text>
-              </Box>
-              <Box padding={1} paddingBottom={2}>
-                <Text size={0} style={{ minWidth: '56px' }}>
+                <HexText size={0} muted>
                   {color.hex}
-                </Text>
-              </Box>
+                </HexText>
+              </Stack>
             </Card>
           }
           fallbackPlacements={['top-end', 'top-start']}
           placement="top"
           portal
         >
-          <Box
-            style={{
-              background: color.hex,
-              boxShadow: 'var(--card-shadow-outline-color) -1px 0px 0 0',
+          <SwatchThumb
+            style={{ background: color.hex }}
+            onClick={(event) => {
+              navigator.clipboard.writeText(color.hex)
+              pushToast({
+                closable: true,
+                status: 'success',
+                title: `Copied ${color.title} to the clipboard`,
+              })
             }}
-            paddingY={2}
           />
         </Tooltip>
       ))}
     </>
   )
 }
+
+const SwatchPreview = styled(Box).attrs({ paddingTop: 3, paddingBottom: 4 })`
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+`
+
+const SwatchThumb = styled(Box).attrs({ paddingY: 2 })`
+  cursor: pointer;
+  box-shadow: var(--card-shadow-outline-color) -1px 0px 0 0;
+`
+
+const HexText = styled(Text)`
+  font-feature-settings: 'tnum';
+`
 
 export default memo(ColorTintsPreview)

@@ -3,7 +3,9 @@ import {
   type ThemeColorSchemeKey,
   Card,
   Grid,
+  LayerProvider,
   ThemeProvider,
+  ToastProvider,
 } from '@sanity/ui'
 import Head from 'components/Head'
 import { HeaderCard, useHeaderCard } from 'components/HeaderCard'
@@ -34,6 +36,11 @@ const StyledGrid = styled(Grid)`
     }
   }
 `
+
+// https://github.com/sanity-io/sanity/blob/afd7010e06eda9acedf4d6654393102e2795fd7b/packages/sanity/src/studio/constants.ts#L4
+const Z_OFFSET = {
+  toast: [100, 11000],
+}
 
 interface Props extends Pick<StudioProviderProps, 'unstable_noAuthBoundary'> {
   initialPreset: ThemePreset
@@ -188,50 +195,58 @@ export default function Themer({
           // @ts-expect-error
           sidebarWidth={sidebarWidth}
         >
-          <Card
-            height="fill"
-            overflow="auto"
-            scheme={scheme}
-            style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
-          >
-            <HeaderCard scheme={scheme} spins={spins} transition={transition} />
-            <Card borderRight height="fill" tone="default">
-              <Grid
-                columns={[2]}
-                paddingBottom={2}
-                style={{ paddingLeft: 'env(safe-area-inset-left)' }}
+          <ToastProvider paddingY={7} zOffset={Z_OFFSET.toast}>
+            <LayerProvider>
+              <Card
+                height="fill"
+                overflow="auto"
+                scheme={scheme}
+                style={{ zIndex: 200, height: '100dvh', maxHeight: '100vh' }}
               >
-                <Card paddingLeft={[4]} paddingTop={4}>
-                  <SchemeMenu
-                    forceScheme={forceScheme}
-                    setForceScheme={setForceScheme}
-                    startTransition={startTransition}
-                  />
-                </Card>
-                <Card paddingTop={[4]}>
-                  <ToggleView toggleView={toggleView} view={view} />
-                </Card>
-              </Grid>
-              <PresetsMenu
-                hues={memoHues}
-                selected={preset}
-                prepareTransition={spin}
-                startTransition={startTransition}
-                setPreset={setPreset}
-                onChange={(nextPreset) =>
-                  startTransition(() => setPreset(nextPreset))
-                }
-              />
-              <Card height="fill" paddingY={1}>
-                <HuesFields
-                  initialHues={initialHues}
-                  startTransition={startTransition}
-                  prepareTransition={spin}
-                  onChange={onHuesChange}
+                <HeaderCard
+                  scheme={scheme}
+                  spins={spins}
+                  transition={transition}
                 />
+                <Card borderRight height="fill" tone="default">
+                  <Grid
+                    columns={[2]}
+                    paddingBottom={2}
+                    style={{ paddingLeft: 'env(safe-area-inset-left)' }}
+                  >
+                    <Card paddingLeft={[4]} paddingTop={4}>
+                      <SchemeMenu
+                        forceScheme={forceScheme}
+                        setForceScheme={setForceScheme}
+                        startTransition={startTransition}
+                      />
+                    </Card>
+                    <Card paddingTop={[4]}>
+                      <ToggleView toggleView={toggleView} view={view} />
+                    </Card>
+                  </Grid>
+                  <PresetsMenu
+                    hues={memoHues}
+                    selected={preset}
+                    prepareTransition={spin}
+                    startTransition={startTransition}
+                    setPreset={setPreset}
+                    onChange={(nextPreset) =>
+                      startTransition(() => setPreset(nextPreset))
+                    }
+                  />
+                  <Card height="fill" paddingY={1}>
+                    <HuesFields
+                      initialHues={initialHues}
+                      startTransition={startTransition}
+                      prepareTransition={spin}
+                      onChange={onHuesChange}
+                    />
+                  </Card>
+                </Card>
               </Card>
-            </Card>
-          </Card>
+            </LayerProvider>
+          </ToastProvider>
           <StudioViewer
             config={config}
             scheme={scheme}

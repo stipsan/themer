@@ -1,6 +1,6 @@
 import { COLOR_TINTS } from '@sanity/color'
 import { type CardTone, Card, Grid, Skeleton, Text } from '@sanity/ui'
-import { ColorInput, Label } from 'components/Sidebar.styles'
+import { ColorInput, Label, RangeInput } from 'components/Sidebar.styles'
 import {
   type TransitionStartFunction,
   lazy,
@@ -8,11 +8,12 @@ import {
   Suspense,
   useEffect,
   useId,
+  useMemo,
   useState,
 } from 'react'
-import styled from 'styled-components'
 import { isMidPoint } from 'utils/isMidPoint'
 import { isColor } from 'utils/parseHuesFromSearchParams'
+import { roundMidPoint } from 'utils/roundMidPoint'
 import type { Hue, Hues } from 'utils/types'
 
 // @TODO move into shared utils
@@ -74,10 +75,16 @@ const HueFields = memo(function HueFields({
   prepareTransition: () => void
 }) {
   // Fast state for intenral use, for inputs, range drags, the color picker etc
-  const [lightest, setLightest] = useState(() => initialHue.lightest)
-  const [mid, setMid] = useState(() => initialHue.mid)
-  const [darkest, setDarkest] = useState(() => initialHue.darkest)
-  const [midPoint, setMidPoint] = useState(() => `${initialHue.midPoint}`)
+  const [lightest, setLightest] = useState<string>(() => initialHue.lightest)
+  const [mid, setMid] = useState<string>(() => initialHue.mid)
+  const [darkest, setDarkest] = useState<string>(() => initialHue.darkest)
+  const [midPoint, setMidPoint] = useState<string>(
+    () => `${initialHue.midPoint}`
+  )
+  const midPointRounded = useMemo<Hue['midPoint']>(
+    () => roundMidPoint(Number(midPoint)),
+    [midPoint]
+  )
 
   // Correct state, uses a transition
   const [hue, setHue] = useState(() => initialHue)
@@ -220,12 +227,11 @@ const HueFields = memo(function HueFields({
           paddingBottom={2}
           style={{ paddingLeft: 'env(safe-area-inset-left)' }}
         >
-          <Label>Mid point ({roundToScale(Number(midPoint))})</Label>
+          <Label>Mid point ({midPointRounded})</Label>
           <Card paddingY={2} tone={tone}>
-            <StyledRange
+            <RangeInput
               name={`${tone}-midPoint`}
               // @TODO handle keyboard nav, make it inc between tints directly instead of every integer between 50 and 950
-              type="range"
               min={50}
               max={950}
               value={midPoint}
@@ -236,23 +242,19 @@ const HueFields = memo(function HueFields({
                 setMidPoint(value)
                 prepareTransition()
                 startTransition(() => {
-                  const nextMidPoint = roundToScale(Number(value))
+                  const nextMidPoint = roundMidPoint(Number(value))
                   if (!Number.isNaN(nextMidPoint) && isMidPoint(nextMidPoint)) {
                     setHue((hue) => ({ ...hue, midPoint: value as any }))
                   }
                 })
               }}
-              onPointerUp={(event) => {
+              onPointerUp={() => {
                 prepareTransition()
-                setMidPoint(
-                  roundToScale(event.currentTarget.value as any) as any
-                )
+                setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
               }}
-              onBlur={(event) => {
+              onBlur={() => {
                 prepareTransition()
-                setMidPoint(
-                  roundToScale(event.currentTarget.value as any) as any
-                )
+                setMidPoint((midPoint) => `${roundMidPoint(Number(midPoint))}`)
               }}
             />
             <datalist id={midRangeId}>
@@ -272,8 +274,12 @@ const HueFields = memo(function HueFields({
           <Suspense fallback={<Skeleton paddingY={2} animated radius={1} />}>
             <Grid columns={11} style={{ gap: '0px' }}>
               <ColorTintsPreview
-                hue={{ mid, midPoint: midPoint as any, lightest, darkest }}
-                title={tone}
+                tone={tone}
+                mid={mid}
+                // Use midPoint instead of midPointRounded as it looks and feels better when dragging the mid point slider
+                midPoint={midPoint as any}
+                lightest={lightest}
+                darkest={darkest}
               />
             </Grid>
           </Suspense>
@@ -282,27 +288,3 @@ const HueFields = memo(function HueFields({
     </>
   )
 })
-
-const StyledRange = styled.input`
-  accent-color: var(--card-focus-ring-color, currentColor);
-  width: 100%;
-
-  &::-webkit-slider-runnable-track {
-    border-color: var(--card-focus-ring-color, currentColor);
-  }
-  &[type='range']::-webkit-slider-thumb {
-    border-color: var(--card-focus-ring-color, currentColor);
-    background-color: var(--card-focus-ring-color, currentColor);
-  }
-`
-
-function roundToScale(value: number): number {
-  if (value < 75) {
-    return 50
-  }
-  if (value > 925) {
-    return 950
-  }
-
-  return Math.round(value / 100) * 100
-}

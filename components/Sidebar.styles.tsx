@@ -41,3 +41,16 @@ export const ColorInput = styled.input.attrs({ type: 'color' })`
       ${({ theme }) => transparentize(0.8, theme.sanity.color.card.enabled.fg)};
   }
 `
+
+export const RangeInput = styled.input.attrs({ type: 'range' })`
+  accent-color: var(--card-focus-ring-color, currentColor);
+  width: 100%;
+
+  &::-webkit-slider-runnable-track {
+    border-color: var(--card-focus-ring-color, currentColor);
+  }
+  &[type='range']::-webkit-slider-thumb {
+    border-color: var(--card-focus-ring-color, currentColor);
+    background-color: var(--card-focus-ring-color, currentColor);
+  }
+`

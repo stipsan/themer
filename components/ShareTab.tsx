@@ -29,7 +29,7 @@ const ShareTab = ({ searchParams }: Props) => {
   }, [])
 
   return (
-    <Stack space={4}>
+    <Stack space={3}>
       <Stack space={2}>
         <Label>Share your theme with the world 💖</Label>
         <Grid columns={canShare ? 2 : 1} gap={2}>

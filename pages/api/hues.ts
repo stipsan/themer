@@ -1,6 +1,7 @@
 import { themeFromHuesTemplate } from 'edge-utils/themeFromHuesTemplate.mjs'
 import type { NextRequest } from 'next/server'
-import { parseHuesFromSearchParams } from 'utils/parseHuesFromSearchParams'
+import { applyHuesFromPreset } from 'utils/applyHuesFromPreset'
+import { getPreset } from 'utils/presets'
 import { ValidationError } from 'utils/ValidationError'
 
 export const config = {
@@ -23,8 +24,12 @@ export default async function handler(req: NextRequest) {
 
   try {
     const resStart = Date.now()
+    const { searchParams: presetParams } = new URL(
+      getPreset(searchParams.get('preset')).url,
+      'http://localhost'
+    )
     const res = themeFromHuesTemplate(
-      parseHuesFromSearchParams(searchParams),
+      applyHuesFromPreset(presetParams, searchParams),
       searchParams.has('min')
     )
     const resDur = Date.now() - resStart

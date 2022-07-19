@@ -90,16 +90,6 @@ function PresetsMenu({
   const [open, setOpen] = useState<
     'import' | 'share' | 'export' | 'export-dialog' | false
   >(false)
-  const [mounted, setMounted] = useState<
-    'import' | 'share' | 'export' | 'export-dialog' | false
-  >(false)
-
-  useEffect(() => {
-    if (open) {
-      setMounted(open)
-    }
-    console.log({ open, mounted })
-  }, [open])
 
   const searchParams = useMemo(() => {
     const searchParams = new URLSearchParams()
@@ -203,43 +193,37 @@ function PresetsMenu({
           hidden={open !== 'import'}
           id="import-panel"
         >
-          {mounted === 'import' && (
-            <Card marginY={2}>
-              <ImportFromImage
-                prepareTransition={prepareTransition}
-                startTransition={startTransition}
-                setPreset={setPreset}
-                unstable_showParsedUrl={unstable_showParsedUrl}
-              />
-            </Card>
-          )}
+          <Card marginY={2}>
+            <ImportFromImage
+              prepareTransition={prepareTransition}
+              startTransition={startTransition}
+              setPreset={setPreset}
+              unstable_showParsedUrl={unstable_showParsedUrl}
+            />
+          </Card>
         </TabPanel>
         <TabPanel
           aria-labelledby="share=panel"
           hidden={open !== 'share'}
           id="share-panel"
         >
-          {mounted === 'share' && (
-            <Card marginY={2}>
-              <ShareTab searchParams={searchParams} />
-            </Card>
-          )}
+          <Card marginY={2}>
+            <ShareTab searchParams={searchParams} />
+          </Card>
         </TabPanel>
         <TabPanel
           aria-labelledby="export=panel"
           hidden={open ? !open.startsWith('export') : true}
           id="export-panel"
         >
-          {mounted && mounted.startsWith('export') && (
-            <Card marginY={2}>
-              <ExportTheme
-                searchParams={searchParams}
-                open={open as 'export'}
-                onOpen={() => setOpen('export-dialog')}
-                onClose={() => setOpen('export')}
-              />
-            </Card>
-          )}
+          <Card marginY={2}>
+            <ExportTheme
+              searchParams={searchParams}
+              open={open as 'export'}
+              onOpen={() => setOpen('export-dialog')}
+              onClose={() => setOpen('export')}
+            />
+          </Card>
         </TabPanel>
       </Card>
     </Card>

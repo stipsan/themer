@@ -90,7 +90,8 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
             text="Copy snippet"
             onClick={() => {
               navigator.clipboard.writeText(
-                formatCode(`import {theme} from ${JSON.stringify(esmUrl)}`)
+                formatCode(`// @ts-expect-error -- TODO figure out how to get typings for this
+                import {theme} from ${JSON.stringify(esmUrl)}`)
               )
               pushToast({
                 closable: true,

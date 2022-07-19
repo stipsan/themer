@@ -15,7 +15,7 @@ const ConicRainbow = styled.div`
   right: -1px;
   bottom: -1px;
   left: -1px;
-  transform-origin: center;
+  transform-origin: center center;
   opacity: 0.8;
 `
 
@@ -27,7 +27,7 @@ const DarkCircle = styled.div`
   bottom: 2px;
   left: 2px;
   border-radius: 50%;
-  transform-origin: center;
+  transform-origin: center center;
   opacity: 0.6;
 `
 

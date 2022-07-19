@@ -8,6 +8,9 @@ const nextConfig = {
     urlImports: ['https://themer.creativecody.dev/'],
     browsersListForSwc: true,
     legacyBrowsers: false,
+    images: {
+      allowFutureImage: true,
+    },
   },
   compiler: {
     styledComponents: true,

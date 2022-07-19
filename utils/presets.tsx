@@ -17,21 +17,37 @@ export const pinkSynth: ThemePreset = {
 export const twCyan: ThemePreset = {
   slug: 'tw-cyan',
   title: 'Tailwind Cyan',
-  url: '/api/hues?default=677389;500;lightest:f9fafb;darkest:101728&primary=51b4d0;500;lightest:effefe;darkest:264d61&transparent=6b727f;500;lightest:f8fafb;darkest:131826&positive=55b785;500;lightest:eefdf5;darkest:214d3b&caution=e2b53e;500;lightest:fefbea;darkest:69411b&critical=e14f62;500;lightest:fdf2f2;darkest:7d2037&min=1',
+  url: '/api/hues?default=677389;500;lightest:f9fafb;darkest:101728&primary=51b4d0;500;lightest:effefe;darkest:264d61&transparent=6b727f;500;lightest:f8fafb;darkest:131826&positive=55b785;500;lightest:eefdf5;darkest:214d3b&caution=e2b53e;500;lightest:fefbea;darkest:69411b&critical=e14f62;500;lightest:fdf2f2;darkest:7d2037',
 }
 
-export const technoRed: ThemePreset = {
-  slug: 'techno-red',
-  title: 'Techno Red',
-  url: '/api/hues?default=ac585c;500;lightest:fbf9f9;darkest:0c0f15&primary=e90522;500;lightest:fbf9f9;darkest:0c0f15&transparent=2c364c;600;lightest:fbf9f9;darkest:0c0f15&positive=10b981;400;lightest:fbf9f9;darkest:0c0f15&caution=fde047;200;lightest:fbf9f9;darkest:0c0f15&critical=fe349f;500;lightest:fbf9f9;darkest:0c0f15&min=1',
-  // https://cdn.sanity.io/images/32a3sayd/blog/943d7e10ee953baac50b56da07898ef20d848262-800x1185.png?h=400&fit=max
+export const verdant: ThemePreset = {
+  slug: 'verdant',
+  title: 'Verdant',
+  url: '/api/hues?default=5c9199;500;lightest:fcfdfd;darkest:0d1415&primary=1cb485;400;lightest:fcfdfd;darkest:0d1415&transparent=5c9199;500;lightest:fcfdfd;darkest:0d1415&positive=43D675;300;lightest:fcfdfd;darkest:0d1415&caution=FBD024;200;lightest:fcfdfd;darkest:0d1415&critical=F03E2F;500;lightest:fcfdfd;darkest:0d1415',
+  // https://cdn.sanity.io/images/32a3sayd/blog/22b33a9a6a7c1a964648e1e9ce1324791c7456dc-800x1000.png
+}
+
+export const rosabel: ThemePreset = {
+  slug: 'rosabel',
+  title: 'Rosabel',
+  url: '/api/hues?preset=verdant&default=9d8966;500;lightest:fdfdfc;darkest:15120d&primary=ed2555;500;lightest:fdfdfc;darkest:15120d&transparent=9d8966;500;lightest:fdfdfc;darkest:15120d&positive=43D675;300;lightest:fdfdfc;darkest:15120d&caution=FBD024;200;lightest:fdfdfc;darkest:15120d&critical=F03E2F;500;lightest:fdfdfc;darkest:15120d',
+  // https://cdn.sanity.io/images/32a3sayd/blog/c7df4bf5a0b43b3996aad56b6cecbfbc3579cb53-800x1198.png
+}
+
+export const dugg: ThemePreset = {
+  slug: 'dew',
+  title: 'Dew',
+  url: '/api/hues?preset=verdant&default=5e63b4;600;lightest:fcfcfd;darkest:0d0d15&primary=d1a308;400;lightest:fcfcfd;darkest:0d0d15&transparent=6c6fa7;500;lightest:fcfcfd;darkest:0d0d15&positive=43D675;300;lightest:fcfcfd;darkest:0d0d15&caution=fb9f24;400;lightest:fcfcfd;darkest:0d0d15&critical=F03E2F;500;lightest:fcfcfd;darkest:0d0d15',
+  // https://cdn.sanity.io/images/32a3sayd/blog/994c6a38c71357af600e7d4856d5fd1340338f6c-2148x1611.png
 }
 
 export const presets: ThemePreset[] = [
   defaultPreset,
+  dugg,
   pinkSynth,
+  rosabel,
   twCyan,
-  technoRed,
+  verdant,
 ]
 
 // @TODO sort through these:

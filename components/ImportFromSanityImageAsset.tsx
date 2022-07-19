@@ -1,37 +1,101 @@
+import { type ThemeColorToneKey } from '@sanity/ui'
+import ImageColorPaletteGrid from 'components/ImageColorPaletteGrid'
 import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  Heading,
-  Label,
-  Text,
-  TextArea,
-} from '@sanity/ui'
-import { setLightness } from 'polished'
+  PaletteVariantsLayout,
+  WarningMessage,
+} from 'components/ImportFromImage.styles'
+import { Button, Label } from 'components/Sidebar.styles'
+import { parseToHsl, setLightness, setSaturation } from 'polished'
+import spacer from 'public/1x1.png'
 import {
   type Dispatch,
   type SetStateAction,
   type TransitionStartFunction,
   memo,
+  useCallback,
+  useMemo,
 } from 'react'
+import type { ImagePalette } from 'sanity'
+import { MediaPreview } from 'sanity/_unstable'
+import styled from 'styled-components'
 import { suspend } from 'suspend-react'
+import { URLSearchParams } from 'url'
+import { applyHues } from 'utils/applyHues'
 import { getMidPointFromLuminance } from 'utils/getMidPointFromLuminance'
-import { parseHuesFromSearchParams } from 'utils/parseHuesFromSearchParams'
-import type { ThemePreset } from 'utils/types'
+import type { Hues, ThemePreset } from 'utils/types'
 import { widenColorHue } from 'utils/widenColorHue'
 
-const colorStyle = {
-  boxSizing: 'border-box',
-  background: 'var(--card-border-color)',
-  border: '1px solid var(--card-border-color)',
-  borderRadius: '2px',
-  padding: '0px 2px',
-  appearance: 'none',
-  margin: 0,
+const imageSize = 75
+
+// Using a img element is a nasty workaround to get the nice semi-transparent inset box-shadow styling in MediaPreview, it only works with <img> elements in the `media` prop
+const ColorPreview = styled.img.attrs({
+  alt: '',
+  height: imageSize,
+  width: imageSize,
+  decoding: 'async',
+  loading: 'lazy',
+  src: spacer.src,
+})``
+const ColorMediaPreview = ({
+  color,
+  dominant,
+  population,
+}: {
+  color: string
+  dominant: string
+  population: number
+}) => {
+  const formatter = useMemo(
+    () =>
+      new Intl.NumberFormat(navigator.languages as any, {
+        style: 'percent',
+        maximumFractionDigits: 2,
+      }),
+    []
+  )
+  const subtitle = formatter.format(Math.max(population / 100, 0.0001))
+  return (
+    <MediaPreview
+      media={<ColorPreview style={{ background: color }} />}
+      title={color}
+      subtitle={dominant === color ? `${subtitle}, dominant` : subtitle}
+      withRadius
+    />
+  )
+}
+
+const PaletteImagePreview = ({ url }: { url: string }) => {
+  suspend(async () => {
+    const loadPromise = new Promise((resolve) => {
+      const img = new Image()
+      img.onload = resolve
+      img.onerror = resolve
+      img.src = url
+    })
+    // @TODO run timeout race
+    await loadPromise
+  }, [url])
+
+  return (
+    <MediaPreview
+      media={
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          alt=""
+          decoding="async"
+          height={imageSize}
+          loading="lazy"
+          src={url}
+          width={imageSize}
+        />
+      }
+      withRadius
+    />
+  )
 }
 
 interface Props {
+  prepareTransition: () => void
   startTransition: TransitionStartFunction
   setPreset: Dispatch<SetStateAction<ThemePreset>>
   projectId: string
@@ -43,6 +107,7 @@ function ImportFromSanityImageAsset({
   dataset,
   id,
   startTransition,
+  prepareTransition,
   setPreset,
 }: Props) {
   const data = suspend(async () => {
@@ -66,334 +131,395 @@ function ImportFromSanityImageAsset({
       )
       console.debug({ palette })
       // */
-    return palette
+    return palette as Required<ImagePalette> | null
   }, [projectId, dataset, id])
+  const imageUrl = useMemo(() => {
+    const [, ref, dimensions, ext] = id.split('-')
+    const url = new URL(
+      `/images/${projectId}/${dataset}/${ref}-${dimensions}.${ext}`,
+      'https://cdn.sanity.io'
+    )
+    url.searchParams.set('w', `${imageSize}`)
+    url.searchParams.set('h', `${imageSize}`)
+    url.searchParams.set('fit', 'crop')
+    url.searchParams.set('auto', 'format')
+
+    return url.toString()
+  }, [dataset, id, projectId])
+
+  const createNextPreset = useCallback(
+    () => [new URL('/api/hues', location.origin), applyHues({})] as const,
+    []
+  )
+  const setNextPreset = useCallback(
+    (url: URL) => {
+      prepareTransition()
+      startTransition(() =>
+        setPreset((preset) => {
+          // @TODO update the preset name and slug instead of re-using the existing one, show in the MenuDropdown that a custom preset is in effect
+          return { ...preset, url: `${url.pathname}${url.search}` }
+        })
+      )
+    },
+    [prepareTransition, setPreset, startTransition]
+  )
+  const setHueSearchParam = useCallback(
+    (
+      tone: ThemeColorToneKey,
+      _mid: string,
+      _lightest: string,
+      _darkest: string,
+      searchParams: URLSearchParams
+    ) => {
+      const mid = _mid.replace(/^#/, '')
+      const midPoint = getMidPointFromLuminance(_mid)
+      const lightest = _lightest.replace(/^#/, '')
+      const darkest = _darkest.replace(/^#/, '')
+      searchParams.set(
+        tone,
+        `${mid};${midPoint};lightest:${lightest};darkest:${darkest}`
+      )
+    },
+    []
+  )
+
+  const setPositiveCautionCritical = useCallback(
+    (
+      url: URL,
+      defaults: Hues,
+      primary: string,
+      lightest: string,
+      darkest: string
+    ) => {
+      const { searchParams } = url
+
+      const positiveMid = widenColorHue(defaults.positive.mid, primary, 12, 12)
+      const cautionMid = widenColorHue(defaults.caution.mid, primary, 12, 12)
+      const criticalMid = widenColorHue(defaults.critical.mid, primary, 12, 12)
+
+      setHueSearchParam(
+        'positive',
+        positiveMid,
+        lightest,
+        darkest,
+        searchParams
+      )
+      setHueSearchParam('caution', cautionMid, lightest, darkest, searchParams)
+      setHueSearchParam(
+        'critical',
+        criticalMid,
+        lightest,
+        darkest,
+        searchParams
+      )
+    },
+    [setHueSearchParam]
+  )
+  const createThemeFromPalette = useCallback(
+    (
+      url: URL,
+      defaults: Hues,
+      {
+        muted,
+        lightestLightness,
+        darkestLightness,
+        saturation,
+        vibrant,
+        transparentSaturation,
+      }: {
+        muted: string
+        lightestLightness: number
+        darkestLightness: number
+        saturation: number
+        vibrant: string
+        transparentSaturation: number
+      }
+    ) => {
+      const { searchParams } = url
+
+      const baseHsl = parseToHsl(muted)
+      const base =
+        baseHsl.saturation > saturation
+          ? setSaturation(saturation, muted)
+          : muted
+      const _lightest =
+        baseHsl.lightness < lightestLightness
+          ? setLightness(lightestLightness, muted)
+          : muted
+      const lightest =
+        parseToHsl(_lightest).saturation > transparentSaturation
+          ? setSaturation(transparentSaturation, _lightest)
+          : _lightest
+      const _darkest =
+        baseHsl.lightness > darkestLightness
+          ? setLightness(darkestLightness, muted)
+          : muted
+      const darkest =
+        parseToHsl(_darkest).saturation > transparentSaturation
+          ? setSaturation(transparentSaturation, _darkest)
+          : _darkest
+      const transparent =
+        parseToHsl(base).saturation > transparentSaturation
+          ? setSaturation(transparentSaturation, base)
+          : base
+      const primaryMid = vibrant
+
+      setHueSearchParam('default', base, lightest, darkest, searchParams)
+      setHueSearchParam('primary', primaryMid, lightest, darkest, searchParams)
+      setHueSearchParam(
+        'transparent',
+        transparent,
+        lightest,
+        darkest,
+        searchParams
+      )
+
+      setPositiveCautionCritical(url, defaults, primaryMid, lightest, darkest)
+    },
+    [setHueSearchParam, setPositiveCautionCritical]
+  )
+
+  const experimentalTheme = useCallback(() => {
+    // @TODO https://tympanus.net/codrops/2021/12/07/coloring-with-code-a-programmatic-approach-to-design/
+  }, [])
+  const mutedTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.muted.background,
+      saturation: 0.02,
+      lightestLightness: 1,
+      darkestLightness: 0.067,
+      transparentSaturation: 0.01,
+      muted:
+        data.dominant.background === data.muted.background
+          ? data.vibrant.background
+          : data.dominant.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createThemeFromPalette,
+    createNextPreset,
+    data?.dominant.background,
+    data?.muted.background,
+    data?.vibrant.background,
+    setNextPreset,
+  ])
+  const vibrantTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.vibrant.background,
+      saturation: 1,
+      lightestLightness: 0.99,
+      darkestLightness: 0.067,
+      transparentSaturation: 0.25,
+      muted: data.muted.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createNextPreset,
+    createThemeFromPalette,
+    data?.muted.background,
+    data?.vibrant.background,
+    setNextPreset,
+  ])
+  const lightMutedTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.lightMuted.background,
+      saturation: 0.02,
+      lightestLightness: 0.98,
+      darkestLightness: 0.067,
+      transparentSaturation: 0.02,
+      muted:
+        data.dominant.background === data.lightMuted.background
+          ? data.lightVibrant.background
+          : data.dominant.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createThemeFromPalette,
+    createNextPreset,
+    data?.dominant.background,
+    data?.lightMuted.background,
+    data?.lightVibrant.background,
+    setNextPreset,
+  ])
+  const lightVibrantTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.lightVibrant.background,
+      saturation: 1,
+      lightestLightness: 0.99,
+      darkestLightness: 0.067,
+      transparentSaturation: 0.25,
+      muted: data.lightMuted.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createNextPreset,
+    createThemeFromPalette,
+    data?.lightMuted.background,
+    data?.lightVibrant.background,
+    setNextPreset,
+  ])
+  const darkMutedTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.darkMuted.background,
+      saturation: 0.02,
+      lightestLightness: 0.99,
+      darkestLightness: 0.03,
+      transparentSaturation: 0.04,
+      muted:
+        data.dominant.background === data.darkMuted.background
+          ? data.darkVibrant.background
+          : data.dominant.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createThemeFromPalette,
+    createNextPreset,
+    data?.darkMuted.background,
+    data?.darkVibrant.background,
+    data?.dominant.background,
+    setNextPreset,
+  ])
+  const darkVibrantTheme = useCallback(() => {
+    const [url, defaults] = createNextPreset()
+
+    createThemeFromPalette(url, defaults, {
+      vibrant: data.darkVibrant.background,
+      saturation: 1,
+      lightestLightness: 0.99,
+      darkestLightness: 0.067,
+      transparentSaturation: 0.25,
+      muted: data.darkMuted.background,
+    })
+
+    setNextPreset(url)
+  }, [
+    createNextPreset,
+    createThemeFromPalette,
+    data?.darkMuted.background,
+    data?.darkVibrant.background,
+    setNextPreset,
+  ])
+  const autoTheme = useCallback(() => {
+    switch (data.dominant.background) {
+      case data.muted.background:
+        return mutedTheme()
+      case data.lightMuted.background:
+        return lightMutedTheme()
+      case data.darkMuted.background:
+        return darkMutedTheme()
+      case data.vibrant.background:
+        return vibrantTheme()
+      case data.lightVibrant.background:
+        return lightVibrantTheme()
+      case data.darkVibrant.background:
+        return darkVibrantTheme()
+      default:
+        throw new Error('Failed to find a theme automatically')
+    }
+  }, [
+    darkMutedTheme,
+    darkVibrantTheme,
+    data?.darkMuted.background,
+    data?.darkVibrant.background,
+    data?.dominant.background,
+    data?.lightMuted.background,
+    data?.lightVibrant.background,
+    data?.muted.background,
+    data?.vibrant.background,
+    lightMutedTheme,
+    lightVibrantTheme,
+    mutedTheme,
+    vibrantTheme,
+  ])
+
+  if (!data) {
+    return (
+      <WarningMessage message="Failed to fetch color palette, double-check the URL or retry in a minute if it's a recently uploaded image asset" />
+    )
+  }
 
   return (
-    <>
-      <Card
-        as="details"
-        tone="transparent"
-        muted
-        radius={2}
-        paddingX={2}
-        paddingY={1}
-      >
-        <summary
-          style={{ position: 'relative', color: 'var(--card-muted-fg-color)' }}
-        >
-          <Text
-            size={1}
-            muted
-            style={{
-              display: 'inline-block',
-              position: 'absolute',
-              top: '0.25rem',
-              left: '1rem',
-            }}
-          >
-            Color Palette
-          </Text>
-        </summary>
-        <Grid columns={3} paddingTop={2}>
-          <Box>
-            <Text muted size={0}>
-              muted
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.muted?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.muted?.background}
-              </Text>
-            </Box>
-          </Box>
-          <Box>
-            <Text muted size={0}>
-              lightMuted
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.lightMuted?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.lightMuted?.background}
-              </Text>
-            </Box>
-          </Box>
-          <Box>
-            <Text muted size={0}>
-              darkMuted
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.darkMuted?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.darkMuted?.background}
-              </Text>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid columns={3} paddingTop={1}>
-          <Box>
-            <Text muted size={0}>
-              vibrant
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.vibrant?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.vibrant?.background}
-              </Text>
-            </Box>
-          </Box>
-          <Box>
-            <Text muted size={0}>
-              lightVibrant
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.lightVibrant?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.lightVibrant?.background}
-              </Text>
-            </Box>
-          </Box>
-          <Box>
-            <Text muted size={0}>
-              darkVibrant
-            </Text>
-            <Box paddingY={2}>
-              <input
-                type="color"
-                readOnly
-                style={colorStyle as any}
-                value={data?.darkVibrant?.background}
-              />
-              <Text
-                as="output"
-                muted
-                size={0}
-                style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-              >
-                {data?.darkVibrant?.background}
-              </Text>
-            </Box>
-          </Box>
-        </Grid>
-        <Box paddingTop={1}>
-          <Text muted size={0}>
-            dominant
-          </Text>
-          <Box paddingY={2}>
-            <input
-              type="color"
-              readOnly
-              style={colorStyle as any}
-              value={data?.dominant?.background}
+    <PaletteVariantsLayout
+      paletteLabel={<Label>Image Color Palette</Label>}
+      paletteGrid={
+        <ImageColorPaletteGrid
+          image={<PaletteImagePreview url={imageUrl} />}
+          muted={
+            <ColorMediaPreview
+              color={data.muted.background}
+              population={data.muted.population}
+              dominant={data.dominant.background}
             />
-            <Text
-              as="output"
-              muted
-              size={0}
-              style={{ paddingTop: '0.4rem', fontFeatureSettings: 'tnum' }}
-            >
-              {data?.dominant?.background}
-            </Text>
-          </Box>
-        </Box>
-      </Card>
-      <Heading size={0} muted>
-        Choose a variant
-      </Heading>
-      <Grid columns={2} gap={1}>
-        <Button
-          fontSize={1}
-          paddingY={2}
-          paddingX={3}
-          text="Dominant"
-          tone="primary"
-          onClick={() => {
-            startTransition(() =>
-              setPreset((prev) => {
-                const { pathname, searchParams } = new URL(
-                  prev.url,
-                  location.origin
-                )
-                const mid = data.dominant.background
-                const midPoint = getMidPointFromLuminance(mid)
-                searchParams.set(
-                  'default',
-                  `${mid.replace(/^#/, '')};${midPoint}`
-                )
-                const primary =
-                  data.dominant.background === data.vibrant.background
-                    ? data.lightVibrant.background
-                    : data.vibrant.background
-                const primaryMidPoint = getMidPointFromLuminance(primary)
-                searchParams.set(
-                  'primary',
-                  `${primary.replace(/^#/, '')};${primaryMidPoint}`
-                )
-                searchParams.set(
-                  'darkest',
-                  setLightness(0.066, mid).replace(/^#/, '')
-                )
-                searchParams.set(
-                  'lightest',
-                  setLightness(0.98, mid).replace(/^#/, '')
-                )
-
-                return {
-                  ...prev,
-                  url: `${pathname}?${searchParams.toString()}`,
-                }
-              })
-            )
-          }}
+          }
+          vibrant={
+            <ColorMediaPreview
+              color={data.vibrant.background}
+              population={data.vibrant.population}
+              dominant={data.dominant.background}
+            />
+          }
+          lightMuted={
+            <ColorMediaPreview
+              color={data.lightMuted.background}
+              population={data.lightMuted.population}
+              dominant={data.dominant.background}
+            />
+          }
+          darkMuted={
+            <ColorMediaPreview
+              color={data.darkMuted.background}
+              population={data.darkMuted.population}
+              dominant={data.dominant.background}
+            />
+          }
+          lightVibrant={
+            <ColorMediaPreview
+              color={data.lightVibrant.background}
+              population={data.lightVibrant.population}
+              dominant={data.dominant.background}
+            />
+          }
+          darkVibrant={
+            <ColorMediaPreview
+              color={data.darkVibrant.background}
+              population={data.darkVibrant.population}
+              dominant={data.dominant.background}
+            />
+          }
         />
-        <Button
-          fontSize={1}
-          paddingY={2}
-          paddingX={3}
-          text="Muted"
-          tone="primary"
-          onClick={() => {
-            startTransition(() =>
-              setPreset((prev) => {
-                const { pathname, searchParams } = new URL(
-                  prev.url,
-                  location.origin
-                )
-                const hues = parseHuesFromSearchParams(searchParams)
-
-                const mid = data.muted.background
-                const transparentMid = data.darkMuted.background
-                const primaryMid = data.vibrant?.background
-                const positiveMid = widenColorHue(
-                  hues.positive.mid,
-                  primaryMid,
-                  12,
-                  12
-                )
-                const cautionMid = widenColorHue(
-                  hues.caution.mid,
-                  primaryMid,
-                  12,
-                  12
-                )
-                const criticalMid = widenColorHue(
-                  hues.critical.mid,
-                  primaryMid,
-                  12,
-                  12
-                )
-
-                const midPoint = getMidPointFromLuminance(mid)
-                searchParams.set(
-                  'default',
-                  `${mid.replace(/^#/, '')};${midPoint}`
-                )
-                searchParams.set(
-                  'primary',
-                  `${primaryMid.replace(/^#/, '')};${getMidPointFromLuminance(
-                    primaryMid
-                  )}`
-                )
-                searchParams.set(
-                  'transparent',
-                  `${transparentMid.replace(
-                    /^#/,
-                    ''
-                  )};${getMidPointFromLuminance(transparentMid)}`
-                )
-                searchParams.set(
-                  'positive',
-                  `${positiveMid.replace(/^#/, '')};${getMidPointFromLuminance(
-                    positiveMid
-                  )}`
-                )
-                searchParams.set(
-                  'caution',
-                  `${cautionMid.replace(/^#/, '')};${getMidPointFromLuminance(
-                    cautionMid
-                  )}`
-                )
-                searchParams.set(
-                  'critical',
-                  `${criticalMid.replace(/^#/, '')};${getMidPointFromLuminance(
-                    criticalMid
-                  )}`
-                )
-                searchParams.set(
-                  'lightest',
-                  `${setLightness(0.98, data.lightMuted.background).replace(
-                    /^#/,
-                    ''
-                  )}`
-                )
-                searchParams.set(
-                  'darkest',
-                  `${setLightness(0.066, data.darkMuted.background).replace(
-                    /^#/,
-                    ''
-                  )}`
-                )
-
-                return {
-                  ...prev,
-                  url: `${pathname}?${searchParams.toString()}`,
-                }
-              })
-            )
-          }}
-        />
-      </Grid>
-    </>
+      }
+      label={<Label>Choose a variant</Label>}
+    >
+      <Button
+        text="Auto"
+        style={{ gridColumn: '1 / 3' }}
+        tone="positive"
+        onClick={autoTheme}
+      />
+      {/* @TODO implement an experimental theme */}
+      {/* <Button text="Experimental" tone="critical" onClick={experimentalTheme} /> */}
+      <Button text="Muted" onClick={mutedTheme} />
+      <Button text="Vibrant" onClick={vibrantTheme} />
+      <Button text="Light muted" onClick={lightMutedTheme} />
+      <Button text="Light vibrant" onClick={lightVibrantTheme} />
+      <Button text="Dark muted" onClick={darkMutedTheme} />
+      <Button text="Dark vibrant" onClick={darkVibrantTheme} />
+    </PaletteVariantsLayout>
   )
 }
 

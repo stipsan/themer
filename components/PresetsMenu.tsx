@@ -32,6 +32,7 @@ import {
   type Dispatch,
   type SetStateAction,
   type TransitionStartFunction,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -86,6 +87,15 @@ export default function PresetsMenu({
   unstable_showParsedUrl,
 }: Props) {
   const [open, setOpen] = useState<'import' | 'share' | 'export' | false>(false)
+  const [mounted, setMounted] = useState<'import' | 'share' | 'export' | false>(
+    false
+  )
+
+  useEffect(() => {
+    if (open) {
+      setMounted(open)
+    }
+  }, [open])
 
   const searchParams = useMemo(() => {
     const searchParams = new URLSearchParams()
@@ -234,7 +244,9 @@ export default function PresetsMenu({
               icon={UploadIcon}
               id="import-tab"
               label="Import"
-              onClick={() => setOpen('import')}
+              onClick={() =>
+                setOpen((open) => (open === 'import' ? false : 'import'))
+              }
               selected={open === 'import'}
             />
             <Tab
@@ -243,7 +255,9 @@ export default function PresetsMenu({
               icon={PackageIcon}
               id="share-tab"
               label="Share"
-              onClick={() => setOpen('share')}
+              onClick={() =>
+                setOpen((open) => (open === 'share' ? false : 'share'))
+              }
               selected={open === 'share'}
             />
             <Tab
@@ -252,7 +266,9 @@ export default function PresetsMenu({
               icon={DownloadIcon}
               id="export-tab"
               label="Export"
-              onClick={() => setOpen('export')}
+              onClick={() =>
+                setOpen((open) => (open === 'export' ? false : 'export'))
+              }
               selected={open === 'export'}
             />
           </TabList>
@@ -262,14 +278,16 @@ export default function PresetsMenu({
           hidden={open !== 'import'}
           id="import-panel"
         >
-          <Card marginY={2}>
-            <ImportFromImage
-              prepareTransition={prepareTransition}
-              startTransition={startTransition}
-              setPreset={setPreset}
-              unstable_showParsedUrl={unstable_showParsedUrl}
-            />
-          </Card>
+          {mounted === 'import' && (
+            <Card marginY={2}>
+              <ImportFromImage
+                prepareTransition={prepareTransition}
+                startTransition={startTransition}
+                setPreset={setPreset}
+                unstable_showParsedUrl={unstable_showParsedUrl}
+              />
+            </Card>
+          )}
         </TabPanel>
       </Card>
       {open === 'export' && (

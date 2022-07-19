@@ -1,6 +1,12 @@
-import { Text } from '@sanity/ui'
+import { Button as UiButton, Text } from '@sanity/ui'
 import { transparentize } from 'polished'
 import styled from 'styled-components'
+
+export const Button = styled(UiButton).attrs({
+  fontSize: 1,
+  paddingY: 2,
+  paddingX: 3,
+})``
 
 export const Label = styled(Text).attrs({ size: 0, weight: 'semibold' })``
 

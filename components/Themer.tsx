@@ -14,13 +14,14 @@ import PresetsMenu from 'components/PresetsMenu'
 import SchemeMenu from 'components/SchemeMenu'
 import { StudioViewer, useStudioViewer } from 'components/StudioViewer'
 import ToggleView from 'components/ToggleView'
+import { useIdleCallback } from 'hooks/useIdleCallback'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { StudioProviderProps, StudioTheme } from 'sanity'
 import { config } from 'studios'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
 import type { PartialDeep } from 'type-fest'
-import { roundMidPoint } from 'utils/roundMidPoint'
+import { expandPresetSearchParams } from 'utils/expandPresetSearchParams'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import type { Hue, Hues, ThemePreset } from 'utils/types'
 
@@ -104,101 +105,34 @@ export default function Themer({
   )
 
   // Backup hue edits to the current URL
-  useEffect(() => {
-    const url = new URL(window.location.href)
-    url.searchParams.set('preset', preset.slug)
-    url.searchParams.set(
-      'default',
-      `${memoHues.default.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.default.midPoint
-      )};lightest:${memoHues.default.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.default.darkest.replace(/^#/, '')}`
-    )
-    url.searchParams.set(
-      'primary',
-      `${memoHues.primary.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.primary.midPoint
-      )};lightest:${memoHues.primary.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.primary.darkest.replace(/^#/, '')}`
-    )
-    url.searchParams.set(
-      'transparent',
-      `${memoHues.transparent.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.transparent.midPoint
-      )};lightest:${memoHues.transparent.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.transparent.darkest.replace(/^#/, '')}`
-    )
-    url.searchParams.set(
-      'positive',
-      `${memoHues.positive.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.positive.midPoint
-      )};lightest:${memoHues.positive.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.positive.darkest.replace(/^#/, '')}`
-    )
-    url.searchParams.set(
-      'caution',
-      `${memoHues.caution.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.caution.midPoint
-      )};lightest:${memoHues.caution.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.caution.darkest.replace(/^#/, '')}`
-    )
-    url.searchParams.set(
-      'critical',
-      `${memoHues.critical.mid.replace(/^#/, '')};${roundMidPoint(
-        memoHues.critical.midPoint
-      )};lightest:${memoHues.critical.lightest.replace(
-        /^#/,
-        ''
-      )};darkest:${memoHues.critical.darkest.replace(/^#/, '')}`
-    )
-    if (!url.searchParams.has('pin')) {
-      if (preset.slug === 'default') {
-        url.searchParams.delete('preset')
+  const backupToUrl = useIdleCallback(
+    useCallback(() => {
+      const url = new URL(window.location.href)
+      url.searchParams.set('preset', preset.slug)
+      expandPresetSearchParams(url.searchParams, memoHues)
+
+      if (!url.searchParams.has('pin')) {
+        if (preset.slug === 'default') {
+          url.searchParams.delete('preset')
+        }
+        shortenPresetSearchParams(url.searchParams)
       }
-      shortenPresetSearchParams(url.searchParams)
-    }
-    window.history.replaceState({}, '', decodeURIComponent(url.href))
-  }, [memoHues, preset.slug])
+      window.history.replaceState({}, '', decodeURIComponent(url.href))
+    }, [memoHues, preset.slug]),
+    { requestTransition: spin, startTransition }
+  )
+  useEffect(() => void backupToUrl(), [backupToUrl])
 
   const [forceScheme, setForceScheme] = useState<ThemeColorSchemeKey | null>(
     null
   )
   const scheme = forceScheme ?? systemScheme
 
-  // startTransition alone is not enough, so we use a combo of requestIdleCallback if available, with a fallback to requestAnimationFrame
-  // This is to avoid as much main thread jank as we can, while keeping the color picking experience as fast and delightful as the hardware allows
-  const throttleRef = useRef(0)
-
-  const onHuesChange = useCallback(
-    (tone: CardTone, hue: Hue) => {
-      if (typeof cancelIdleCallback === 'function') {
-        cancelIdleCallback(throttleRef.current)
-      } else {
-        cancelAnimationFrame(throttleRef.current)
-      }
-      const scheduledUpdate = () => {
-        startTransition(() => {
-          setHuesState((prev) => ({ ...prev, [tone]: hue }))
-        })
-      }
-
-      if (typeof requestIdleCallback === 'function') {
-        throttleRef.current = requestIdleCallback(scheduledUpdate)
-      } else {
-        throttleRef.current = requestAnimationFrame(scheduledUpdate)
-      }
-    },
-    [startTransition]
+  const onHuesChange = useIdleCallback(
+    useCallback((tone: CardTone, hue: Hue) => {
+      setHuesState((prev) => ({ ...prev, [tone]: hue }))
+    }, []),
+    { requestTransition: spin, startTransition }
   )
 
   return (

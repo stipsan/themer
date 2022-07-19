@@ -115,7 +115,7 @@ test('&lightest overrides preset values', () => {
   const searchParams = new URLSearchParams('?preset=verdant&lightest=effefe')
   shortenPresetSearchParams(searchParams)
   expect(decodeURIComponent(searchParams.toString())).toMatchInlineSnapshot(
-    `"preset=verdant&default=lightest:effefe&primary=lightest:effefe&transparent=lightest:effefe&positive=lightest:effefe&caution=lightest:effefe&critical=lightest:effefe"`
+    `"preset=verdant&lightest=effefe"`
   )
   const lightest = '#effefe'
   expect(
@@ -138,7 +138,7 @@ test('&darkest overrides preset values', () => {
   const searchParams = new URLSearchParams('?preset=verdant&darkest=264d61')
   shortenPresetSearchParams(searchParams)
   expect(decodeURIComponent(searchParams.toString())).toMatchInlineSnapshot(
-    `"preset=verdant&default=darkest:264d61&primary=darkest:264d61&transparent=darkest:264d61&positive=darkest:264d61&caution=darkest:264d61&critical=darkest:264d61"`
+    `"preset=verdant&darkest=264d61"`
   )
   const darkest = '#264d61'
   expect(

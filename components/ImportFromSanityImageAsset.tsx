@@ -508,7 +508,7 @@ function ImportFromSanityImageAsset({
       <Button
         text="Auto"
         style={{ gridColumn: '1 / 3' }}
-        tone="positive"
+        tone="primary"
         onClick={autoTheme}
       />
       {/* @TODO implement an experimental theme */}

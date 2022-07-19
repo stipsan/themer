@@ -21,17 +21,15 @@ function ImageColorPaletteGrid({
   darkVibrant,
 }: Props) {
   return (
-    <Card padding={1} tone="transparent" radius={2}>
-      <Grid columns={5} rows={2} gap={1}>
-        <ImageBox>{image}</ImageBox>
-        {muted}
-        {lightMuted}
-        {darkMuted}
-        {vibrant}
-        {lightVibrant}
-        {darkVibrant}
-      </Grid>
-    </Card>
+    <Grid columns={5} rows={2} gap={1}>
+      <ImageBox>{image}</ImageBox>
+      {muted}
+      {lightMuted}
+      {darkMuted}
+      {vibrant}
+      {lightVibrant}
+      {darkVibrant}
+    </Grid>
   )
 }
 

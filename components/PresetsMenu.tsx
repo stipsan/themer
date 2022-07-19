@@ -3,7 +3,10 @@
 import { MusicNoteIcon } from '@heroicons/react/outline'
 import {
   DownloadIcon,
+  DropIcon,
+  HeartIcon,
   LaunchIcon,
+  LemonIcon,
   MasterDetailIcon,
   PackageIcon,
   SelectIcon,
@@ -15,11 +18,9 @@ import {
   Card,
   Code,
   Dialog,
-  Heading,
   Label,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   Stack,
   Tab,
@@ -28,6 +29,7 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
+import ImportFromImage from 'components/ImportFromImage'
 import {
   type Dispatch,
   type SetStateAction,
@@ -39,8 +41,6 @@ import {
 import styled from 'styled-components'
 import { presets } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
-
-import ImportFromImage from './ImportFromImage'
 
 const SynthWaveIcon = styled(MusicNoteIcon)`
   transform: translateX(-1px);
@@ -65,6 +65,12 @@ const iconFromSlug = (slug: string) => {
     ? SynthWaveIcon
     : slug === 'tw-cyan'
     ? TwLogo
+    : slug === 'dew'
+    ? DropIcon
+    : slug === 'rosabel'
+    ? HeartIcon
+    : slug === 'verdant'
+    ? LemonIcon
     : MasterDetailIcon
 }
 

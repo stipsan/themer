@@ -14,22 +14,12 @@ import {
   useState,
 } from 'react'
 import styled from 'styled-components'
-import { isMidPoint } from 'utils/isMidPoint'
+import { TONES } from 'utils/colors'
 import { isColor } from 'utils/parseHuesFromSearchParams'
 import { roundMidPoint } from 'utils/roundMidPoint'
 import type { Hue, Hues } from 'utils/types'
 
 import HueColorInput from './HueColorInput'
-
-// @TODO move into shared utils
-const RENDER_TONES = [
-  'default',
-  'primary',
-  'transparent',
-  'positive',
-  'caution',
-  'critical',
-] as const
 
 const ColorTintsPreview = lazy(() => import('components/ColorTintsPreview'))
 
@@ -48,7 +38,7 @@ function HuesFields({
 }: Props) {
   return (
     <>
-      {RENDER_TONES.map((key) => {
+      {TONES.map((key) => {
         return (
           <HueFields
             key={key}

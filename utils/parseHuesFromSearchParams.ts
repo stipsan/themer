@@ -84,12 +84,12 @@ function parseHue(
     }
   }
 
-  return {
-    mid,
-    midPoint: midPoint,
-    lightest: lightest ?? defaultLightest,
-    darkest: darkest ?? defaultDarkest,
-  }
+  const result: Partial<Hue> = {}
+  if (mid) result.mid = mid
+  if (midPoint) result.midPoint = midPoint
+  if (lightest ?? defaultLightest) result.lightest = lightest ?? defaultLightest
+  if (darkest ?? defaultDarkest) result.darkest = darkest ?? defaultDarkest
+  return result
 }
 
 function throwDuplicate(key: string, a: unknown, b: unknown, input: string) {

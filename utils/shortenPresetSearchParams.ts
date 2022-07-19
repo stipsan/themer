@@ -19,21 +19,6 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
   // Get defaults from preset
   const defaults = applyHues(parseHuesFromSearchParams(presetParams))
 
-  // Merge current search params with the preset params
-  const mergedParams = new URLSearchParams(presetParams)
-  if (searchParams.has('lightest')) {
-    mergedParams.set('lightest', searchParams.get('lightest'))
-  }
-  if (searchParams.has('darkest')) {
-    mergedParams.set('darkest', searchParams.get('darkest'))
-  }
-
-  for (const tone of TONES) {
-    if (searchParams.has(tone)) {
-      mergedParams.set(tone, searchParams.get(tone))
-    }
-  }
-
   const hues = applyHues(parseHuesFromSearchParams(searchParams), defaults)
 
   // Start off by checking for lightest and darkest duplicates
@@ -57,7 +42,7 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
   }
 
   let lightest
-  if (lightestMap.size === TONES.length) {
+  if (lightestMap.size === TONES.length || lightestMap.size <= 1) {
     searchParams.delete('lightest')
   } else {
     let count = 0
@@ -67,10 +52,12 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
         lightest = key
       }
     }
-    searchParams.set('lightest', stringifyColorSearchParam(lightest))
+    if (lightest) {
+      searchParams.set('lightest', stringifyColorSearchParam(lightest))
+    }
   }
   let darkest
-  if (darkestMap.size === TONES.length) {
+  if (darkestMap.size === TONES.length || darkestMap.size <= 1) {
     searchParams.delete('darkest')
   } else {
     let count = 0
@@ -80,7 +67,9 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
         darkest = key
       }
     }
-    searchParams.set('darkest', stringifyColorSearchParam(darkest))
+    if (darkest) {
+      searchParams.set('darkest', stringifyColorSearchParam(darkest))
+    }
   }
 
   for (const tone of TONES) {
@@ -88,25 +77,39 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
     const hue = hues[tone]
     const shouldSkipLightest = lightest && hue.lightest === lightest
     const shouldSkipDarkest = darkest && hue.darkest === darkest
+    const shouldIncludeMid = baseHue.mid !== hue.mid
+    const shouldIncludeMidPoint =
+      baseHue.mid !== hue.mid && hue.midPoint && hue.midPoint !== 500
+        ? true
+        : baseHue.mid === hue.mid &&
+          baseHue.midPoint !== hue.midPoint &&
+          hue.midPoint !== 500
+        ? true
+        : baseHue.mid !== hue.mid && hue.midPoint !== 500
+        ? true
+        : baseHue.mid === hue.mid &&
+          baseHue.midPoint !== 500 &&
+          hue.midPoint === 500
+        ? true
+        : false
     const param = [
-      baseHue.mid !== hue.mid && stringifyColorSearchParam(hue.mid),
-      baseHue.midPoint !== hue.midPoint && hue.midPoint,
+      (shouldIncludeMid || shouldIncludeMidPoint) &&
+        stringifyColorSearchParam(hue.mid),
+      shouldIncludeMidPoint && hue.midPoint,
       shouldSkipLightest
         ? false
         : lightest && hue.lightest !== lightest
         ? `lightest:${stringifyColorSearchParam(hue.lightest)}`
-        : baseHue.lightest !== hue.lightest &&
-          `lightest:${stringifyColorSearchParam(
-            hue.lightest || baseHue.lightest
-          )}`,
+        : hue.lightest &&
+          baseHue.lightest !== hue.lightest &&
+          `lightest:${stringifyColorSearchParam(hue.lightest)}`,
       shouldSkipDarkest
         ? false
         : darkest && hue.darkest !== darkest
         ? `darkest:${stringifyColorSearchParam(hue.darkest)}`
-        : baseHue.darkest !== hue.darkest &&
-          `darkest:${stringifyColorSearchParam(
-            hue.darkest || baseHue.darkest
-          )}`,
+        : hue.darkest &&
+          baseHue.darkest !== hue.darkest &&
+          `darkest:${stringifyColorSearchParam(hue.darkest)}`,
     ]
       .filter(Boolean)
       .join(';')

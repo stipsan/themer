@@ -7,10 +7,9 @@
 
 import type { PartialDeep } from 'type-fest'
 import { isMidPoint } from 'utils/isMidPoint'
+import { roundMidPoint } from 'utils/roundMidPoint'
 import type { Hue, Hues } from 'utils/types'
 import { ValidationError } from 'utils/ValidationError'
-
-import { roundMidPoint } from 'utils/roundMidPoint'
 
 export function parseHuesFromSearchParams(
   searchParams: URLSearchParams
@@ -22,14 +21,17 @@ export function parseHuesFromSearchParams(
     ? assertValidColor(`#${searchParams.get('darkest').toLowerCase()}`)
     : undefined
 
-  return {
-    default: parseHue('default', searchParams, lightest, darkest),
-    primary: parseHue('primary', searchParams, lightest, darkest),
-    transparent: parseHue('transparent', searchParams, lightest, darkest),
-    positive: parseHue('positive', searchParams, lightest, darkest),
-    caution: parseHue('caution', searchParams, lightest, darkest),
-    critical: parseHue('critical', searchParams, lightest, darkest),
-  }
+  // The JSON trick is to filter out undefined keys
+  return JSON.parse(
+    JSON.stringify({
+      default: parseHue('default', searchParams, lightest, darkest),
+      primary: parseHue('primary', searchParams, lightest, darkest),
+      transparent: parseHue('transparent', searchParams, lightest, darkest),
+      positive: parseHue('positive', searchParams, lightest, darkest),
+      caution: parseHue('caution', searchParams, lightest, darkest),
+      critical: parseHue('critical', searchParams, lightest, darkest),
+    })
+  )
 }
 
 type ParsedHue = Partial<Hue>
@@ -91,12 +93,12 @@ function parseHue(
     }
   }
 
-  const result: Partial<Hue> = {}
-  if (mid) result.mid = mid
-  if (midPoint) result.midPoint = midPoint
-  if (lightest ?? defaultLightest) result.lightest = lightest ?? defaultLightest
-  if (darkest ?? defaultDarkest) result.darkest = darkest ?? defaultDarkest
-  return result
+  return {
+    mid,
+    midPoint,
+    lightest: lightest ?? defaultLightest,
+    darkest: darkest ?? defaultDarkest,
+  }
 }
 
 function throwDuplicate(key: string, a: unknown, b: unknown, input: string) {

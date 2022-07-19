@@ -49,9 +49,11 @@ const defaultHues: Hues = {
 }
 
 export function applyHues(
-  hues: PartialDeep<Hues>,
+  _hues: PartialDeep<Hues>,
   defaults: Hues = defaultHues
 ): Hues {
+  // Filter out undefined keys etc
+  const hues = JSON.parse(JSON.stringify(_hues))
   const defaultMid = hues.default?.mid?.toLowerCase() || defaults.default.mid
   const primaryMid = hues.primary?.mid?.toLowerCase() || defaults.primary.mid
   const transparentMid =
@@ -63,55 +65,49 @@ export function applyHues(
     default: {
       ...defaults.default,
       midPoint:
-        defaultMid === defaults.default.mid
-          ? defaults.default.midPoint
-          : hues.default?.midPoint || 500,
+        defaultMid === defaults.default.mid ? defaults.default.midPoint : 500,
       ...hues.default,
       mid: defaultMid,
     },
     primary: {
       ...defaults.primary,
-      ...hues.primary,
       midPoint:
-        primaryMid === defaults.primary.mid
-          ? defaults.primary.midPoint
-          : hues.primary?.midPoint || 500,
+        primaryMid === defaults.primary.mid ? defaults.primary.midPoint : 500,
+      ...hues.primary,
       mid: primaryMid,
     },
     transparent: {
       ...defaults.transparent,
-      ...hues.transparent,
       midPoint:
         transparentMid === defaults.transparent.mid
           ? defaults.transparent.midPoint
-          : hues.transparent?.midPoint || 500,
+          : 500,
+      ...hues.transparent,
       mid: transparentMid,
     },
     positive: {
       ...defaults.positive,
-      ...hues.positive,
       midPoint:
         positiveMid === defaults.positive.mid
           ? defaults.positive.midPoint
-          : hues.positive?.midPoint || 500,
+          : 500,
+      ...hues.positive,
       mid: positiveMid,
     },
     caution: {
       ...defaults.caution,
-      ...hues.caution,
       midPoint:
-        cautionMid === defaults.caution.mid
-          ? defaults.caution.midPoint
-          : hues.caution?.midPoint || 500,
+        cautionMid === defaults.caution.mid ? defaults.caution.midPoint : 500,
+      ...hues.caution,
       mid: cautionMid,
     },
     critical: {
       ...defaults.critical,
-      ...hues.critical,
       midPoint:
         criticalMid === defaults.critical.mid
           ? defaults.critical.midPoint
-          : hues.critical?.midPoint || 500,
+          : 500,
+      ...hues.critical,
       mid: criticalMid,
     },
   }

@@ -1,4 +1,3 @@
-import { URLSearchParams } from 'url'
 import { applyHuesFromPreset } from 'utils/applyHuesFromPreset'
 import { defaultPreset, getPreset } from 'utils/presets'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'

@@ -34,7 +34,7 @@ function ColorTintsPreview({ mid, midPoint, lightest, darkest, tone }: Props) {
         >
           <SwatchThumb
             style={{ background: color.hex }}
-            onClick={(event) => {
+            onClick={() => {
               navigator.clipboard.writeText(color.hex)
               pushToast({
                 closable: true,

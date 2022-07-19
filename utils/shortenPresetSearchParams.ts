@@ -26,23 +26,30 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
   const darkestMap = new Map<string, number>()
 
   for (const tone of TONES) {
-    if (!lightestMap.has(hues[tone].lightest)) {
-      lightestMap.set(hues[tone].lightest, 0)
-    } else {
-      lightestMap.set(
-        hues[tone].lightest,
-        lightestMap.get(hues[tone].lightest) + 1
-      )
+    if (defaults[tone].lightest !== hues[tone].lightest) {
+      if (!lightestMap.has(hues[tone].lightest)) {
+        lightestMap.set(hues[tone].lightest, 0)
+      } else {
+        lightestMap.set(
+          hues[tone].lightest,
+          lightestMap.get(hues[tone].lightest) + 1
+        )
+      }
     }
-    if (!darkestMap.has(hues[tone].darkest)) {
-      darkestMap.set(hues[tone].darkest, 0)
-    } else {
-      darkestMap.set(hues[tone].darkest, darkestMap.get(hues[tone].darkest) + 1)
+    if (defaults[tone].darkest !== hues[tone].darkest) {
+      if (!darkestMap.has(hues[tone].darkest)) {
+        darkestMap.set(hues[tone].darkest, 0)
+      } else {
+        darkestMap.set(
+          hues[tone].darkest,
+          darkestMap.get(hues[tone].darkest) + 1
+        )
+      }
     }
   }
 
   let lightest
-  if (lightestMap.size === TONES.length || lightestMap.size <= 1) {
+  if (lightestMap.size === TONES.length || lightestMap.size < 1) {
     searchParams.delete('lightest')
   } else {
     let count = 0
@@ -57,7 +64,7 @@ export function shortenPresetSearchParams(searchParams: URLSearchParams) {
     }
   }
   let darkest
-  if (darkestMap.size === TONES.length || darkestMap.size <= 1) {
+  if (darkestMap.size === TONES.length || darkestMap.size < 1) {
     searchParams.delete('darkest')
   } else {
     let count = 0

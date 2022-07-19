@@ -22,6 +22,7 @@ import { suspend } from 'suspend-react'
 import { URLSearchParams } from 'url'
 import { applyHues } from 'utils/applyHues'
 import { getMidPointFromLuminance } from 'utils/getMidPointFromLuminance'
+import { defaultPreset } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
 import { widenColorHue } from 'utils/widenColorHue'
 
@@ -155,10 +156,8 @@ function ImportFromSanityImageAsset({
     (url: URL) => {
       prepareTransition()
       startTransition(() =>
-        setPreset((preset) => {
-          // @TODO update the preset name and slug instead of re-using the existing one, show in the MenuDropdown that a custom preset is in effect
-          return { ...preset, url: `${url.pathname}${url.search}` }
-        })
+        // @TODO update the preset name and slug instead of re-using the existing one, show in the MenuDropdown that a custom preset is in effect
+        setPreset({ ...defaultPreset, url: `${url.pathname}${url.search}` })
       )
     },
     [prepareTransition, setPreset, startTransition]

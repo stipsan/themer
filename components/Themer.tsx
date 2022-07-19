@@ -21,6 +21,7 @@ import styled from 'styled-components'
 import { suspend } from 'suspend-react'
 import type { PartialDeep } from 'type-fest'
 import { roundMidPoint } from 'utils/roundMidPoint'
+import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import type { Hue, Hues, ThemePreset } from 'utils/types'
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
@@ -160,6 +161,12 @@ export default function Themer({
         ''
       )};darkest:${memoHues.critical.darkest.replace(/^#/, '')}`
     )
+    if (!url.searchParams.has('pin')) {
+      if (preset.slug === 'default') {
+        url.searchParams.delete('preset')
+      }
+      shortenPresetSearchParams(url.searchParams)
+    }
     window.history.replaceState({}, '', decodeURIComponent(url.href))
   }, [memoHues, preset.slug])
 

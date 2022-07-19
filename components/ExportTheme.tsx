@@ -1,47 +1,22 @@
 import { ShareIcon as _ShareIcon } from '@heroicons/react/outline'
+import { DownloadIcon, InfoOutlineIcon } from '@sanity/icons'
+import { ClipboardIcon } from '@sanity/icons'
 import {
-  DownloadIcon,
-  DropIcon,
-  HeartIcon,
-  InfoOutlineIcon,
-  LaunchIcon,
-  LemonIcon,
-  MasterDetailIcon,
-  PackageIcon,
-  SelectIcon,
-  UploadIcon,
-} from '@sanity/icons'
-import { ClipboardIcon, LockIcon } from '@sanity/icons'
-import {
-  Badge,
   Box,
   Button as UiButton,
   Card,
   Code,
   Dialog,
-  Grid,
-  Inline,
-  Menu,
-  MenuButton,
-  MenuItem,
   Stack,
-  Tab,
-  TabList,
-  TabPanel,
   Text,
   useToast,
 } from '@sanity/ui'
 import { Button, Label } from 'components/Sidebar.styles'
 import parserBabel from 'prettier/esm/parser-babel.mjs'
 import prettier from 'prettier/esm/standalone.mjs'
-import { memo, useLayoutEffect, useMemo, useState } from 'react'
-import styled from 'styled-components'
-import { expandPresetSearchParams } from 'utils/expandPresetSearchParams'
-import { presets } from 'utils/presets'
+import { memo, useMemo } from 'react'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
-import type { Hues, ThemePreset } from 'utils/types'
 
-console.log(formatCode('const html=/* HTML */ `<DIV> </DIV>`'))
 function formatCode(code: string): string {
   return prettier.format(code, {
     parser: 'babel',

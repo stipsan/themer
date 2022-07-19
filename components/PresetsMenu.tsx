@@ -28,7 +28,6 @@ import {
   type SetStateAction,
   type TransitionStartFunction,
   memo,
-  useEffect,
   useMemo,
   useState,
 } from 'react'

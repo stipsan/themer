@@ -1,4 +1,4 @@
-import { Box, Card, Grid, Skeleton } from '@sanity/ui'
+import { Box, Grid, Skeleton } from '@sanity/ui'
 import { type ReactNode, memo } from 'react'
 import styled from 'styled-components'
 

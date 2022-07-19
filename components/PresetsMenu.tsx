@@ -34,6 +34,7 @@ import {
   type Dispatch,
   type SetStateAction,
   type TransitionStartFunction,
+  memo,
   useEffect,
   useMemo,
   useState,
@@ -83,7 +84,7 @@ interface Props {
   hues: Hues
   unstable_showParsedUrl: boolean
 }
-export default function PresetsMenu({
+function PresetsMenu({
   selected,
   onChange,
   hues,
@@ -552,3 +553,5 @@ export default createConfig({
     </Card>
   )
 }
+
+export default memo(PresetsMenu)

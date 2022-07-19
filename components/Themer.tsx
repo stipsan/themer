@@ -134,6 +134,10 @@ export default function Themer({
     }, []),
     { requestTransition: spin, startTransition }
   )
+  const onChangePreset = useIdleCallback(
+    useCallback((nextPreset: ThemePreset) => setPreset(nextPreset), []),
+    { requestTransition: spin, startTransition }
+  )
 
   return (
     <ThemeProvider theme={themeFromHues} scheme={scheme}>
@@ -180,9 +184,7 @@ export default function Themer({
                     prepareTransition={spin}
                     startTransition={startTransition}
                     setPreset={setPreset}
-                    onChange={(nextPreset) =>
-                      startTransition(() => setPreset(nextPreset))
-                    }
+                    onChange={onChangePreset}
                     unstable_showParsedUrl={unstable_showParsedUrl}
                   />
                   <Card height="fill" paddingY={1}>

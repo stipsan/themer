@@ -1,7 +1,7 @@
 import { black, hues, white } from '@sanity/color'
 
-export const lightest = white.hex
-export const darkest = black.hex
+export const lightest = white.hex.toLowerCase()
+export const darkest = black.hex.toLowerCase()
 
 export const NEUTRAL_TONES = ['default', 'transparent']
 

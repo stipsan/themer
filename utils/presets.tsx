@@ -5,7 +5,7 @@ import type { ThemePreset } from 'utils/types'
 export const defaultPreset: ThemePreset = {
   slug: 'default',
   title: 'Studio v3',
-  url: '/api/hues',
+  url: '/api/hues?lightest=fff&darkest=101112&default=8690a0;500&primary=2276fc;500&transparent=8690a0;500&positive=43d675;400&caution=fbd024;300&critical=f03e2f;500',
 }
 
 export const pinkSynth: ThemePreset = {

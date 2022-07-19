@@ -9,10 +9,10 @@ export function parseHuesFromSearchParams(
   searchParams: URLSearchParams
 ): PartialDeep<Hues> {
   const lightest = searchParams.has('lightest')
-    ? assertValidColor(`#${searchParams.get('lightest')}`)
+    ? assertValidColor(`#${searchParams.get('lightest').toLowerCase()}`)
     : undefined
   const darkest = searchParams.get('darkest')
-    ? assertValidColor(`#${searchParams.get('darkest')}`)
+    ? assertValidColor(`#${searchParams.get('darkest').toLowerCase()}`)
     : undefined
 
   return {
@@ -35,7 +35,7 @@ function parseHue(
   if (!searchParams.has(key)) {
     return { lightest: defaultLightest, darkest: defaultDarkest }
   }
-  const input = searchParams.get(key)
+  const input = searchParams.get(key).toLowerCase()
 
   let mid: string | undefined
   let midPoint: Hue['midPoint'] | undefined

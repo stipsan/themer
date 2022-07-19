@@ -1,3 +1,10 @@
+/**
+ * Yes a lot of the code here is gnarly, nasty and overly defensive.
+ * That's because this file is currently in Stage 1 "Make it work".
+ * The next two stages will be "Make right" and "Make it fast".
+ * Stage 2 requires integrtation tests.
+ */
+
 // Removes search params that match defaults specified in the preset
 
 import { applyHues } from 'utils/applyHues'
@@ -5,7 +12,6 @@ import { TONES } from 'utils/colors'
 import { parseHuesFromSearchParams } from 'utils/parseHuesFromSearchParams'
 import { getPreset } from 'utils/presets'
 import { stringifyColorSearchParam } from 'utils/stringifyColorSearchParam'
-import { applyHuesFromPreset } from 'utils/applyHuesFromPreset'
 
 export function shortenPresetSearchParams(searchParams: URLSearchParams) {
   const preset = getPreset(searchParams.get('preset'))

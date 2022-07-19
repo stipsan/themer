@@ -20,7 +20,7 @@ import { config } from 'studios'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
 import type { PartialDeep } from 'type-fest'
-import { roundMidPointToScale } from 'utils/roundMidPointToScale'
+import { roundMidPoint } from 'utils/roundMidPoint'
 import type { Hue, Hues, ThemePreset } from 'utils/types'
 
 // @TODO read the media query from the theme context instead of hardcoding to 600px
@@ -108,7 +108,7 @@ export default function Themer({
     url.searchParams.set('preset', preset.slug)
     url.searchParams.set(
       'default',
-      `${memoHues.default.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.default.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.default.midPoint
       )};lightest:${memoHues.default.lightest.replace(
         /^#/,
@@ -117,7 +117,7 @@ export default function Themer({
     )
     url.searchParams.set(
       'primary',
-      `${memoHues.primary.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.primary.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.primary.midPoint
       )};lightest:${memoHues.primary.lightest.replace(
         /^#/,
@@ -126,7 +126,7 @@ export default function Themer({
     )
     url.searchParams.set(
       'transparent',
-      `${memoHues.transparent.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.transparent.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.transparent.midPoint
       )};lightest:${memoHues.transparent.lightest.replace(
         /^#/,
@@ -135,7 +135,7 @@ export default function Themer({
     )
     url.searchParams.set(
       'positive',
-      `${memoHues.positive.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.positive.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.positive.midPoint
       )};lightest:${memoHues.positive.lightest.replace(
         /^#/,
@@ -144,7 +144,7 @@ export default function Themer({
     )
     url.searchParams.set(
       'caution',
-      `${memoHues.caution.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.caution.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.caution.midPoint
       )};lightest:${memoHues.caution.lightest.replace(
         /^#/,
@@ -153,7 +153,7 @@ export default function Themer({
     )
     url.searchParams.set(
       'critical',
-      `${memoHues.critical.mid.replace(/^#/, '')};${roundMidPointToScale(
+      `${memoHues.critical.mid.replace(/^#/, '')};${roundMidPoint(
         memoHues.critical.midPoint
       )};lightest:${memoHues.critical.lightest.replace(
         /^#/,

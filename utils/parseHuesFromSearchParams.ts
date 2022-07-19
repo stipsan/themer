@@ -1,9 +1,16 @@
+/**
+ * Yes a lot of the code here is gnarly, nasty and overly defensive.
+ * That's because this file is currently in Stage 1 "Make it work".
+ * The next two stages will be "Make right" and "Make it fast".
+ * Stage 2 requires integrtation tests.
+ */
+
 import type { PartialDeep } from 'type-fest'
 import { isMidPoint } from 'utils/isMidPoint'
 import type { Hue, Hues } from 'utils/types'
 import { ValidationError } from 'utils/ValidationError'
 
-import { roundMidPointToScale } from './roundMidPointToScale'
+import { roundMidPoint } from 'utils/roundMidPoint'
 
 export function parseHuesFromSearchParams(
   searchParams: URLSearchParams
@@ -52,7 +59,7 @@ function parseHue(
   }
   for (const param of params) {
     const maybeMid = `#${param}`
-    const maybeMidPoint = roundMidPointToScale(Number(param))
+    const maybeMidPoint = roundMidPoint(Number(param))
 
     switch (true) {
       case param === '':

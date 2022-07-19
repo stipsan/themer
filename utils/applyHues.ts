@@ -1,3 +1,10 @@
+/**
+ * Yes a lot of the code here is gnarly, nasty and overly defensive.
+ * That's because this file is currently in Stage 1 "Make it work".
+ * The next two stages will be "Make right" and "Make it fast".
+ * Stage 2 requires integrtation tests.
+ */
+
 import type { PartialDeep } from 'type-fest'
 import { darkest, lightest } from 'utils/colors'
 import type { Hues } from 'utils/types'

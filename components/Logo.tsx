@@ -16,6 +16,7 @@ const ConicRainbow = styled.div`
   bottom: -1px;
   left: -1px;
   transform-origin: center center;
+  will-change: transform, opacity;
   opacity: 0.8;
 `
 
@@ -28,6 +29,7 @@ const DarkCircle = styled.div`
   left: 2px;
   border-radius: 50%;
   transform-origin: center center;
+  will-change: transform, opacity;
   opacity: 0.6;
 `
 
@@ -35,11 +37,13 @@ const Figure = styled.figure`
   display: block;
   border-radius: 16px;
   overflow: hidden;
+  overflow: clip;
   height: 32px;
   margin: 0;
   position: relative;
   width: 32px;
   contain: strict;
+  transform: translateZ(0);
 `
 
 interface Props {

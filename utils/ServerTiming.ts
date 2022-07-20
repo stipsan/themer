@@ -32,3 +32,5 @@ export class ServerTiming {
     return timings.join(',')
   }
 }
+
+export type ServerTimingInstance = InstanceType<typeof ServerTiming>

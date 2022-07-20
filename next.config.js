@@ -11,6 +11,8 @@ const nextConfig = {
     images: {
       allowFutureImage: true,
     },
+    // @TODO figure out why it fails due to not finding a 'critters' module
+    // optimizeCss: true,
   },
   compiler: {
     styledComponents: true,
@@ -20,6 +22,7 @@ const nextConfig = {
     domains: ['cdn.sanity.io', 'source.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
   },
+  swcMinify: true,
 }
 
 module.exports = nextConfig

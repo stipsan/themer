@@ -26,8 +26,8 @@ export default async function handler(req: NextRequest) {
 
   try {
     console.log(process.hrtime())
-  } catch(err) {
-    console.error('failed to hrtime', err
+  } catch (err) {
+    console.error('failed to hrtime', err)
   }
 
   try {

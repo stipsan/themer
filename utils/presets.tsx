@@ -48,7 +48,7 @@ const rosabel: ThemePreset = {
   slug: 'rosabel',
   title: 'Rosabel',
   url: createApiUrl(
-    '?default=9d8966;500;lightest:fdfdfc;darkest:15120d&primary=ed2555;500;lightest:fdfdfc;darkest:15120d&transparent=9d8966;500;lightest:fdfdfc;darkest:15120d&positive=43D675;300;lightest:fdfdfc;darkest:15120d&caution=FBD024;200;lightest:fdfdfc;darkest:15120d&critical=F03E2F;500;lightest:fdfdfc;darkest:15120d'
+    '?default=9d8966;500;lightest:fdfdfc;darkest:15120d&primary=ed2555;600;lightest:fdfdfc;darkest:15120d&transparent=9d8966;500;lightest:fdfdfc;darkest:15120d&positive=43D675;300;lightest:fdfdfc;darkest:15120d&caution=FBD024;200;lightest:fdfdfc;darkest:15120d&critical=F03E2F;500;lightest:fdfdfc;darkest:15120d'
   ),
   // https://cdn.sanity.io/images/32a3sayd/blog/c7df4bf5a0b43b3996aad56b6cecbfbc3579cb53-800x1198.png
 }

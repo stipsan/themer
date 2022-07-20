@@ -22,6 +22,30 @@ import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 // Setting up a themer.d.ts is a decent workaround for now
 // https://github.com/microsoft/TypeScript/issues/35749
 
+const sanityConfigCode = (
+  themeImport: string,
+  themeConfig: string = 'theme,'
+): string => `// sanity.config.ts
+import { createConfig } from 'sanity'
+import { deskTool } from 'sanity/desk'
+
+import { schemaTypes } from './schemas'
+
+${themeImport}
+
+export default createConfig({
+  ${themeConfig}
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: { types: schemaTypes,},
+})
+
+`
+
 interface Props {
   searchParams: URLSearchParams
   open: 'export' | 'export-dialog'
@@ -106,60 +130,22 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 below, in your sanity.config.ts file, and add `theme` to one of
                 your workspaces.
               </Text>
-              <Card
-                marginY={[2, 2, 3]}
-                overflow="auto"
-                padding={4}
-                radius={2}
-                shadow={1}
-              >
-                <CodeSnippet>
-                  {`// sanity.config.ts
-import { createConfig } from "sanity";
-import { deskTool } from "sanity/desk";
-
-// Add this URL ESM import
-import { theme } from ${JSON.stringify(esmUrl)};
-
-export default createConfig({
-  theme, // <-- add the theme here
-  plugins: [deskTool()],
-  projectId: "b5vzhxkv",
-  dataset: "production",
-  schema: {
-    types: [
-      {
-        type: "document",
-        name: "post",
-        title: "Post",
-        fields: [
-          {
-            type: "string",
-            name: "title",
-            title: "Title",
-          },
-        ],
-      },
-    ],
-  },
-});`}
-                </CodeSnippet>
-              </Card>
+              <CodeSnippet>
+                {sanityConfigCode(
+                  `// Add this URL ESM import
+import { theme } from ${JSON.stringify(esmUrl)};`,
+                  'theme, // <-- add the theme here'
+                )}
+              </CodeSnippet>
               <Text>
                 If you want to quickly iterate on your theme from the comfort of
                 your Studio you don&quote;t have to constantly edit import URLs.
                 You can import `createTheme` and the `hues` input that were used
                 to create the `theme` export:
               </Text>
-              <Card
-                marginY={[2, 2, 3]}
-                overflow="auto"
-                padding={4}
-                radius={2}
-                shadow={1}
-              >
-                <CodeSnippet>
-                  {`// sanity.config.ts
+
+              <CodeSnippet>
+                {`// sanity.config.ts
 import { createConfig } from "sanity";
 import { deskTool } from "sanity/desk";
 
@@ -191,25 +177,17 @@ export default createConfig({
     ],
   },
 });`}
-                </CodeSnippet>
-              </Card>
+              </CodeSnippet>
               <Text>
                 This also works in a Webpack bundled app, if you add a magic
                 comment to the import:
               </Text>
-              <Card
-                marginY={[2, 2, 3]}
-                overflow="auto"
-                padding={4}
-                radius={2}
-                shadow={1}
-              >
-                <CodeSnippet>
-                  {`// In create-react-app or similar
+
+              <CodeSnippet>
+                {`// In create-react-app or similar
 const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
 `}
-                </CodeSnippet>
-              </Card>
+              </CodeSnippet>
               <Text>
                 Please note that this only works if your Webpack application is
                 outputting ESM code that are loaded using{' '}
@@ -221,15 +199,9 @@ const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
                 the same ease as node_modules by turning URL Imports in
                 next.config.js:
               </Text>
-              <Card
-                marginY={[2, 2, 3]}
-                overflow="auto"
-                padding={4}
-                radius={2}
-                shadow={1}
-              >
-                <CodeSnippet>
-                  {`// next.config.js
+
+              <CodeSnippet>
+                {`// next.config.js
 // @ts-check
 
 /**
@@ -245,16 +217,15 @@ import {theme} from ${JSON.stringify(esmUrl)}
 
 // If you want to do fancy things like running this as native ESM in the browser, at runtime, no prefetching or local caching of the theme, like below:
 const {createTheme, hues} = await import(/* webpackIgnore: true */${JSON.stringify(
-                    esmUrl
-                  )})
+                  esmUrl
+                )})
 // Then you'll, in addition to that webpackIgnore comment, will need to add these to your next.config
 module.exports = {
   experimental: {urlImports: ['https://themer.creativecody.dev/'],browsersListForSwc: true,legacyBrowsers: false,},
 }
 // Fun fact, that's how this Next App is loading the theme for the Sanity Studio you're looking at right now while reading this 🤯
 `}
-                </CodeSnippet>
-              </Card>
+              </CodeSnippet>
               <Text>
                 If URL ESM is not a viable option for you, copy paste the
                 contents of this URL, it is self-contained and you can use the
@@ -267,15 +238,9 @@ module.exports = {
                 download="theme.js"
                 text="Download theme.js"
               />
-              <Card
-                marginY={[2, 2, 3]}
-                overflow="auto"
-                padding={4}
-                radius={2}
-                shadow={1}
-              >
-                <CodeSnippet>
-                  {`// ./theme.js
+
+              <CodeSnippet>
+                {`// ./theme.js
 // copy-paste of this URL: ${JSON.stringify(esmUrl)}
 
 // sanity.config.ts
@@ -308,8 +273,7 @@ export default createConfig({
   },
 })
 `}
-                </CodeSnippet>
-              </Card>
+              </CodeSnippet>
             </Stack>
           </Box>
         </Dialog>

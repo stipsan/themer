@@ -17,6 +17,7 @@ export function useFormatted(code: string, options: Options = null): string {
     return prettier.format(code, {
       semi: false,
       singleQuote: true,
+      trailingComma: 'none',
       ...options,
       parser: 'typescript',
       plugins: [parserTypescript],

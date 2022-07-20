@@ -10,25 +10,19 @@ export const config = {
 }
 
 const headers = (serverTiming: ServerTimingInstance) => ({
-  'access-control-allow-origin': '*',
+  'Access-Control-Allow-Origin': '*',
   // @TODO force no caching until we have a better solution that limits bandwidth without causing trouble
   // 'cache-control': 'no-cache',
   // Test https://vercel.com/docs/concepts/functions/serverless-functions/edge-caching#stale-while-revalidate
-  'cache-control': `s-maxage=1, stale-while-revalidate`,
-  'content-type': 'application/javascript; charset=utf-8',
-  'server-timing': `${serverTiming}`,
+  'Cache-Control': `s-maxage=1, stale-while-revalidate`,
+  'Content-Type': 'application/javascript; charset=utf-8',
+  'Server-Timing': `${serverTiming}`,
 })
 
 export default async function handler(req: NextRequest) {
   const serverTiming = new ServerTiming()
   serverTiming.start('handler')
   const { searchParams } = new URL(req.url)
-
-  try {
-    console.log(process.hrtime())
-  } catch (err) {
-    console.error('failed to hrtime', err)
-  }
 
   try {
     serverTiming.start('getPreset')

@@ -22,7 +22,8 @@ const nextConfig = {
     domains: ['cdn.sanity.io', 'source.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
   },
-  swcMinify: true,
+  // Disabling swcMinify until figuring out why the export modal crashes
+  // swcMinify: true,
 }
 
 module.exports = nextConfig

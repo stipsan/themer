@@ -141,7 +141,7 @@ export default function Themer({
 
   return (
     <ThemeProvider theme={themeFromHues} scheme={scheme}>
-      <Head />
+      <Head presetUrl={preset.url} />
       <Card
         height="fill"
         tone="transparent"

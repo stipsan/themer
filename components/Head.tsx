@@ -6,7 +6,10 @@ import { memo } from 'react'
 
 const title = 'Themer | Create Sanity Studio v3 themes 🪄'
 
-function Head() {
+interface Props {
+  presetUrl: string
+}
+function Head({ presetUrl }: Props) {
   const { light, dark } = useRootTheme().theme.color
 
   // @TODO find a better way to override the page title
@@ -21,6 +24,8 @@ function Head() {
 
   return (
     <NextHead>
+      {/* Use Edge Middleware to set this preload as a header to work with custom presets */}
+      <link rel="modulepreload" href={presetUrl} />
       <meta name="viewport" content="width=device-width, viewport-fit=cover" />
       <title>{title}</title>
       <meta

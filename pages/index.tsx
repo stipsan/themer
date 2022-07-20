@@ -25,9 +25,6 @@ export default function Index() {
     const inheritFrom =
       presets.find((preset) => preset.slug === slug) || defaultPreset
     const { pathname, searchParams } = new URL(inheritFrom.url, location.origin)
-    if (process.env.NODE_ENV === 'production') {
-      searchParams.set('min', '1')
-    }
 
     const paramsAllowlist = [
       'lightest',

@@ -8,10 +8,11 @@ import {
 } from '@sanity/ui'
 import Head from 'components/Head'
 import { memo } from 'react'
+import { defaultPreset } from 'utils/presets'
 
 const ThemerFallback = () => (
   <ThemeProvider scheme="light" theme={studioTheme}>
-    <Head />
+    <Head presetUrl={defaultPreset.url} />
     <Card height="fill" tone="transparent">
       <Flex
         align="center"

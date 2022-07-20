@@ -106,7 +106,10 @@ function ImportFromImage({
           pattern="^https://cdn.sanity.io/images/.+"
           fontSize={[2, 2, 1]}
           value={url}
-          onFocus={() => setTouched(false)}
+          onFocus={(event) => {
+            setTouched(false)
+            event.target.setSelectionRange(0, event.target.value.length)
+          }}
           onChange={(event) => {
             setUrl(event.currentTarget.value)
             prepareTransition()

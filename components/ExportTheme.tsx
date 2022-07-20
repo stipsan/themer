@@ -1,6 +1,5 @@
 import { ShareIcon as _ShareIcon } from '@heroicons/react/outline'
 import { DownloadIcon, InfoOutlineIcon } from '@sanity/icons'
-import { ClipboardIcon } from '@sanity/icons'
 import {
   Box,
   Button as UiButton,
@@ -8,24 +7,20 @@ import {
   Code,
   Dialog,
   Grid,
+  Skeleton,
   Stack,
   Text,
   useToast,
 } from '@sanity/ui'
+import CodeSnippet from 'components/CodeSnippet'
+import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
-import parserBabel from 'prettier/esm/parser-babel.mjs'
-import prettier from 'prettier/esm/standalone.mjs'
-import { memo, useMemo } from 'react'
+import { memo, Suspense, useMemo } from 'react'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 
-function formatCode(code: string): string {
-  return prettier.format(code, {
-    parser: 'babel',
-    plugins: [parserBabel],
-    semi: false,
-    singleQuote: true,
-  })
-}
+// Support for URL Imports in TS isn't quite there yet
+// Setting up a themer.d.ts is a decent workaround for now
+// https://github.com/microsoft/TypeScript/issues/35749
 
 interface Props {
   searchParams: URLSearchParams
@@ -70,24 +65,24 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
         </Stack>
         <Stack space={2}>
           <Label>Paste this into your sanity.config.ts 🧑‍💻</Label>
-          <Grid columns={1} gap={2}>
-            <Button
-              icon={ClipboardIcon}
-              text="Copy JS"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  formatCode(`const {theme} = await import(
-                  // @ts-expect-error
-                  ${JSON.stringify(esmUrl)}
-                )`)
-                )
-                pushToast({
-                  closable: true,
-                  status: 'success',
-                  title: `Copied JS snippet to the clipboard`,
-                })
-              }}
-            />
+          <Grid columns={2} gap={2}>
+            <Suspense fallback={<Skeleton padding={3} animated radius={2} />}>
+              <CopySnippetButton
+                text="Copy JS"
+                toastTitle="Copied JS snippet to the clipboard"
+                code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
+              />
+            </Suspense>
+            <Suspense fallback={<Skeleton padding={3} animated radius={2} />}>
+              <CopySnippetButton
+                text="Copy TS"
+                toastTitle="Copied TS snippet to the clipboard"
+                code={`const { theme } = (await import(
+              // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
+              ${JSON.stringify(esmUrl)}
+            )) as { theme: import('sanity').StudioTheme }`}
+              />
+            </Suspense>
           </Grid>
         </Stack>
       </Stack>
@@ -118,8 +113,8 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 radius={2}
                 shadow={1}
               >
-                <Code language={'ts'} muted>
-                  {formatCode(`// sanity.config.ts
+                <CodeSnippet>
+                  {`// sanity.config.ts
 import { createConfig } from "sanity";
 import { deskTool } from "sanity/desk";
 
@@ -147,8 +142,8 @@ export default createConfig({
       },
     ],
   },
-});`)}
-                </Code>
+});`}
+                </CodeSnippet>
               </Card>
               <Text>
                 If you want to quickly iterate on your theme from the comfort of
@@ -163,8 +158,8 @@ export default createConfig({
                 radius={2}
                 shadow={1}
               >
-                <Code language={'ts'} muted>
-                  {formatCode(`// sanity.config.ts
+                <CodeSnippet>
+                  {`// sanity.config.ts
 import { createConfig } from "sanity";
 import { deskTool } from "sanity/desk";
 
@@ -195,8 +190,8 @@ export default createConfig({
       },
     ],
   },
-});`)}
-                </Code>
+});`}
+                </CodeSnippet>
               </Card>
               <Text>
                 This also works in a Webpack bundled app, if you add a magic
@@ -209,11 +204,11 @@ export default createConfig({
                 radius={2}
                 shadow={1}
               >
-                <Code language={'ts'} muted>
-                  {formatCode(`// In create-react-app or similar
+                <CodeSnippet>
+                  {`// In create-react-app or similar
 const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
-`)}
-                </Code>
+`}
+                </CodeSnippet>
               </Card>
               <Text>
                 Please note that this only works if your Webpack application is
@@ -233,8 +228,8 @@ const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
                 radius={2}
                 shadow={1}
               >
-                <Code language={'ts'} muted>
-                  {formatCode(`// next.config.js
+                <CodeSnippet>
+                  {`// next.config.js
 // @ts-check
 
 /**
@@ -257,8 +252,8 @@ module.exports = {
   experimental: {urlImports: ['https://themer.creativecody.dev/'],browsersListForSwc: true,legacyBrowsers: false,},
 }
 // Fun fact, that's how this Next App is loading the theme for the Sanity Studio you're looking at right now while reading this 🤯
-`)}
-                </Code>
+`}
+                </CodeSnippet>
               </Card>
               <Text>
                 If URL ESM is not a viable option for you, copy paste the
@@ -279,8 +274,8 @@ module.exports = {
                 radius={2}
                 shadow={1}
               >
-                <Code language={'ts'} muted>
-                  {formatCode(`// ./theme.js
+                <CodeSnippet>
+                  {`// ./theme.js
 // copy-paste of this URL: ${JSON.stringify(esmUrl)}
 
 // sanity.config.ts
@@ -312,8 +307,8 @@ export default createConfig({
     ],
   },
 })
-`)}
-                </Code>
+`}
+                </CodeSnippet>
               </Card>
             </Stack>
           </Box>

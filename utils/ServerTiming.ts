@@ -2,12 +2,12 @@
 
 // @TODO regex check if `id` is ascii letters according to the Server-Timing spec
 
-function getNow() {
-  try {
-    return performance.now() * 1000
-  } catch {
-    return Date.now()
-  }
+let getNow: () => number
+try {
+  performance.now()
+  getNow = () => performance.now() * 1000
+} catch {
+  getNow = () => Date.now()
 }
 
 export class ServerTiming {

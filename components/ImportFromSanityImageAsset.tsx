@@ -15,11 +15,11 @@ import {
   useCallback,
   useMemo,
 } from 'react'
-import type { ImagePalette } from 'sanity'
 import { MediaPreview } from 'sanity/_unstable'
 import styled from 'styled-components'
 import { suspend } from 'suspend-react'
 import { applyHues } from 'utils/applyHues'
+import { useFetcher } from 'utils/fetcher'
 import { getMidPointFromLuminance } from 'utils/getMidPointFromLuminance'
 import { defaultPreset } from 'utils/presets'
 import type { Hues, ThemePreset } from 'utils/types'
@@ -110,29 +110,8 @@ function ImportFromSanityImageAsset({
   prepareTransition,
   setPreset,
 }: Props) {
-  const data = suspend(async () => {
-    const url = new URL(
-      `/api/palette/${projectId}/${dataset}/${id}`,
-      location.origin
-    )
-    const res = await fetch(url)
-    const palette = await res.json()
-    /*
-    const { default: createClient } = await import('@sanity/client')
-    const client = createClient({
-      projectId,
-      dataset,
-      apiVersion: '2022-07-10',
-      useCdn: true,
-    })
-    const palette = await client.fetch(
-      `*[ _type == "sanity.imageAsset" && _id == $id ][0].metadata.palette`,
-      { id }
-      )
-      console.debug({ palette })
-      // */
-    return palette as Required<ImagePalette> | null
-  }, [projectId, dataset, id])
+  const data = useFetcher(`/api/palette/${projectId}/${dataset}/${id}`)
+
   const imageUrl = useMemo(() => {
     const [, ref, dimensions, ext] = id.split('-')
     const url = new URL(

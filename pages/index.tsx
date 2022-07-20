@@ -1,10 +1,9 @@
 import { usePrefersDark } from '@sanity/ui'
+import Themer from 'components/Themer'
 import ThemerFallback from 'components/ThemerFallback'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { defaultPreset, presets } from 'utils/presets'
 import type { ThemePreset } from 'utils/types'
-
-const Themer = lazy(() => import('components/Themer'))
 
 export default function Index() {
   const prefersDark = usePrefersDark()

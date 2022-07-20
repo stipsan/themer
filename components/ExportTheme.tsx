@@ -7,6 +7,7 @@ import {
   Card,
   Code,
   Dialog,
+  Grid,
   Stack,
   Text,
   useToast,
@@ -59,30 +60,35 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
     <>
       <Stack space={3}>
         <Stack space={2}>
-          <Label>Paste this into your sanity.config.ts 🧑‍💻</Label>
-          <Button
-            icon={ClipboardIcon}
-            text="Copy snippet"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                formatCode(`// @ts-expect-error -- TODO figure out how to get typings for this
-                import {theme} from ${JSON.stringify(esmUrl)}`)
-              )
-              pushToast({
-                closable: true,
-                status: 'success',
-                title: `The url is copied to the clipboard`,
-              })
-            }}
-          />
-        </Stack>
-        <Stack space={2}>
           <Label>First time exporting? 🤷</Label>
           <Button
+            tone="primary"
             icon={InfoOutlineIcon}
             text="Read the guide"
             onClick={() => onOpen()}
           />
+        </Stack>
+        <Stack space={2}>
+          <Label>Paste this into your sanity.config.ts 🧑‍💻</Label>
+          <Grid columns={1} gap={2}>
+            <Button
+              icon={ClipboardIcon}
+              text="Copy JS"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  formatCode(`const {theme} = await import(
+                  // @ts-expect-error
+                  ${JSON.stringify(esmUrl)}
+                )`)
+                )
+                pushToast({
+                  closable: true,
+                  status: 'success',
+                  title: `Copied JS snippet to the clipboard`,
+                })
+              }}
+            />
+          </Grid>
         </Stack>
       </Stack>
       {open === 'export-dialog' && (

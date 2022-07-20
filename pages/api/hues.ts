@@ -25,6 +25,12 @@ export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
 
   try {
+    console.log(process.hrtime())
+  } catch(err) {
+    console.error('failed to hrtime', err
+  }
+
+  try {
     serverTiming.start('getPreset')
     const { searchParams: presetParams } = new URL(
       getPreset(searchParams.get('preset')).url,

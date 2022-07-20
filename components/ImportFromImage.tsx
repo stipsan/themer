@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
+import { DiceIcon } from 'components/icons'
 import {
   SuspenseFallback,
   WarningMessage,
@@ -144,19 +145,18 @@ function ImportFromImage({
           onBlur={() => setTouched(true)}
         />
         {validationMessage && <WarningMessage message={validationMessage} />}
-        {!imageUrl && (
-          <Button
-            text="Demo"
-            tone="primary"
-            onClick={() => {
-              const exampleUrl =
-                exampleUrls[~~(exampleUrls.length * Math.random())]
-              setUrl(exampleUrl)
-              setValidationMessage('')
-              setImageUrl(exampleUrl)
-            }}
-          />
-        )}
+        <Button
+          icon={<DiceIcon />}
+          text="Random image"
+          tone={imageUrl ? 'default' : 'primary'}
+          onClick={() => {
+            const exampleUrl =
+              exampleUrls[~~(exampleUrls.length * Math.random())]
+            setUrl(exampleUrl)
+            setValidationMessage('')
+            setImageUrl(exampleUrl)
+          }}
+        />
         {unstable_showParsedUrl && (
           <Card
             as="details"

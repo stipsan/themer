@@ -59,6 +59,7 @@ const ShareTab = ({ searchParams }: Props) => {
           />
           {canShare && (
             <Button
+              tone="primary"
               icon={ShareIcon}
               text="Share URL"
               onClick={async () => {

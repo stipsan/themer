@@ -49,16 +49,16 @@ const {theme} = await import(${dummies.esmUrl})
   [
     'studio-config',
     ['import'],
-    `// sanity.config.ts
-import { createConfig } from 'sanity'
+    `import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
 
+// 1. Add the import
 ${dummies.import}
 
 export default createConfig({
-  theme, // <-- add the theme here
+  theme, // <-- 2. add the theme here
 
   name: 'default',
   title: 'My Sanity Project',

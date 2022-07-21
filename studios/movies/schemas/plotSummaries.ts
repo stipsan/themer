@@ -1,4 +1,6 @@
-export default {
+import { defineType } from 'sanity'
+
+export const plotSummaries = defineType({
   title: 'Plot summaries',
   name: 'plotSummaries',
   type: 'object',
@@ -15,4 +17,4 @@ export default {
       of: [{ type: 'plotSummary' }],
     },
   ],
-}
+})

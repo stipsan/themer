@@ -31,10 +31,11 @@ import { deskTool } from "sanity/desk"
 
 import { schemaTypes } from "./schemas"
 
+// 1. Add the import
 ${first}
 
 export default createConfig({
-  theme, // <-- add the theme here
+  theme, // <-- 2. add the theme here
 
   name: "default",
   title: "My Sanity Project",

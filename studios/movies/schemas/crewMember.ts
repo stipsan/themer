@@ -1,4 +1,6 @@
-export default {
+import { defineType } from 'sanity'
+
+export const crewMember = defineType({
   name: 'crewMember',
   title: 'Crew Member',
   type: 'object',
@@ -46,4 +48,4 @@ export default {
       }
     },
   },
-}
+})

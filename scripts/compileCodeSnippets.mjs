@@ -87,7 +87,7 @@ export default createConfig({
     import { createCliConfig } from 'sanity/cli'
     import type { UserConfig } from "vite";
     
-    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'}, vite: (config): UserConfig => ({...config,build: {...config.build,target: "esnext"},})})
+    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'}, vite: (config: UserConfig): UserConfig => ({...config,build: {...config.build,target: "esnext"},})})
 `,
   ],
   [

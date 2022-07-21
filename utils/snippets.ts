@@ -60,7 +60,7 @@ import type { UserConfig } from 'vite'
 
 export default createCliConfig({
   api: { projectId: 'b5vzhxkv', dataset: 'production' },
-  vite: (config): UserConfig => ({
+  vite: (config: UserConfig): UserConfig => ({
     ...config,
     build: { ...config.build, target: 'esnext' }
   })

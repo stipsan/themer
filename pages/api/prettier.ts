@@ -26,13 +26,18 @@ export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
 
   serverTiming.start('prettier')
-  const code = prettier.format(searchParams.get('code') || '', {
-    semi: false,
-    singleQuote: true,
-    trailingComma: 'none',
-    parser: 'typescript',
-    plugins: [parserTypescript],
-  })
-
-  return new Response(code, { headers: headers(serverTiming) })
+  const code = decodeURIComponent(searchParams.get('code')) || ''
+  try {
+    const prettyCode = prettier.format(code, {
+      semi: false,
+      singleQuote: true,
+      trailingComma: 'none',
+      parser: 'typescript',
+      plugins: [parserTypescript],
+    })
+    return new Response(prettyCode, { headers: headers(serverTiming) })
+  } catch (err) {
+    console.error('Failed to prettify code', err, searchParams.get('code'))
+    return new Response(`${err}`, { headers: headers(serverTiming) })
+  }
 }

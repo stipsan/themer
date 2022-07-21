@@ -5,6 +5,7 @@
     "build": "next build",
     "prebuild:edge": "npx rimraf edge-utils",
     "build:edge": "node scripts/buildEdgeUtils.mjs",
+    "build:snippets": "node scripts/compileCodeSnippets.mjs && npx prettier --write utils/snippets.ts",
     "predev": "npm run build:edge",
     "dev": "next dev",
     "format": "npx prettier --write . && npm run lint -- --fix",

@@ -57,7 +57,9 @@ const {theme} = await import(${dummies.esmUrl})
   [
     'studio-config',
     ['import'],
-    `import { createConfig } from 'sanity'
+    `
+    // Add two lines of code to your workspace
+import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
@@ -79,24 +81,29 @@ export default createConfig({
 `,
   ],
   [
-    'cli-config',
+    'sanity.cli.ts',
     [],
-    `import { createCliConfig } from 'sanity/cli'
+    `// Change target to allow top-level await in sanity.config.ts
+    import { createCliConfig } from 'sanity/cli'
     import type { UserConfig } from "vite";
     
-    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'},
-    // Change minify and target to allow top-level await in sanity.config.ts
-      vite: (config): UserConfig => ({...config,
-        build: {...config.build,minify: 'esbuild',target: "esnext"},
-      })
-    })
+    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'}, vite: (config): UserConfig => ({...config,build: {...config.build,target: "esnext"},})})
+`,
+  ],
+  [
+    'sanity.cli.js',
+    [],
+    `// Change target to allow top-level await in sanity.config.js
+    import { createCliConfig } from 'sanity/cli'
     
+    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'},vite: (config) => ({...config, build: {...config.build,target: "esnext"},})})
 `,
   ],
   [
     'studio-config-create-theme',
     ['import'],
-    `import { createConfig } from 'sanity'
+    `// Import createTheme and hues to quickly modify your theme without changing the import URL
+import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
@@ -104,10 +111,7 @@ import { schemaTypes } from './schemas'
 ${dummies.import}
 
 export default createConfig({
-  theme: createTheme({
-    // override just the bits you want to iterate on
-    ...hues, primary: { ...hues.primary, mid: '#22fca8' } 
-  }),
+  theme: createTheme({...hues, primary: { ...hues.primary, mid: '#22fca8' } }),
 
   name: 'default',
   title: 'My Sanity Project',
@@ -122,15 +126,13 @@ export default createConfig({
   [
     'import-create-theme-static',
     ['esmUrl'],
-    `// Use createTheme and hues to iterate locally without needing to mess with URLs
-import { createTheme, hues } from ${dummies.esmUrl};
+    `import { createTheme, hues } from ${dummies.esmUrl};
 `,
   ],
   [
     'import-create-theme-dynamic',
     ['esmUrl'],
-    `// Use createTheme and hues to iterate locally without needing to mess with URLs
-const { createTheme, hues } = await import(${dummies.esmUrl});
+    `const { createTheme, hues } = await import(${dummies.esmUrl});
 `,
   ],
   [

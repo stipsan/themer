@@ -308,7 +308,11 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             sanity.cli.{state.typescript ? 'ts' : 'js'}
                           </StyledBadge>
                         </Box>
-                        <CodeSnippet>{snippet('cli-config')()}</CodeSnippet>
+                        <CodeSnippet>
+                          {state.typescript
+                            ? snippet('sanity.cli.ts')()
+                            : snippet('sanity.cli.js')()}
+                        </CodeSnippet>
                       </Stack>
                       {state.typescript && (
                         <>

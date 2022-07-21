@@ -4,7 +4,8 @@ export function snippet(id: 'import-dynamic-js'): (first: string) => string
 export function snippet(id: 'import-dynamic-ts'): (first: string) => string
 export function snippet(id: 'import-static'): (first: string) => string
 export function snippet(id: 'studio-config'): (first: string) => string
-export function snippet(id: 'cli-config'): () => string
+export function snippet(id: 'sanity.cli.ts'): () => string
+export function snippet(id: 'sanity.cli.js'): () => string
 export function snippet(
   id: 'studio-config-create-theme'
 ): (first: string) => string
@@ -32,7 +33,8 @@ export function snippet(id) {
 import { theme } from ${first}`
 
     case 'studio-config':
-      return (first: string) => `import { createConfig } from 'sanity'
+      return (first: string) => `// Add two lines of code to your workspace
+import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
@@ -51,21 +53,33 @@ export default createConfig({
   schema: { types: schemaTypes }
 })`
 
-    case 'cli-config':
-      return () => `import { createCliConfig } from 'sanity/cli'
+    case 'sanity.cli.ts':
+      return () => `// Change target to allow top-level await in sanity.config.ts
+import { createCliConfig } from 'sanity/cli'
 import type { UserConfig } from 'vite'
 
 export default createCliConfig({
   api: { projectId: 'b5vzhxkv', dataset: 'production' },
-  // Change minify and target to allow top-level await in sanity.config.ts
   vite: (config): UserConfig => ({
     ...config,
-    build: { ...config.build, minify: 'esbuild', target: 'esnext' }
+    build: { ...config.build, target: 'esnext' }
   })
 })`
 
+    case 'sanity.cli.js':
+      return () => `// Change target to allow top-level await in sanity.config.js
+import { createCliConfig } from 'sanity/cli'
+
+export default createCliConfig({
+  api: { projectId: 'b5vzhxkv', dataset: 'production' },
+  vite: config => ({ ...config, build: { ...config.build, target: 'esnext' } })
+})`
+
     case 'studio-config-create-theme':
-      return (first: string) => `import { createConfig } from 'sanity'
+      return (
+        first: string
+      ) => `// Import createTheme and hues to quickly modify your theme without changing the import URL
+import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
@@ -73,11 +87,7 @@ import { schemaTypes } from './schemas'
 ${first}
 
 export default createConfig({
-  theme: createTheme({
-    // override just the bits you want to iterate on
-    ...hues,
-    primary: { ...hues.primary, mid: '#22fca8' }
-  }),
+  theme: createTheme({ ...hues, primary: { ...hues.primary, mid: '#22fca8' } }),
 
   name: 'default',
   title: 'My Sanity Project',
@@ -88,16 +98,10 @@ export default createConfig({
 })`
 
     case 'import-create-theme-static':
-      return (
-        first: string
-      ) => `// Use createTheme and hues to iterate locally without needing to mess with URLs
-import { createTheme, hues } from ${first}`
+      return (first: string) => `import { createTheme, hues } from ${first}`
 
     case 'import-create-theme-dynamic':
-      return (
-        first: string
-      ) => `// Use createTheme and hues to iterate locally without needing to mess with URLs
-const { createTheme, hues } = await import(
+      return (first: string) => `const { createTheme, hues } = await import(
   ${first}
 )`
 

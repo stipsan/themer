@@ -1,18 +1,9 @@
-import { DownloadIcon, InfoOutlineIcon } from '@sanity/icons'
-import {
-  Badge,
-  Box,
-  Button as UiButton,
-  Card,
-  Dialog,
-  Grid,
-  Inline,
-  Stack,
-  Text,
-} from '@sanity/ui'
+import { InfoOutlineIcon } from '@sanity/icons'
+import { Badge, Box, Dialog, Grid, Inline, Stack, Text } from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
+import JSON5 from 'json5'
 import { memo, useMemo, useReducer } from 'react'
 import styled from 'styled-components'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
@@ -128,12 +119,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
               text="Copy JS"
               toastTitle="Copied JS snippet to the clipboard"
               // code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
-              code={snippet('import-dynamic-js')(JSON.stringify(esmUrl))}
+              code={snippet('import-dynamic-js')(JSON5.stringify(esmUrl))}
             />
             <CopySnippetButton
               text="Copy TS"
               toastTitle="Copied TS snippet to the clipboard"
-              code={snippet('import-dynamic-ts')(JSON.stringify(esmUrl))}
+              code={snippet('import-dynamic-ts')(JSON5.stringify(esmUrl))}
             />
           </Grid>
         </Stack>
@@ -302,7 +293,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         </Box>
                         <CodeSnippet>
                           {snippet('studio-config')(
-                            snippet('import-dynamic-js')(JSON.stringify(esmUrl))
+                            snippet('import-dynamic-js')(
+                              JSON5.stringify(esmUrl)
+                            )
                           )}
                         </CodeSnippet>
                       </Stack>
@@ -322,7 +315,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             </Box>
                             <CodeSnippet>
                               {snippet('themer.d.ts')(
-                                JSON.stringify(esmUrlDTS)
+                                JSON5.stringify(esmUrlDTS)
                               )}
                             </CodeSnippet>
                           </Stack>
@@ -343,7 +336,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         <CodeSnippet>
                           {snippet('studio-config-create-theme')(
                             snippet('import-create-theme-dynamic')(
-                              JSON.stringify(esmUrl)
+                              JSON5.stringify(esmUrl)
                             )
                           )}
                         </CodeSnippet>

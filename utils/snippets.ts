@@ -20,17 +20,17 @@ export function snippet(id: SnippetId) {
       return (first: string) => `const { theme } = (await import(
   // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
   ${first}
-)) as { theme: import("sanity").StudioTheme }`
+)) as { theme: import('sanity').StudioTheme }`
 
     case 'import-static':
       return (first: string) => `// Add this URL ESM import
 import { theme } from ${first}`
 
     case 'studio-config':
-      return (first: string) => `import { createConfig } from "sanity"
-import { deskTool } from "sanity/desk"
+      return (first: string) => `import { createConfig } from 'sanity'
+import { deskTool } from 'sanity/desk'
 
-import { schemaTypes } from "./schemas"
+import { schemaTypes } from './schemas'
 
 // 1. Add the import
 ${first}
@@ -38,41 +38,32 @@ ${first}
 export default createConfig({
   theme, // <-- 2. add the theme here
 
-  name: "default",
-  title: "My Sanity Project",
-  projectId: "b5vzhxkv",
-  dataset: "production",
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
   plugins: [deskTool()],
   schema: { types: schemaTypes }
 })`
 
     case 'cli-config':
-      return () => `import { createCliConfig } from "sanity/cli"
-import { type UserConfig } from "vite"
+      return () => `import { createCliConfig } from 'sanity/cli'
+import type { UserConfig } from 'vite'
 
 export default createCliConfig({
-  api: {
-    projectId: "b5vzhxkv",
-    dataset: "production"
-  },
-  vite: (config): UserConfig => {
-    return {
-      ...config,
-      build: {
-        ...config.build,
-        // Change minify and target to allow top-level await in sanity.config.ts
-        minify: "esbuild",
-        target: "esnext"
-      }
-    }
-  }
+  api: { projectId: 'b5vzhxkv', dataset: 'production' },
+  // Change minify and target to allow top-level await in sanity.config.ts
+  vite: (config): UserConfig => ({
+    ...config,
+    build: { ...config.build, minify: 'esbuild', target: 'esnext' }
+  })
 })`
 
     case 'studio-config-create-theme':
-      return (first: string) => `import { createConfig } from "sanity"
-import { deskTool } from "sanity/desk"
+      return (first: string) => `import { createConfig } from 'sanity'
+import { deskTool } from 'sanity/desk'
 
-import { schemaTypes } from "./schemas"
+import { schemaTypes } from './schemas'
 
 ${first}
 
@@ -80,13 +71,13 @@ export default createConfig({
   theme: createTheme({
     // override just the bits you want to iterate on
     ...hues,
-    primary: { ...hues.primary, mid: "#22fca8" }
+    primary: { ...hues.primary, mid: '#22fca8' }
   }),
 
-  name: "default",
-  title: "My Sanity Project",
-  projectId: "b5vzhxkv",
-  dataset: "production",
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
   plugins: [deskTool()],
   schema: { types: schemaTypes }
 })`
@@ -108,7 +99,7 @@ const { createTheme, hues } = await import(
     case 'themer.d.ts':
       return (first: string) => `module ${first} {
   interface Hue
-    extends Omit<import("@sanity/color").ColorHueConfig, "title" | "midPoint"> {
+    extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
     midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
   }
   interface Hues {
@@ -120,7 +111,7 @@ const { createTheme, hues } = await import(
     critical: Hue
   }
   const hues: Hues
-  type Theme = import("sanity").StudioTheme
+  type Theme = import('sanity').StudioTheme
   const createTheme = (hues: Hues): Theme => theme
   const theme: Theme
 

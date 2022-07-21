@@ -1,23 +1,26 @@
 // @ts-check
 // Compiles snippets so they have prettier formatting pre-applied
 
+import JSON5 from 'json5'
 import parserTypescript from 'prettier/esm/parser-typescript.mjs'
 import prettier from 'prettier/esm/standalone.mjs'
 import writeFileAtomic from 'write-file-atomic'
 
 const options = {
+  arrowParens: 'avoid',
   parser: 'typescript',
   plugins: [parserTypescript],
   semi: false,
+  singleQuote: true,
   trailingComma: 'none',
 }
 
 const args = ['first', 'second']
 const dummies = {
-  esmUrl: `/* @dummy */ ${JSON.stringify('https://example.com/api/hues')}`,
+  esmUrl: `/* @dummy */ ${JSON5.stringify('https://example.com/api/hues')}`,
   themeConfigProperty: '/* @dummy */ theme,',
   import: `/* @dummy */
-import { studioTheme as theme } from "@sanity/ui"`,
+import { studioTheme as theme } from '@sanity/ui'`,
 }
 
 const snippets = [
@@ -74,24 +77,13 @@ export default createConfig({
     'cli-config',
     [],
     `import { createCliConfig } from 'sanity/cli'
-    import { type UserConfig } from "vite";
+    import type { UserConfig } from "vite";
     
-    export default createCliConfig({
-      api: {
-        projectId: 'b5vzhxkv',
-        dataset: 'production',
-      },
-      vite: (config): UserConfig => {
-        return {
-          ...config,
-          build: {
-            ...config.build,
-            // Change minify and target to allow top-level await in sanity.config.ts
-            minify: 'esbuild',
-            target: "esnext"
-          },
-        };
-      },
+    export default createCliConfig({api: {projectId: 'b5vzhxkv',dataset: 'production'},
+    // Change minify and target to allow top-level await in sanity.config.ts
+      vite: (config): UserConfig => ({...config,
+        build: {...config.build,minify: 'esbuild',target: "esnext"},
+      })
     })
     
 `,
@@ -174,7 +166,7 @@ for (const [id] of snippets) {
 }
 
 const ids = snippets.map(([id]) => id)
-const idsType = ids.map((id) => JSON.stringify(id)).join(' | ')
+const idsType = ids.map((id) => JSON5.stringify(id)).join(' | ')
 const getArgs = (argsLength) => {
   const input = args.map((_) => `${_}: string`)
   switch (argsLength) {
@@ -202,7 +194,7 @@ const cases = snippets.map(([id, placeholders, snippet]) => {
   }
   console.group('template')
   const template = `
-  case ${JSON.stringify(id)}:
+  case ${JSON5.stringify(id)}:
     return (${getArgs(placeholders.length)}) => \`${code}\`
   `
   console.log(template)

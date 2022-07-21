@@ -17,6 +17,7 @@ import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
 import { memo, Suspense, useMemo } from 'react'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
+import {snippet} from 'utils/snippets'
 
 // Support for URL Imports in TS isn't quite there yet
 // Setting up a themer.d.ts is a decent workaround for now
@@ -94,7 +95,8 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
               <CopySnippetButton
                 text="Copy JS"
                 toastTitle="Copied JS snippet to the clipboard"
-                code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
+                // code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
+                code={snippet('import-dynamic-js')(JSON.stringify(esmUrl))}
               />
             </Suspense>
             <Suspense fallback={<Skeleton padding={3} animated radius={2} />}>

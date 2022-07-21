@@ -2,9 +2,10 @@ import { InfoOutlineIcon } from '@sanity/icons'
 import { Badge, Box, Dialog, Grid, Inline, Stack, Text } from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
+import { QuizButton, QuizRow } from 'components/ExportTheme.styles'
 import { Button, Label } from 'components/Sidebar.styles'
 import JSON5 from 'json5'
-import { memo, useMemo, useReducer } from 'react'
+import { type Dispatch, memo, useMemo, useReducer } from 'react'
 import styled from 'styled-components'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import { snippet } from 'utils/snippets'
@@ -22,7 +23,9 @@ type QuizAction =
   | { type: 'esm'; payload: QuizEsm }
   | { type: 'typescript'; payload: QuizTypeScript }
 
-interface QuizState {
+export type QuizDispatch = Dispatch<QuizAction>
+
+export interface QuizState {
   build?: QuizBuild
   load?: QuizLoad
   esm?: QuizEsm
@@ -140,61 +143,56 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
         >
           <Box padding={4}>
             <Stack space={4}>
-              <Stack space={2}>
-                <Text muted size={1}>
-                  How do you build your studio?
-                </Text>
-                <Inline space={1}>
-                  <Button
-                    text="sanity build"
-                    mode="bleed"
-                    onClick={() =>
-                      dispatch({ type: 'build', payload: 'sanity build' })
-                    }
-                    selected={state.build === 'sanity build'}
-                  />
-                  <Button
-                    text="next build"
-                    mode="bleed"
-                    onClick={() =>
-                      dispatch({ type: 'build', payload: 'next build' })
-                    }
-                    selected={state.build === 'next build'}
-                  />
-                  <Button
-                    text="Other"
-                    mode="bleed"
-                    onClick={() =>
-                      dispatch({ type: 'build', payload: 'other' })
-                    }
-                    selected={state.build === 'other'}
-                  />
-                </Inline>
-              </Stack>
+              <QuizRow
+                text="How do you build your studio?"
+                options={
+                  <>
+                    <QuizButton
+                      text="sanity build"
+                      onClick={() =>
+                        dispatch({ type: 'build', payload: 'sanity build' })
+                      }
+                      selected={state.build === 'sanity build'}
+                    />
+                    <QuizButton
+                      text="next build"
+                      onClick={() =>
+                        dispatch({ type: 'build', payload: 'next build' })
+                      }
+                      selected={state.build === 'next build'}
+                    />
+                    <QuizButton
+                      text="custom"
+                      onClick={() =>
+                        dispatch({ type: 'build', payload: 'other' })
+                      }
+                      selected={state.build === 'other'}
+                    />
+                  </>
+                }
+              />
               {state.build === 'next build' && (
-                <Stack space={2}>
-                  <Text muted size={1}>
-                    Load the theme at?
-                  </Text>
-                  <Inline space={1}>
-                    <Button
-                      text="Build time"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'load', payload: 'build-time' })
-                      }
-                      selected={state.load === 'build-time'}
-                    />
-                    <Button
-                      text="Runtime"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'load', payload: 'runtime' })
-                      }
-                      selected={state.load === 'runtime'}
-                    />
-                  </Inline>
-                </Stack>
+                <QuizRow
+                  text="Load the theme at?"
+                  options={
+                    <>
+                      <QuizButton
+                        text="Build time"
+                        onClick={() =>
+                          dispatch({ type: 'load', payload: 'build-time' })
+                        }
+                        selected={state.load === 'build-time'}
+                      />
+                      <QuizButton
+                        text="Runtime"
+                        onClick={() =>
+                          dispatch({ type: 'load', payload: 'runtime' })
+                        }
+                        selected={state.load === 'runtime'}
+                      />
+                    </>
+                  }
+                />
               )}
               {state.build === 'other' && (
                 <Stack space={2}>
@@ -245,7 +243,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                       selected={state.typescript === true}
                     />
                     <Button
-                      text="No, but I know I should be"
+                      text="No, but I should be"
                       mode="bleed"
                       onClick={() =>
                         dispatch({ type: 'typescript', payload: false })

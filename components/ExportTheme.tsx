@@ -1,8 +1,12 @@
 import { InfoOutlineIcon } from '@sanity/icons'
-import { Badge, Box, Dialog, Grid, Inline, Stack, Text } from '@sanity/ui'
+import { Badge, Box, Dialog, Grid, Stack, Text } from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
-import { QuizButton, QuizRow } from 'components/ExportTheme.styles'
+import {
+  QuizButton,
+  QuizRow,
+  TransitionMinHeight,
+} from 'components/ExportTheme.styles'
 import { Button, Label } from 'components/Sidebar.styles'
 import JSON5 from 'json5'
 import { type Dispatch, memo, useMemo, useReducer } from 'react'
@@ -69,7 +73,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
       return true
     }
 
-    return false
+    return state.typescript !== null
   }, [state])
 
   const esmUrl = useMemo(() => {
@@ -136,30 +140,30 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
           width={2}
         >
           <Box padding={4}>
-            <Stack space={4}>
-              <QuizRow key="state.build" text="How do you build your studio?">
-                <QuizButton
-                  text="sanity build"
-                  onClick={() =>
-                    dispatch({ type: 'build', payload: 'sanity build' })
-                  }
-                  selected={state.build === 'sanity build'}
-                />
-                <QuizButton
-                  text="next build"
-                  onClick={() =>
-                    dispatch({ type: 'build', payload: 'next build' })
-                  }
-                  selected={state.build === 'next build'}
-                />
-                <QuizButton
-                  text="custom"
-                  onClick={() => dispatch({ type: 'build', payload: 'other' })}
-                  selected={state.build === 'other'}
-                />
-              </QuizRow>
+            <QuizRow key="state.build" text="How do you build your studio?">
+              <QuizButton
+                text="sanity build"
+                onClick={() =>
+                  dispatch({ type: 'build', payload: 'sanity build' })
+                }
+                selected={state.build === 'sanity build'}
+              />
+              <QuizButton
+                text="next build"
+                onClick={() =>
+                  dispatch({ type: 'build', payload: 'next build' })
+                }
+                selected={state.build === 'next build'}
+              />
+              <QuizButton
+                text="custom"
+                onClick={() => dispatch({ type: 'build', payload: 'other' })}
+                selected={state.build === 'other'}
+              />
+            </QuizRow>
+            <TransitionMinHeight key="state.load">
               {state.build === 'next build' && (
-                <QuizRow key="state.load" text="Load the theme at?">
+                <QuizRow text="Load the theme at?">
                   <QuizButton
                     text="Build time"
                     onClick={() =>
@@ -176,11 +180,10 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   />
                 </QuizRow>
               )}
-              {showTS && (
-                <QuizRow
-                  key="state.typescript"
-                  text="Are you using TypeScript?"
-                >
+            </TransitionMinHeight>
+            <TransitionMinHeight key="state.typescript">
+              {state.build && (
+                <QuizRow text="Are you using TypeScript?">
                   <QuizButton
                     text="Yes"
                     mode="bleed"
@@ -199,131 +202,125 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   />
                 </QuizRow>
               )}
-              {showTS && state.typescript !== null && (
-                <>
-                  {state.build === 'sanity build' && (
-                    <>
-                      <Box paddingTop={4}>
-                        <Text size={1}>
-                          To get started you&#39;ll need to modify your{' '}
-                          {state.typescript ? (
-                            <>
-                              <StyledBadge fontSize={0}>
-                                sanity.config.{state.typescript ? 'ts' : 'js'}
-                              </StyledBadge>
-                              ,{' '}
-                              <StyledBadge fontSize={0}>
-                                sanity.config.{state.typescript ? 'ts' : 'js'}
-                              </StyledBadge>{' '}
-                              <StyledBadge fontSize={0}>
-                                tsconfig.json
-                              </StyledBadge>{' '}
-                              and create a{' '}
-                              <StyledBadge fontSize={0}>
-                                themer.d.ts
-                              </StyledBadge>
-                            </>
-                          ) : (
-                            <>
-                              <StyledBadge fontSize={0}>
-                                sanity.config.{state.typescript ? 'ts' : 'js'}
-                              </StyledBadge>{' '}
-                              and{' '}
-                              <StyledBadge fontSize={0}>
-                                sanity.config.{state.typescript ? 'ts' : 'js'}
-                              </StyledBadge>
-                            </>
-                          )}
-                        </Text>
+            </TransitionMinHeight>
+            {showTS && state.typescript !== null && (
+              <>
+                {state.build === 'sanity build' && (
+                  <>
+                    <Box paddingTop={4}>
+                      <Text size={1}>
+                        To get started you&#39;ll need to modify your{' '}
+                        {state.typescript ? (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>
+                            ,{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>{' '}
+                            <StyledBadge fontSize={0}>
+                              tsconfig.json
+                            </StyledBadge>{' '}
+                            and create a{' '}
+                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>
+                          </>
+                        ) : (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>{' '}
+                            and{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>
+                          </>
+                        )}
+                      </Text>
+                    </Box>
+                    <Stack space={2}>
+                      <Box>
+                        <StyledBadge>
+                          sanity.config.{state.typescript ? 'ts' : 'js'}
+                        </StyledBadge>
                       </Box>
-                      <Stack space={2}>
-                        <Box>
-                          <StyledBadge>
-                            sanity.config.{state.typescript ? 'ts' : 'js'}
-                          </StyledBadge>
-                        </Box>
-                        <CodeSnippet>
-                          {snippet('studio-config')(
-                            snippet('import-dynamic-js')(
-                              JSON5.stringify(esmUrl)
-                            )
-                          )}
-                        </CodeSnippet>
-                      </Stack>
-                      <Stack space={2}>
-                        <Box>
-                          <StyledBadge>
-                            sanity.cli.{state.typescript ? 'ts' : 'js'}
-                          </StyledBadge>
-                        </Box>
-                        <CodeSnippet>
-                          {state.typescript
-                            ? snippet('sanity.cli.ts')()
-                            : snippet('sanity.cli.js')()}
-                        </CodeSnippet>
-                      </Stack>
-                      {state.typescript && (
-                        <>
-                          <Stack space={2}>
-                            <Box>
-                              <StyledBadge>themer.d.ts</StyledBadge>
-                            </Box>
-                            <CodeSnippet>
-                              {snippet('themer.d.ts')(
-                                JSON5.stringify(esmUrlDTS)
-                              )}
-                            </CodeSnippet>
-                          </Stack>
-                          <Stack space={2}>
-                            <Box>
-                              <StyledBadge>tsconfig.json</StyledBadge>
-                            </Box>
-                            <CodeSnippet>{snippet('tsconfig')()}</CodeSnippet>
-                          </Stack>
-                        </>
-                      )}
+                      <CodeSnippet>
+                        {snippet('studio-config')(
+                          snippet('import-dynamic-js')(JSON5.stringify(esmUrl))
+                        )}
+                      </CodeSnippet>
+                    </Stack>
+                    <Stack space={2}>
+                      <Box>
+                        <StyledBadge>
+                          sanity.cli.{state.typescript ? 'ts' : 'js'}
+                        </StyledBadge>
+                      </Box>
+                      <CodeSnippet>
+                        {state.typescript
+                          ? snippet('sanity.cli.ts')()
+                          : snippet('sanity.cli.js')()}
+                      </CodeSnippet>
+                    </Stack>
+                    {state.typescript && (
+                      <>
+                        <Stack space={2}>
+                          <Box>
+                            <StyledBadge>themer.d.ts</StyledBadge>
+                          </Box>
+                          <CodeSnippet>
+                            {snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS))}
+                          </CodeSnippet>
+                        </Stack>
+                        <Stack space={2}>
+                          <Box>
+                            <StyledBadge>tsconfig.json</StyledBadge>
+                          </Box>
+                          <CodeSnippet>{snippet('tsconfig')()}</CodeSnippet>
+                        </Stack>
+                      </>
+                    )}
 
-                      <Stack space={2}>
-                        <Text size={1}>
-                          If you&#39;re quickly iterating on your theme in the
-                          comfort of your own Studio it&#39;s annoying to keep
-                          changing the import URL to change your theme. You can
-                          use the createTheme utility instead:
-                        </Text>
-                        <Box>
-                          <StyledBadge>
-                            sanity.config.{state.typescript ? 'ts' : 'js'}
-                          </StyledBadge>
-                        </Box>
-                        <CodeSnippet>
-                          {snippet('studio-config-create-theme')(
-                            snippet('import-create-theme-dynamic')(
-                              JSON5.stringify(esmUrl)
-                            )
-                          )}
-                        </CodeSnippet>
-                      </Stack>
-                      <Stack space={2}>
-                        <Text size={1}>
-                          You can make the studio load faster by adding a
-                          modulepreload tag for the theme.
-                        </Text>
-                        <Box>
-                          <StyledBadge>
-                            _document.{state.typescript ? 'tsx' : 'js'}
-                          </StyledBadge>
-                        </Box>
-                        <CodeSnippet>
-                          {state.typescript
-                            ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
-                            : snippet('_document.js')(JSON5.stringify(esmUrl))}
-                        </CodeSnippet>
-                      </Stack>
-                    </>
-                  )}
-                </>
-              )}
-            </Stack>
+                    <Stack space={2}>
+                      <Text size={1}>
+                        If you&#39;re quickly iterating on your theme in the
+                        comfort of your own Studio it&#39;s annoying to keep
+                        changing the import URL to change your theme. You can
+                        use the createTheme utility instead:
+                      </Text>
+                      <Box>
+                        <StyledBadge>
+                          sanity.config.{state.typescript ? 'ts' : 'js'}
+                        </StyledBadge>
+                      </Box>
+                      <CodeSnippet>
+                        {snippet('studio-config-create-theme')(
+                          snippet('import-create-theme-dynamic')(
+                            JSON5.stringify(esmUrl)
+                          )
+                        )}
+                      </CodeSnippet>
+                    </Stack>
+                    <Stack space={2}>
+                      <Text size={1}>
+                        You can make the studio load faster by adding a
+                        modulepreload tag for the theme.
+                      </Text>
+                      <Box>
+                        <StyledBadge>
+                          _document.{state.typescript ? 'tsx' : 'js'}
+                        </StyledBadge>
+                      </Box>
+                      <CodeSnippet>
+                        {state.typescript
+                          ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
+                          : snippet('_document.js')(JSON5.stringify(esmUrl))}
+                      </CodeSnippet>
+                    </Stack>
+                  </>
+                )}
+              </>
+            )}
           </Box>
         </Dialog>
       )}

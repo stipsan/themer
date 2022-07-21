@@ -15,7 +15,7 @@ import {
 import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
-import { memo, Suspense, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import {snippet} from 'utils/snippets'
 
@@ -91,24 +91,17 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
         <Stack space={2}>
           <Label>Paste this into your sanity.config.ts 🧑‍💻</Label>
           <Grid columns={2} gap={2}>
-            <Suspense fallback={<Skeleton padding={3} animated radius={2} />}>
               <CopySnippetButton
                 text="Copy JS"
                 toastTitle="Copied JS snippet to the clipboard"
                 // code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
                 code={snippet('import-dynamic-js')(JSON.stringify(esmUrl))}
               />
-            </Suspense>
-            <Suspense fallback={<Skeleton padding={3} animated radius={2} />}>
               <CopySnippetButton
                 text="Copy TS"
                 toastTitle="Copied TS snippet to the clipboard"
-                code={`const { theme } = (await import(
-              // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
-              ${JSON.stringify(esmUrl)}
-            )) as { theme: import('sanity').StudioTheme }`}
+                code={snippet('import-dynamic-ts')(JSON.stringify(esmUrl))}
               />
-            </Suspense>
           </Grid>
         </Stack>
       </Stack>
@@ -133,11 +126,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 your workspaces.
               </Text>
               <CodeSnippet>
-                {sanityConfigCode(
-                  `// Add this URL ESM import
-import { theme } from ${JSON.stringify(esmUrl)};`,
-                  'theme, // <-- add the theme here'
-                )}
+                {snippet('studio-config')(snippet('import-static')(JSON.stringify(esmUrl)))}
               </CodeSnippet>
               <Text>
                 If you want to quickly iterate on your theme from the comfort of

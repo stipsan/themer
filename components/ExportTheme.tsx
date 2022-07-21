@@ -15,12 +15,10 @@ import { snippet } from 'utils/snippets'
 // https://github.com/microsoft/TypeScript/issues/35749
 type QuizBuild = 'sanity build' | 'next build' | 'other'
 type QuizLoad = 'build-time' | 'runtime'
-type QuizEsm = 'static' | 'dynamic' | 'help'
 type QuizTypeScript = boolean
 type QuizAction =
   | { type: 'build'; payload: QuizBuild }
   | { type: 'load'; payload: QuizLoad }
-  | { type: 'esm'; payload: QuizEsm }
   | { type: 'typescript'; payload: QuizTypeScript }
 
 export type QuizDispatch = Dispatch<QuizAction>
@@ -28,14 +26,12 @@ export type QuizDispatch = Dispatch<QuizAction>
 export interface QuizState {
   build?: QuizBuild
   load?: QuizLoad
-  esm?: QuizEsm
   typescript?: QuizTypeScript
 }
 
 const initialQuizState: QuizState = {
   build: null,
   load: null,
-  esm: null,
   typescript: null,
 }
 
@@ -45,8 +41,6 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
       return { ...state, build: action.payload }
     case 'load':
       return { ...state, load: action.payload }
-    case 'esm':
-      return { ...state, esm: action.payload }
     case 'typescript':
       return { ...state, typescript: action.payload }
     default:
@@ -62,7 +56,7 @@ interface Props {
 }
 const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
   const [state, dispatch] = useReducer(quizReducer, initialQuizState)
-  const quizzed = useMemo(() => {
+  const showTS = useMemo(() => {
     if (state.build === 'sanity build') {
       return true
     }
@@ -71,7 +65,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
       return true
     }
 
-    if (state.build === 'other' && state.esm !== null && state.esm !== 'help') {
+    if (state.build === 'other') {
       return true
     }
 
@@ -143,117 +137,69 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
         >
           <Box padding={4}>
             <Stack space={4}>
-              <QuizRow
-                text="How do you build your studio?"
-                options={
-                  <>
-                    <QuizButton
-                      text="sanity build"
-                      onClick={() =>
-                        dispatch({ type: 'build', payload: 'sanity build' })
-                      }
-                      selected={state.build === 'sanity build'}
-                    />
-                    <QuizButton
-                      text="next build"
-                      onClick={() =>
-                        dispatch({ type: 'build', payload: 'next build' })
-                      }
-                      selected={state.build === 'next build'}
-                    />
-                    <QuizButton
-                      text="custom"
-                      onClick={() =>
-                        dispatch({ type: 'build', payload: 'other' })
-                      }
-                      selected={state.build === 'other'}
-                    />
-                  </>
-                }
-              />
-              {state.build === 'next build' && (
-                <QuizRow
-                  text="Load the theme at?"
-                  options={
-                    <>
-                      <QuizButton
-                        text="Build time"
-                        onClick={() =>
-                          dispatch({ type: 'load', payload: 'build-time' })
-                        }
-                        selected={state.load === 'build-time'}
-                      />
-                      <QuizButton
-                        text="Runtime"
-                        onClick={() =>
-                          dispatch({ type: 'load', payload: 'runtime' })
-                        }
-                        selected={state.load === 'runtime'}
-                      />
-                    </>
+              <QuizRow key="state.build" text="How do you build your studio?">
+                <QuizButton
+                  text="sanity build"
+                  onClick={() =>
+                    dispatch({ type: 'build', payload: 'sanity build' })
                   }
+                  selected={state.build === 'sanity build'}
                 />
+                <QuizButton
+                  text="next build"
+                  onClick={() =>
+                    dispatch({ type: 'build', payload: 'next build' })
+                  }
+                  selected={state.build === 'next build'}
+                />
+                <QuizButton
+                  text="custom"
+                  onClick={() => dispatch({ type: 'build', payload: 'other' })}
+                  selected={state.build === 'other'}
+                />
+              </QuizRow>
+              {state.build === 'next build' && (
+                <QuizRow key="state.load" text="Load the theme at?">
+                  <QuizButton
+                    text="Build time"
+                    onClick={() =>
+                      dispatch({ type: 'load', payload: 'build-time' })
+                    }
+                    selected={state.load === 'build-time'}
+                  />
+                  <QuizButton
+                    text="Runtime"
+                    onClick={() =>
+                      dispatch({ type: 'load', payload: 'runtime' })
+                    }
+                    selected={state.load === 'runtime'}
+                  />
+                </QuizRow>
               )}
-              {state.build === 'other' && (
-                <Stack space={2}>
-                  <Text muted size={1}>
-                    Can you use dynamic URL ESM imports?
-                  </Text>
-                  <Inline space={1}>
-                    <Button
-                      text="Yes"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'esm', payload: 'dynamic' })
-                      }
-                      selected={state.esm === 'dynamic'}
-                    />
-                    <Button
-                      text="No"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'esm', payload: 'static' })
-                      }
-                      selected={state.esm === 'static'}
-                    />
-                    <Button
-                      text="What?"
-                      mode="bleed"
-                      onClick={() => dispatch({ type: 'esm', payload: 'help' })}
-                      selected={state.esm === 'help'}
-                    />
-                  </Inline>
-                  {state.esm === 'help' && (
-                    <Text size={1}>ESM Help placeholder</Text>
-                  )}
-                </Stack>
+              {showTS && (
+                <QuizRow
+                  key="state.typescript"
+                  text="Are you using TypeScript?"
+                >
+                  <QuizButton
+                    text="Yes"
+                    mode="bleed"
+                    onClick={() =>
+                      dispatch({ type: 'typescript', payload: true })
+                    }
+                    selected={state.typescript === true}
+                  />
+                  <QuizButton
+                    text="No, but I should be"
+                    mode="bleed"
+                    onClick={() =>
+                      dispatch({ type: 'typescript', payload: false })
+                    }
+                    selected={state.typescript === false}
+                  />
+                </QuizRow>
               )}
-              {state.build && (state.esm !== 'help' || quizzed) && (
-                <Stack space={2}>
-                  <Text muted size={1}>
-                    Are you using TypeScript?
-                  </Text>
-                  <Inline space={1}>
-                    <Button
-                      text="Yes"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'typescript', payload: true })
-                      }
-                      selected={state.typescript === true}
-                    />
-                    <Button
-                      text="No, but I should be"
-                      mode="bleed"
-                      onClick={() =>
-                        dispatch({ type: 'typescript', payload: false })
-                      }
-                      selected={state.typescript === false}
-                    />
-                  </Inline>
-                </Stack>
-              )}
-              {quizzed && state.typescript !== null && (
+              {showTS && state.typescript !== null && (
                 <>
                   {state.build === 'sanity build' && (
                     <>

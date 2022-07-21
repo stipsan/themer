@@ -157,7 +157,7 @@ test('tsconfig', () => {
     }"
   `)
 })
-test.skip('_document.tsx', () => {
+test('_document.tsx', () => {
   expect(snippet('_document.tsx')(esmUrl)).toMatchInlineSnapshot(`
     "// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
     // Thus we have to re-implement DefaultDocument to make it happen.

@@ -259,35 +259,39 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 <>
                   {state.build === 'sanity build' && (
                     <>
-                      <Text size={1}>
-                        To get started you&#39;ll need to modify your{' '}
-                        {state.typescript ? (
-                          <>
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>
-                            ,{' '}
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>{' '}
-                            <StyledBadge fontSize={0}>
-                              tsconfig.json
-                            </StyledBadge>{' '}
-                            and create a{' '}
-                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>
-                          </>
-                        ) : (
-                          <>
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>{' '}
-                            and{' '}
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>
-                          </>
-                        )}
-                      </Text>
+                      <Box paddingTop={4}>
+                        <Text size={1}>
+                          To get started you&#39;ll need to modify your{' '}
+                          {state.typescript ? (
+                            <>
+                              <StyledBadge fontSize={0}>
+                                sanity.config.{state.typescript ? 'ts' : 'js'}
+                              </StyledBadge>
+                              ,{' '}
+                              <StyledBadge fontSize={0}>
+                                sanity.config.{state.typescript ? 'ts' : 'js'}
+                              </StyledBadge>{' '}
+                              <StyledBadge fontSize={0}>
+                                tsconfig.json
+                              </StyledBadge>{' '}
+                              and create a{' '}
+                              <StyledBadge fontSize={0}>
+                                themer.d.ts
+                              </StyledBadge>
+                            </>
+                          ) : (
+                            <>
+                              <StyledBadge fontSize={0}>
+                                sanity.config.{state.typescript ? 'ts' : 'js'}
+                              </StyledBadge>{' '}
+                              and{' '}
+                              <StyledBadge fontSize={0}>
+                                sanity.config.{state.typescript ? 'ts' : 'js'}
+                              </StyledBadge>
+                            </>
+                          )}
+                        </Text>
+                      </Box>
                       <Stack space={2}>
                         <Box>
                           <StyledBadge>
@@ -334,13 +338,14 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                           </Stack>
                         </>
                       )}
-                      <Text size={1}>
-                        If you&#39;re quickly iterating on your theme in the
-                        comfort of your own Studio it&#39;s annoying to keep
-                        changing the import URL to change your theme. You can
-                        use the createTheme utility instead:
-                      </Text>
+
                       <Stack space={2}>
+                        <Text size={1}>
+                          If you&#39;re quickly iterating on your theme in the
+                          comfort of your own Studio it&#39;s annoying to keep
+                          changing the import URL to change your theme. You can
+                          use the createTheme utility instead:
+                        </Text>
                         <Box>
                           <StyledBadge>
                             sanity.config.{state.typescript ? 'ts' : 'js'}
@@ -352,6 +357,22 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                               JSON5.stringify(esmUrl)
                             )
                           )}
+                        </CodeSnippet>
+                      </Stack>
+                      <Stack space={2}>
+                        <Text size={1}>
+                          You can make the studio load faster by adding a
+                          modulepreload tag for the theme.
+                        </Text>
+                        <Box>
+                          <StyledBadge>
+                            _document.{state.typescript ? 'tsx' : 'js'}
+                          </StyledBadge>
+                        </Box>
+                        <CodeSnippet>
+                          {state.typescript
+                            ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
+                            : snippet('_document.tsx')(JSON5.stringify(esmUrl))}
                         </CodeSnippet>
                       </Stack>
                     </>

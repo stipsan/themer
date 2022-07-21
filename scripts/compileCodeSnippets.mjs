@@ -9,15 +9,19 @@ import writeFileAtomic from 'write-file-atomic'
 
 const options = {
   arrowParens: 'avoid',
+  bracketSpacing: false,
   parser: 'typescript',
   plugins: [parserTypescript],
+  printWidth: 100,
   semi: false,
   singleQuote: true,
   trailingComma: 'none',
 }
 const jsonOptions = {
+  bracketSpacing: false,
   parser: 'json',
   plugins: [parserBabel],
+  printWidth: 100,
 }
 
 const args = ['first', 'second']
@@ -191,7 +195,6 @@ export default createConfig({
     'json',
   ],
   // @TODO suggest adding children props (for example prehead, posthead, prebody, children, postbody) to stop the need to do a full document override
-  /*
   [
     '_document.tsx',
     ['esmUrl'],
@@ -246,7 +249,7 @@ export default function DefaultDocument(props: DefaultDocumentProps): React.Reac
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="robots" content="noindex" />
         <meta name="referrer" content="same-origin" />
-        { This is the only line of code we're adding that is different from the default implementation of DefaultDocument }
+        {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}
         <link rel="modulepreload" href={${dummies.esmUrl}} />
 
         <Favicons basePath={basePath} />
@@ -270,7 +273,6 @@ export default function DefaultDocument(props: DefaultDocumentProps): React.Reac
 
     `,
   ],
-  // */
 ]
 
 // Sanity check
@@ -310,9 +312,9 @@ const cases = snippets.map(
       const dummy = dummies[key]
       const arg = `\${${args[i]}}`
       code = code
-        //.replaceAll('${', '${"${"}')
-        //.replaceAll('`', '${"`"}')
-        //.replaceAll(String.raw`/\/+$/`, `\${${new RegExp(/\/+$/)}}`)
+        .replaceAll('${', '${"${"}')
+        .replaceAll('`', '${"`"}')
+        .replaceAll(String.raw`/\/+$/`, `\${${new RegExp(/\/+$/)}}`)
         .replaceAll(dummy, arg)
     }
     console.group('template')

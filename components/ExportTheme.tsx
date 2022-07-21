@@ -372,7 +372,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         <CodeSnippet>
                           {state.typescript
                             ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
-                            : snippet('_document.tsx')(JSON5.stringify(esmUrl))}
+                            : snippet('_document.js')(JSON5.stringify(esmUrl))}
                         </CodeSnippet>
                       </Stack>
                     </>

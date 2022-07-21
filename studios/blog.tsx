@@ -1,3 +1,4 @@
+import { BookIcon } from '@sanity/icons'
 import { type WorkspaceOptions, defineType } from 'sanity'
 import { deskTool } from 'sanity/desk'
 import slugify from 'slugify'
@@ -94,6 +95,7 @@ export const config: WorkspaceOptions = {
   name: 'blog',
   title: 'Blog',
   basePath: '/blog',
+  icon: BookIcon,
   projectId,
   dataset,
   plugins: [deskTool()],

@@ -216,15 +216,12 @@ function PresetsMenu({
           id="export-panel"
         >
           <Card marginY={2}>
-            {/* @TODO remove unmounting when prettier is moved to an api endpoint */}
-            {open && open.startsWith('export') && (
-              <ExportTheme
-                searchParams={searchParams}
-                open={open as 'export'}
-                onOpen={() => setOpen('export-dialog')}
-                onClose={() => setOpen('export')}
-              />
-            )}
+            <ExportTheme
+              searchParams={searchParams}
+              open={open as 'export'}
+              onOpen={() => setOpen('export-dialog')}
+              onClose={() => setOpen('export')}
+            />
           </Card>
         </TabPanel>
       </Card>

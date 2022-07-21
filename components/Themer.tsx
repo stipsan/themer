@@ -73,14 +73,13 @@ export default function Themer({
 
   const { createTheme, initialHues } = suspend(async () => {
     const url = new URL(preset.url, location.origin)
-    const [{ createTheme, hues: partialHues }, { applyHues }] =
-      await Promise.all([
-        import(/* webpackIgnore: true */ url.toString()),
-        import('utils/applyHues'),
-      ])
+    const { createTheme, hues } = await import(
+      /* webpackIgnore: true */ url.toString()
+    )
+
     return {
-      createTheme: createTheme as (hues: PartialDeep<Hues>) => StudioTheme,
-      initialHues: applyHues(partialHues),
+      createTheme: createTheme as (hues: Hues) => StudioTheme,
+      initialHues: hues as Hues,
     }
   }, [preset.url])
   // used by useMemoHues, is updated by local state when syncing

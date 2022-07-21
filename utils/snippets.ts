@@ -121,7 +121,7 @@ const { createTheme, hues } = await import(
   }
   const hues: Hues
   type Theme = import("sanity").StudioTheme
-  const createTheme = (hues: Hues) => Theme
+  const createTheme = (hues: Hues): Theme => theme
   const theme: Theme
 
   export { hues, createTheme, theme }

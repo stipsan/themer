@@ -1,13 +1,9 @@
-import { ShareIcon as _ShareIcon } from '@heroicons/react/outline'
 import { DownloadIcon, InfoOutlineIcon } from '@sanity/icons'
 import {
   Box,
   Button as UiButton,
-  Card,
-  Code,
   Dialog,
   Grid,
-  Skeleton,
   Stack,
   Text,
   useToast,
@@ -17,35 +13,11 @@ import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
 import { memo, useMemo } from 'react'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
-import {snippet} from 'utils/snippets'
+import { snippet } from 'utils/snippets'
 
 // Support for URL Imports in TS isn't quite there yet
 // Setting up a themer.d.ts is a decent workaround for now
 // https://github.com/microsoft/TypeScript/issues/35749
-
-const sanityConfigCode = (
-  themeImport: string,
-  themeConfig: string = 'theme,'
-): string => `// sanity.config.ts
-import { createConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
-
-import { schemaTypes } from './schemas'
-
-${themeImport}
-
-export default createConfig({
-  ${themeConfig}
-
-  name: 'default',
-  title: 'My Sanity Project',
-  projectId: 'b5vzhxkv',
-  dataset: 'production',
-  plugins: [deskTool()],
-  schema: { types: schemaTypes,},
-})
-
-`
 
 interface Props {
   searchParams: URLSearchParams
@@ -65,8 +37,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
     if (process.env.NODE_ENV === 'production') {
       params.set('min', '1')
     }
+    const search = decodeURIComponent(params.toString())
     return new URL(
-      `/api/hues?${decodeURIComponent(params.toString())}`,
+      `/api/hues${search ? `?${search}` : ''}`,
       location.origin
     ).toString()
   }, [searchParams])
@@ -91,17 +64,17 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
         <Stack space={2}>
           <Label>Paste this into your sanity.config.ts 🧑‍💻</Label>
           <Grid columns={2} gap={2}>
-              <CopySnippetButton
-                text="Copy JS"
-                toastTitle="Copied JS snippet to the clipboard"
-                // code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
-                code={snippet('import-dynamic-js')(JSON.stringify(esmUrl))}
-              />
-              <CopySnippetButton
-                text="Copy TS"
-                toastTitle="Copied TS snippet to the clipboard"
-                code={snippet('import-dynamic-ts')(JSON.stringify(esmUrl))}
-              />
+            <CopySnippetButton
+              text="Copy JS"
+              toastTitle="Copied JS snippet to the clipboard"
+              // code={`const {theme} = await import(${JSON.stringify(esmUrl)})`}
+              code={snippet('import-dynamic-js')(JSON.stringify(esmUrl))}
+            />
+            <CopySnippetButton
+              text="Copy TS"
+              toastTitle="Copied TS snippet to the clipboard"
+              code={snippet('import-dynamic-ts')(JSON.stringify(esmUrl))}
+            />
           </Grid>
         </Stack>
       </Stack>
@@ -126,7 +99,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 your workspaces.
               </Text>
               <CodeSnippet>
-                {snippet('studio-config')(snippet('import-static')(JSON.stringify(esmUrl)))}
+                {snippet('studio-config')(
+                  snippet('import-static')(JSON.stringify(esmUrl))
+                )}
               </CodeSnippet>
               <Text>
                 If you want to quickly iterate on your theme from the comfort of
@@ -136,38 +111,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
               </Text>
 
               <CodeSnippet>
-                {`// sanity.config.ts
-import { createConfig } from "sanity";
-import { deskTool } from "sanity/desk";
-
-// Add this URL ESM import
-import { createTheme, hues } from ${JSON.stringify(esmUrl)};
-
-export default createConfig({
-  theme: createTheme({
-    // override just the bits you want to iterate on
-    ...hues, primary: { ...hues.primary, mid: '#22fca8' } 
-  }),
-  plugins: [deskTool()],
-  projectId: "b5vzhxkv",
-  dataset: "production",
-  schema: {
-    types: [
-      {
-        type: "document",
-        name: "post",
-        title: "Post",
-        fields: [
-          {
-            type: "string",
-            name: "title",
-            title: "Title",
-          },
-        ],
-      },
-    ],
-  },
-});`}
+                {snippet('studio-config-create-theme')(
+                  snippet('import-create-theme-dynamic')(JSON.stringify(esmUrl))
+                )}
               </CodeSnippet>
               <Text>
                 This also works in a Webpack bundled app, if you add a magic

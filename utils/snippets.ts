@@ -5,24 +5,24 @@ export type SnippetId =
   | 'import-dynamic-ts'
   | 'import-static'
   | 'studio-config'
+  | 'studio-config-create-theme'
+  | 'import-create-theme-static'
+  | 'import-create-theme-dynamic'
 
 export function snippet(id: SnippetId) {
   switch (id) {
     case 'import-dynamic-js':
-      return (first: string) => `const { theme } = await import(${first})
-`
+      return (first: string) => `const { theme } = await import(${first})`
 
     case 'import-dynamic-ts':
       return (first: string) => `const { theme } = (await import(
   // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
   ${first}
-)) as { theme: import("sanity").StudioTheme }
-`
+)) as { theme: import("sanity").StudioTheme }`
 
     case 'import-static':
       return (first: string) => `// Add this URL ESM import
-import { theme } from ${first}
-`
+import { theme } from ${first}`
 
     case 'studio-config':
       return (first: string) => `// sanity.config.ts
@@ -31,7 +31,7 @@ import { deskTool } from "sanity/desk"
 
 import { schemaTypes } from "./schemas"
 
-;(${first})
+${first}
 
 export default createConfig({
   theme, // <-- add the theme here
@@ -42,8 +42,45 @@ export default createConfig({
   dataset: "production",
   plugins: [deskTool()],
   schema: { types: schemaTypes }
-})
-`
+})`
+
+    case 'studio-config-create-theme':
+      return (first: string) => `// sanity.config.ts
+import { createConfig } from "sanity"
+import { deskTool } from "sanity/desk"
+
+import { schemaTypes } from "./schemas"
+
+${first}
+
+export default createConfig({
+  theme: createTheme({
+    // override just the bits you want to iterate on
+    ...hues,
+    primary: { ...hues.primary, mid: "#22fca8" }
+  }),
+
+  name: "default",
+  title: "My Sanity Project",
+  projectId: "b5vzhxkv",
+  dataset: "production",
+  plugins: [deskTool()],
+  schema: { types: schemaTypes }
+})`
+
+    case 'import-create-theme-static':
+      return (
+        first: string
+      ) => `// Use createTheme and hues to iterate locally without needing to mess with URLs
+import { createTheme, hues } from ${first}`
+
+    case 'import-create-theme-dynamic':
+      return (
+        first: string
+      ) => `// Use createTheme and hues to iterate locally without needing to mess with URLs
+const { createTheme, hues } = await import(
+  ${first}
+)`
 
     default:
       throw new TypeError('Unknown snippet id: ' + id)

@@ -5,38 +5,20 @@ import parserTypescript from 'prettier/esm/parser-typescript.mjs'
 import prettier from 'prettier/esm/standalone.mjs'
 import writeFileAtomic from 'write-file-atomic'
 
-const keys = ['__FIRST__', '__SECOND__'].map((_) => JSON.stringify(_))
-const args = ['first', 'second']
-const dummies = {
-  esmUrl: JSON.stringify('https://example.com/api/hues'),
-  themeImport: 'theme',
-  themeConfigProperty: 'theme,',
-  import: "import {studioTheme as theme} from '@sanity/ui'",
+const options = {
+  parser: 'typescript',
+  plugins: [parserTypescript],
+  semi: false,
+  trailingComma: 'none',
 }
 
-const sanityConfigCode = (
-  themeImport,
-  themeConfig = 'theme,'
-) => `// sanity.config.ts
-import { createConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
-
-import { schemaTypes } from './schemas'
-
-${themeImport}
-
-export default createConfig({
-  ${themeConfig}
-
-  name: 'default',
-  title: 'My Sanity Project',
-  projectId: 'b5vzhxkv',
-  dataset: 'production',
-  plugins: [deskTool()],
-  schema: { types: schemaTypes,},
-})
-
-`
+const args = ['first', 'second']
+const dummies = {
+  esmUrl: `/* @dummy */ ${JSON.stringify('https://example.com/api/hues')}`,
+  themeConfigProperty: '/* @dummy */ theme,',
+  import: `/* @dummy */
+import { studioTheme as theme } from "@sanity/ui"`,
+}
 
 const snippets = [
   [
@@ -51,7 +33,7 @@ const {theme} = await import(${dummies.esmUrl})
     ['esmUrl'],
     `
     const { theme } = (await import(
-      // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
+      // @ts-${'expect'}-error -- TODO setup themer.d.ts to get correct typings
       ${dummies.esmUrl}
     )) as { theme: import('sanity').StudioTheme }
 `,
@@ -66,7 +48,7 @@ const {theme} = await import(${dummies.esmUrl})
   ],
   [
     'studio-config',
-    ['import', 'themeConfigProperty'],
+    ['import'],
     `// sanity.config.ts
 import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
@@ -76,8 +58,7 @@ import { schemaTypes } from './schemas'
 ${dummies.import}
 
 export default createConfig({
-  ${dummies.themeConfigProperty}
-
+  theme, // <-- add the theme here
 
   name: 'default',
   title: 'My Sanity Project',
@@ -87,6 +68,47 @@ export default createConfig({
   schema: { types: schemaTypes,},
 })
 
+`,
+  ],
+  [
+    'studio-config-create-theme',
+    ['import'],
+    `// sanity.config.ts
+import { createConfig } from 'sanity'
+import { deskTool } from 'sanity/desk'
+
+import { schemaTypes } from './schemas'
+
+${dummies.import}
+
+export default createConfig({
+  theme: createTheme({
+    // override just the bits you want to iterate on
+    ...hues, primary: { ...hues.primary, mid: '#22fca8' } 
+  }),
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: { types: schemaTypes,},
+})
+
+`,
+  ],
+  [
+    'import-create-theme-static',
+    ['esmUrl'],
+    `// Use createTheme and hues to iterate locally without needing to mess with URLs
+import { createTheme, hues } from ${dummies.esmUrl};
+`,
+  ],
+  [
+    'import-create-theme-dynamic',
+    ['esmUrl'],
+    `// Use createTheme and hues to iterate locally without needing to mess with URLs
+const { createTheme, hues } = await import(${dummies.esmUrl});
 `,
   ],
 ]
@@ -115,25 +137,26 @@ const getArgs = (argsLength) => {
 }
 
 console.group('snippets.map')
-const cases = snippets.map(([id, argsLength, snippet]) => {
+const cases = snippets.map(([id, placeholders, snippet]) => {
   console.group('prettier')
-  let code = prettier.format(snippet, {
-    parser: 'typescript',
-    plugins: [parserTypescript],
-    semi: false,
-    trailingComma: 'none',
-  })
+  let code = prettier.format(snippet, options).trim()
   console.log(code)
   console.groupEnd()
-  for (const i in keys) {
-    const key = keys[i]
+  // @ts-expect-error -- dunno what to do with the typing of placeholders, maybe try the `const snippets = as const` trick?
+  for (const i in placeholders) {
+    const key = placeholders[i]
+    const dummy = dummies[key]
     const arg = `\${${args[i]}}`
-    code = code.replace(key, arg)
+    code = code.replaceAll(dummy, arg)
   }
-  return `
+  console.group('template')
+  const template = `
   case ${JSON.stringify(id)}:
-    return (${getArgs(argsLength)}) => \`${code}\`
+    return (${getArgs(placeholders.length)}) => \`${code}\`
   `
+  console.log(template)
+  console.groupEnd()
+  return template
 })
 console.groupCollapsed()
 

@@ -270,6 +270,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             <StyledBadge fontSize={0}>
                               sanity.config.{state.typescript ? 'ts' : 'js'}
                             </StyledBadge>{' '}
+                            <StyledBadge fontSize={0}>
+                              tsconfig.json
+                            </StyledBadge>{' '}
                             and create a{' '}
                             <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>
                           </>
@@ -305,7 +308,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             sanity.cli.{state.typescript ? 'ts' : 'js'}
                           </StyledBadge>
                         </Box>
-                        <CodeSnippet>{snippet('cli-config')('')}</CodeSnippet>
+                        <CodeSnippet>{snippet('cli-config')()}</CodeSnippet>
                       </Stack>
                       {state.typescript && (
                         <>
@@ -318,6 +321,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                 JSON5.stringify(esmUrlDTS)
                               )}
                             </CodeSnippet>
+                          </Stack>
+                          <Stack space={2}>
+                            <Box>
+                              <StyledBadge>tsconfig.json</StyledBadge>
+                            </Box>
+                            <CodeSnippet>{snippet('tsconfig')()}</CodeSnippet>
                           </Stack>
                         </>
                       )}

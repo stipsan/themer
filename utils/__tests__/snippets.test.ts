@@ -6,30 +6,30 @@ const staticImport = `import { theme } from 'http://localhost/api/hues'`
 
 test('import-dynamic-js', () => {
   expect(snippet('import-dynamic-js')(esmUrl)).toMatchInlineSnapshot(
-    `"const { theme } = await import('http://localhost/api/hues')"`
+    `"const {theme} = await import('http://localhost/api/hues')"`
   )
 })
 test('import-dynamic-ts', () => {
   expect(snippet('import-dynamic-ts')(esmUrl)).toMatchInlineSnapshot(`
-    "const { theme } = (await import(
+    "const {theme} = (await import(
       // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
       'http://localhost/api/hues'
-    )) as { theme: import('sanity').StudioTheme }"
+    )) as {theme: import('sanity').StudioTheme}"
   `)
 })
 test('import-static', () => {
   expect(snippet('import-static')(esmUrl)).toMatchInlineSnapshot(`
     "// Add this URL ESM import
-    import { theme } from 'http://localhost/api/hues'"
+    import {theme} from 'http://localhost/api/hues'"
   `)
 })
 test('studio-config', () => {
   expect(snippet('studio-config')(staticImport)).toMatchInlineSnapshot(`
     "// Add two lines of code to your workspace
-    import { createConfig } from 'sanity'
-    import { deskTool } from 'sanity/desk'
+    import {createConfig} from 'sanity'
+    import {deskTool} from 'sanity/desk'
 
-    import { schemaTypes } from './schemas'
+    import {schemaTypes} from './schemas'
 
     // 1. Add the import
     import { theme } from 'http://localhost/api/hues'
@@ -42,21 +42,21 @@ test('studio-config', () => {
       projectId: 'b5vzhxkv',
       dataset: 'production',
       plugins: [deskTool()],
-      schema: { types: schemaTypes }
+      schema: {types: schemaTypes}
     })"
   `)
 })
 test('sanity.cli.ts', () => {
   expect(snippet('sanity.cli.ts')()).toMatchInlineSnapshot(`
     "// Change target to allow top-level await in sanity.config.ts
-    import { createCliConfig } from 'sanity/cli'
-    import type { UserConfig } from 'vite'
+    import {createCliConfig} from 'sanity/cli'
+    import type {UserConfig} from 'vite'
 
     export default createCliConfig({
-      api: { projectId: 'b5vzhxkv', dataset: 'production' },
+      api: {projectId: 'b5vzhxkv', dataset: 'production'},
       vite: (config: UserConfig): UserConfig => ({
         ...config,
-        build: { ...config.build, target: 'esnext' }
+        build: {...config.build, target: 'esnext'}
       })
     })"
   `)
@@ -64,11 +64,11 @@ test('sanity.cli.ts', () => {
 test('sanity.cli.js', () => {
   expect(snippet('sanity.cli.js')()).toMatchInlineSnapshot(`
     "// Change target to allow top-level await in sanity.config.js
-    import { createCliConfig } from 'sanity/cli'
+    import {createCliConfig} from 'sanity/cli'
 
     export default createCliConfig({
-      api: { projectId: 'b5vzhxkv', dataset: 'production' },
-      vite: config => ({ ...config, build: { ...config.build, target: 'esnext' } })
+      api: {projectId: 'b5vzhxkv', dataset: 'production'},
+      vite: config => ({...config, build: {...config.build, target: 'esnext'}})
     })"
   `)
 })
@@ -76,33 +76,33 @@ test('studio-config-create-theme', () => {
   expect(snippet('studio-config-create-theme')(staticImport))
     .toMatchInlineSnapshot(`
     "// Import createTheme and hues to quickly modify your theme without changing the import URL
-    import { createConfig } from 'sanity'
-    import { deskTool } from 'sanity/desk'
+    import {createConfig} from 'sanity'
+    import {deskTool} from 'sanity/desk'
 
-    import { schemaTypes } from './schemas'
+    import {schemaTypes} from './schemas'
 
     import { theme } from 'http://localhost/api/hues'
 
     export default createConfig({
-      theme: createTheme({ ...hues, primary: { ...hues.primary, mid: '#22fca8' } }),
+      theme: createTheme({...hues, primary: {...hues.primary, mid: '#22fca8'}}),
 
       name: 'default',
       title: 'My Sanity Project',
       projectId: 'b5vzhxkv',
       dataset: 'production',
       plugins: [deskTool()],
-      schema: { types: schemaTypes }
+      schema: {types: schemaTypes}
     })"
   `)
 })
 test('import-create-theme-static', () => {
   expect(snippet('import-create-theme-static')(esmUrl)).toMatchInlineSnapshot(
-    `"import { createTheme, hues } from 'http://localhost/api/hues'"`
+    `"import {createTheme, hues} from 'http://localhost/api/hues'"`
   )
 })
 test('import-create-theme-dynamic', () => {
   expect(snippet('import-create-theme-dynamic')(esmUrl)).toMatchInlineSnapshot(`
-    "const { createTheme, hues } = await import(
+    "const {createTheme, hues} = await import(
       'http://localhost/api/hues'
     )"
   `)
@@ -110,8 +110,7 @@ test('import-create-theme-dynamic', () => {
 test('themer.d.ts', () => {
   expect(snippet('themer.d.ts')(esmUrl)).toMatchInlineSnapshot(`
     "module 'http://localhost/api/hues' {
-      interface Hue
-        extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
+      interface Hue extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
         midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
       }
       interface Hues {
@@ -127,7 +126,7 @@ test('themer.d.ts', () => {
       const createTheme = (hues: Hues): Theme => theme
       const theme: Theme
 
-      export { hues, createTheme, theme }
+      export {hues, createTheme, theme}
     }"
   `)
 })
@@ -164,8 +163,8 @@ test('_document.tsx', () => {
     // Expect this to get much easier before v3 hits stable
 
     import React from 'react'
-    import { type DefaultDocumentProps } from 'sanity'
-    import { GlobalErrorHandler } from 'sanity/_unstable'
+    import {type DefaultDocumentProps} from 'sanity'
+    import {GlobalErrorHandler} from 'sanity/_unstable'
 
     const globalStyles = \`
       html {
@@ -186,7 +185,7 @@ test('_document.tsx', () => {
       basePath: string
     }
 
-    function Favicons({ basePath }: FaviconProps) {
+    function Favicons({basePath}: FaviconProps) {
       const base = \`\${basePath.replace(/\\\\/+$/, '')}/static\`
       return (
         <>
@@ -199,18 +198,13 @@ test('_document.tsx', () => {
     }
 
     const EMPTY_ARRAY: never[] = []
-    export default function DefaultDocument(
-      props: DefaultDocumentProps
-    ): React.ReactElement {
-      const { entryPath, css = EMPTY_ARRAY, basePath = '/' } = props
+    export default function DefaultDocument(props: DefaultDocumentProps): React.ReactElement {
+      const {entryPath, css = EMPTY_ARRAY, basePath = '/'} = props
       return (
         <html lang=\\"en\\">
           <head>
             <meta charSet=\\"utf-8\\" />
-            <meta
-              name=\\"viewport\\"
-              content=\\"width=device-width, initial-scale=1, viewport-fit=cover\\"
-            />
+            <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1, viewport-fit=cover\\" />
             <meta name=\\"robots\\" content=\\"noindex\\" />
             <meta name=\\"referrer\\" content=\\"same-origin\\" />
             {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}

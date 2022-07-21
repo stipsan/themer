@@ -26,10 +26,12 @@ const jsonOptions = {
 
 const args = ['first', 'second']
 const dummies = {
-  esmUrl: `/* @dummy */ ${JSON5.stringify('https://example.com/api/hues')}`,
+  esmUrl: `/* @dummy */ ${JSON5.stringify(
+    'https://example.com/api/hues?preset=verdant&min=1'
+  )}`,
   themeConfigProperty: '/* @dummy */ theme,',
   import: `/* @dummy */
-import { studioTheme as theme } from '@sanity/ui'`,
+import {studioTheme as theme} from '@sanity/ui'`,
 }
 
 const snippets = [

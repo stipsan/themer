@@ -21,24 +21,24 @@ export function snippet(id: '_document.tsx'): (first: string) => string
 export function snippet(id) {
   switch (id) {
     case 'import-dynamic-js':
-      return (first: string) => `const { theme } = await import(${first})`
+      return (first: string) => `const {theme} = await import(${first})`
 
     case 'import-dynamic-ts':
-      return (first: string) => `const { theme } = (await import(
+      return (first: string) => `const {theme} = (await import(
   // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
   ${first}
-)) as { theme: import('sanity').StudioTheme }`
+)) as {theme: import('sanity').StudioTheme}`
 
     case 'import-static':
       return (first: string) => `// Add this URL ESM import
-import { theme } from ${first}`
+import {theme} from ${first}`
 
     case 'studio-config':
       return (first: string) => `// Add two lines of code to your workspace
-import { createConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
 
-import { schemaTypes } from './schemas'
+import {schemaTypes} from './schemas'
 
 // 1. Add the import
 ${first}
@@ -51,65 +51,64 @@ export default createConfig({
   projectId: 'b5vzhxkv',
   dataset: 'production',
   plugins: [deskTool()],
-  schema: { types: schemaTypes }
+  schema: {types: schemaTypes}
 })`
 
     case 'sanity.cli.ts':
       return () => `// Change target to allow top-level await in sanity.config.ts
-import { createCliConfig } from 'sanity/cli'
-import type { UserConfig } from 'vite'
+import {createCliConfig} from 'sanity/cli'
+import type {UserConfig} from 'vite'
 
 export default createCliConfig({
-  api: { projectId: 'b5vzhxkv', dataset: 'production' },
+  api: {projectId: 'b5vzhxkv', dataset: 'production'},
   vite: (config: UserConfig): UserConfig => ({
     ...config,
-    build: { ...config.build, target: 'esnext' }
+    build: {...config.build, target: 'esnext'}
   })
 })`
 
     case 'sanity.cli.js':
       return () => `// Change target to allow top-level await in sanity.config.js
-import { createCliConfig } from 'sanity/cli'
+import {createCliConfig} from 'sanity/cli'
 
 export default createCliConfig({
-  api: { projectId: 'b5vzhxkv', dataset: 'production' },
-  vite: config => ({ ...config, build: { ...config.build, target: 'esnext' } })
+  api: {projectId: 'b5vzhxkv', dataset: 'production'},
+  vite: config => ({...config, build: {...config.build, target: 'esnext'}})
 })`
 
     case 'studio-config-create-theme':
       return (
         first: string
       ) => `// Import createTheme and hues to quickly modify your theme without changing the import URL
-import { createConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
 
-import { schemaTypes } from './schemas'
+import {schemaTypes} from './schemas'
 
 ${first}
 
 export default createConfig({
-  theme: createTheme({ ...hues, primary: { ...hues.primary, mid: '#22fca8' } }),
+  theme: createTheme({...hues, primary: {...hues.primary, mid: '#22fca8'}}),
 
   name: 'default',
   title: 'My Sanity Project',
   projectId: 'b5vzhxkv',
   dataset: 'production',
   plugins: [deskTool()],
-  schema: { types: schemaTypes }
+  schema: {types: schemaTypes}
 })`
 
     case 'import-create-theme-static':
-      return (first: string) => `import { createTheme, hues } from ${first}`
+      return (first: string) => `import {createTheme, hues} from ${first}`
 
     case 'import-create-theme-dynamic':
-      return (first: string) => `const { createTheme, hues } = await import(
+      return (first: string) => `const {createTheme, hues} = await import(
   ${first}
 )`
 
     case 'themer.d.ts':
       return (first: string) => `module ${first} {
-  interface Hue
-    extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
+  interface Hue extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
     midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
   }
   interface Hues {
@@ -125,7 +124,7 @@ export default createConfig({
   const createTheme = (hues: Hues): Theme => theme
   const theme: Theme
 
-  export { hues, createTheme, theme }
+  export {hues, createTheme, theme}
 }`
 
     case 'tsconfig':
@@ -160,8 +159,8 @@ export default createConfig({
 // Expect this to get much easier before v3 hits stable
 
 import React from 'react'
-import { type DefaultDocumentProps } from 'sanity'
-import { GlobalErrorHandler } from 'sanity/_unstable'
+import {type DefaultDocumentProps} from 'sanity'
+import {GlobalErrorHandler} from 'sanity/_unstable'
 
 const globalStyles = ${'`'}
   html {
@@ -182,7 +181,7 @@ interface FaviconProps {
   basePath: string
 }
 
-function Favicons({ basePath }: FaviconProps) {
+function Favicons({basePath}: FaviconProps) {
   const base = ${'`'}${'${'}basePath.replace(${/\/+$/}, '')}/static${'`'}
   return (
     <>
@@ -195,18 +194,13 @@ function Favicons({ basePath }: FaviconProps) {
 }
 
 const EMPTY_ARRAY: never[] = []
-export default function DefaultDocument(
-  props: DefaultDocumentProps
-): React.ReactElement {
-  const { entryPath, css = EMPTY_ARRAY, basePath = '/' } = props
+export default function DefaultDocument(props: DefaultDocumentProps): React.ReactElement {
+  const {entryPath, css = EMPTY_ARRAY, basePath = '/'} = props
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="robots" content="noindex" />
         <meta name="referrer" content="same-origin" />
         {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}

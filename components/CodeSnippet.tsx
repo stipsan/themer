@@ -20,4 +20,4 @@ const CodeSnippetSuspense = (props: Props) => (
   </Suspense>
 )
 
-export default memo(CodeSnippetSuspense)
+export default memo(CodeSnippet)

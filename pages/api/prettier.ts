@@ -1,11 +1,6 @@
+import { format } from 'edge-utils/prettier.mjs'
 import type { NextRequest } from 'next/server'
-import _parserTypescript from 'prettier/esm/parser-typescript.mjs'
-import _prettier from 'prettier/esm/standalone.mjs'
 import { type ServerTimingInstance, ServerTiming } from 'utils/ServerTiming'
-
-const prettier = _prettier as typeof import('prettier')
-const parserTypescript =
-  _parserTypescript as typeof import('prettier/parser-typescript')
 
 export const config = {
   runtime: 'experimental-edge',
@@ -28,6 +23,20 @@ export default async function handler(req: NextRequest) {
   serverTiming.start('prettier')
   const code = decodeURIComponent(searchParams.get('code')) || ''
   try {
+    /*
+    const [{ default: prettier }, { default: parserTypescript }] =
+      await Promise.all([
+        import(
+           '../../node_modules/prettier/esm/standalone.mjs'
+        ) as Promise<{
+          default: typeof import('prettier')
+        }>,
+        import(
+           '../../node_modules/prettier/esm/parser-typescript.mjs'
+        ) as Promise<{
+          default: typeof import('prettier/parser-typescript')
+        }>,
+      ])
     const prettyCode = prettier.format(code, {
       semi: false,
       singleQuote: true,
@@ -35,7 +44,9 @@ export default async function handler(req: NextRequest) {
       parser: 'typescript',
       plugins: [parserTypescript],
     })
-    return new Response(prettyCode, { headers: headers(serverTiming) })
+    // */
+    const prettierCode = format(code)
+    return new Response(prettierCode, { headers: headers(serverTiming) })
   } catch (err) {
     console.error('Failed to prettify code', err, searchParams.get('code'))
     return new Response(`${err}`, { headers: headers(serverTiming) })

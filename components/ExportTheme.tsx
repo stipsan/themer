@@ -3,6 +3,7 @@ import {
   Badge,
   Box,
   Button as UiButton,
+  Card,
   Dialog,
   Grid,
   Inline,
@@ -13,6 +14,7 @@ import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
 import { Button, Label } from 'components/Sidebar.styles'
 import { memo, useMemo, useReducer } from 'react'
+import styled from 'styled-components'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import { snippet } from 'utils/snippets'
 
@@ -66,15 +68,21 @@ interface Props {
 }
 const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
   const [state, dispatch] = useReducer(quizReducer, initialQuizState)
-  const quizzed = useMemo(
-    () =>
-      state.build &&
-      state.load &&
-      state.esm !== null &&
-      state.esm !== 'help' &&
-      state.typescript !== null,
-    [state]
-  )
+  const quizzed = useMemo(() => {
+    if (state.build === 'sanity build') {
+      return true
+    }
+
+    if (state.build === 'next build' && state.load) {
+      return true
+    }
+
+    if (state.build === 'other' && state.esm !== null && state.esm !== 'help') {
+      return true
+    }
+
+    return false
+  }, [state])
 
   const esmUrl = useMemo(() => {
     const params = new URLSearchParams(searchParams)
@@ -91,6 +99,10 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
       location.origin
     ).toString()
   }, [searchParams])
+  const esmUrlDTS = useMemo(() => {
+    const url = new URL(esmUrl)
+    return `${url.origin}${url.pathname}?*`
+  }, [esmUrl])
   const downloadUrl = useMemo(() => {
     const url = new URL(esmUrl)
     url.searchParams.delete('min')
@@ -168,7 +180,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   />
                 </Inline>
               </Stack>
-              {state.build && (
+              {state.build === 'next build' && (
                 <Stack space={2}>
                   <Text muted size={1}>
                     Load the theme at?
@@ -193,7 +205,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   </Inline>
                 </Stack>
               )}
-              {state.load && (
+              {state.build === 'other' && (
                 <Stack space={2}>
                   <Text muted size={1}>
                     Can you use dynamic URL ESM imports?
@@ -227,7 +239,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   )}
                 </Stack>
               )}
-              {state.esm && state.esm !== 'help' && (
+              {state.build && (state.esm !== 'help' || quizzed) && (
                 <Stack space={2}>
                   <Text muted size={1}>
                     Are you using TypeScript?
@@ -252,15 +264,41 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   </Inline>
                 </Stack>
               )}
-              {quizzed && (
+              {quizzed && state.typescript !== null && (
                 <>
-                  {state.build === 'sanity build' && state.typescript && (
+                  {state.build === 'sanity build' && (
                     <>
+                      <Text size={1}>
+                        To get started you&#39;ll need to modify your{' '}
+                        {state.typescript ? (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>
+                            ,{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>{' '}
+                            and create a{' '}
+                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>
+                          </>
+                        ) : (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>{' '}
+                            and{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.config.{state.typescript ? 'ts' : 'js'}
+                            </StyledBadge>
+                          </>
+                        )}
+                      </Text>
                       <Stack space={2}>
                         <Box>
-                          <Badge>
+                          <StyledBadge>
                             sanity.config.{state.typescript ? 'ts' : 'js'}
-                          </Badge>
+                          </StyledBadge>
                         </Box>
                         <CodeSnippet>
                           {snippet('studio-config')(
@@ -268,133 +306,50 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                           )}
                         </CodeSnippet>
                       </Stack>
+                      <Stack space={2}>
+                        <Box>
+                          <StyledBadge>
+                            sanity.cli.{state.typescript ? 'ts' : 'js'}
+                          </StyledBadge>
+                        </Box>
+                        <CodeSnippet>{snippet('cli-config')('')}</CodeSnippet>
+                      </Stack>
+                      {state.typescript && (
+                        <>
+                          <Stack space={2}>
+                            <Box>
+                              <StyledBadge>themer.d.ts</StyledBadge>
+                            </Box>
+                            <CodeSnippet>
+                              {snippet('themer.d.ts')(
+                                JSON.stringify(esmUrlDTS)
+                              )}
+                            </CodeSnippet>
+                          </Stack>
+                        </>
+                      )}
+                      <Text size={1}>
+                        If you&#39;re quickly iterating on your theme in the
+                        comfort of your own Studio it&#39;s annoying to keep
+                        changing the import URL to change your theme. You can
+                        use the createTheme utility instead:
+                      </Text>
+                      <Stack space={2}>
+                        <Box>
+                          <StyledBadge>
+                            sanity.config.{state.typescript ? 'ts' : 'js'}
+                          </StyledBadge>
+                        </Box>
+                        <CodeSnippet>
+                          {snippet('studio-config-create-theme')(
+                            snippet('import-create-theme-dynamic')(
+                              JSON.stringify(esmUrl)
+                            )
+                          )}
+                        </CodeSnippet>
+                      </Stack>
                     </>
                   )}
-
-                  <Text>
-                    The easiest way to add your new Studio Theme to your studios
-                    is by using URL ESM Imports.
-                  </Text>
-                  <Text>
-                    Luckily Sanity v3 uses Vite, thus you can just add this
-                    snippet below, in your sanity.config.ts file, and add
-                    `theme` to one of your workspaces.
-                  </Text>
-                  <CodeSnippet>
-                    {snippet('studio-config')(
-                      snippet('import-static')(JSON.stringify(esmUrl))
-                    )}
-                  </CodeSnippet>
-                  <Text>
-                    If you want to quickly iterate on your theme from the
-                    comfort of your Studio you don&quote;t have to constantly
-                    edit import URLs. You can import `createTheme` and the
-                    `hues` input that were used to create the `theme` export:
-                  </Text>
-
-                  <CodeSnippet>
-                    {snippet('studio-config-create-theme')(
-                      snippet('import-create-theme-dynamic')(
-                        JSON.stringify(esmUrl)
-                      )
-                    )}
-                  </CodeSnippet>
-                  <Text>
-                    This also works in a Webpack bundled app, if you add a magic
-                    comment to the import:
-                  </Text>
-
-                  <CodeSnippet>
-                    {`// In create-react-app or similar
-const {theme} = await import(/* webpackIgnore: true */${JSON.stringify(esmUrl)})
-`}
-                  </CodeSnippet>
-                  <Text>
-                    Please note that this only works if your Webpack application
-                    is outputting ESM code that are loaded using{' '}
-                    {`<script type="module">`} tags as browsers only supports
-                    import() in that mode.
-                  </Text>
-                  <Text>
-                    Lastly, if you are using Next.js you can import these URLs
-                    with the same ease as node_modules by turning URL Imports in
-                    next.config.js:
-                  </Text>
-
-                  <CodeSnippet>
-                    {`// next.config.js
-// @ts-check
-
-/**
- * @type {import('next').NextConfig}
- **/
-const nextConfig = {experimental: {urlImports: ['https://themer.creativecody.dev/'],},}
-
-module.exports = nextConfig
-
-// Anywhere in your next application:
-import {theme} from ${JSON.stringify(esmUrl)}
-// Yay, no need for top-level async await or other complicated things, it's as if you npm-installed it :D
-
-// If you want to do fancy things like running this as native ESM in the browser, at runtime, no prefetching or local caching of the theme, like below:
-const {createTheme, hues} = await import(/* webpackIgnore: true */${JSON.stringify(
-                      esmUrl
-                    )})
-// Then you'll, in addition to that webpackIgnore comment, will need to add these to your next.config
-module.exports = {
-  experimental: {urlImports: ['https://themer.creativecody.dev/'],browsersListForSwc: true,legacyBrowsers: false,},
-}
-// Fun fact, that's how this Next App is loading the theme for the Sanity Studio you're looking at right now while reading this 🤯
-`}
-                  </CodeSnippet>
-                  <Text>
-                    If URL ESM is not a viable option for you, copy paste the
-                    contents of this URL, it is self-contained and you can use
-                    the same imports as previously demonstrated:
-                  </Text>
-                  <UiButton
-                    icon={DownloadIcon}
-                    as="a"
-                    href={downloadUrl}
-                    download="theme.js"
-                    text="Download theme.js"
-                  />
-
-                  <CodeSnippet>
-                    {`// ./theme.js
-// copy-paste of this URL: ${JSON.stringify(esmUrl)}
-
-// sanity.config.ts
-import {theme} from './theme'
-
-// Easy usage as before, and you can still access
-import {hues, createTheme} from './theme'
-// Allowing you to tweak your theme as you wish
-// Without having to run back-and-forth between your studio and this app ;)
-
-export default createConfig({
-  theme,
-  // or
-  theme: createTheme({...hues, ...overrides}),
-  plugins: [deskTool()],
-  projectId: "b5vzhxkv",
-  dataset: "production",
-  schema: {
-    types: [
-      {type: "document", name: "post",title: "Post",
-        fields: [
-          {
-            type: "string",
-            name: "title",
-            title: "Title",
-          },
-        ],
-      },
-    ],
-  },
-})
-`}
-                  </CodeSnippet>
                 </>
               )}
             </Stack>
@@ -406,3 +361,9 @@ export default createConfig({
 }
 
 export default memo(ExportTheme)
+
+const StyledBadge = styled(Badge)`
+  span {
+    text-transform: none;
+  }
+`

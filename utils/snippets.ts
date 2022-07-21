@@ -5,9 +5,11 @@ export type SnippetId =
   | 'import-dynamic-ts'
   | 'import-static'
   | 'studio-config'
+  | 'cli-config'
   | 'studio-config-create-theme'
   | 'import-create-theme-static'
   | 'import-create-theme-dynamic'
+  | 'themer.d.ts'
 
 export function snippet(id: SnippetId) {
   switch (id) {
@@ -25,8 +27,7 @@ export function snippet(id: SnippetId) {
 import { theme } from ${first}`
 
     case 'studio-config':
-      return (first: string) => `// sanity.config.ts
-import { createConfig } from "sanity"
+      return (first: string) => `import { createConfig } from "sanity"
 import { deskTool } from "sanity/desk"
 
 import { schemaTypes } from "./schemas"
@@ -45,9 +46,30 @@ export default createConfig({
   schema: { types: schemaTypes }
 })`
 
+    case 'cli-config':
+      return () => `import { createCliConfig } from "sanity/cli"
+import { type UserConfig } from "vite"
+
+export default createCliConfig({
+  api: {
+    projectId: "b5vzhxkv",
+    dataset: "production"
+  },
+  vite: (config): UserConfig => {
+    return {
+      ...config,
+      build: {
+        ...config.build,
+        // Change minify and target to allow top-level await in sanity.config.ts
+        minify: "esbuild",
+        target: "esnext"
+      }
+    }
+  }
+})`
+
     case 'studio-config-create-theme':
-      return (first: string) => `// sanity.config.ts
-import { createConfig } from "sanity"
+      return (first: string) => `import { createConfig } from "sanity"
 import { deskTool } from "sanity/desk"
 
 import { schemaTypes } from "./schemas"
@@ -82,6 +104,28 @@ import { createTheme, hues } from ${first}`
 const { createTheme, hues } = await import(
   ${first}
 )`
+
+    case 'themer.d.ts':
+      return (first: string) => `module ${first} {
+  interface Hue
+    extends Omit<import("@sanity/color").ColorHueConfig, "title" | "midPoint"> {
+    midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
+  }
+  interface Hues {
+    default: Hue
+    transparent: Hue
+    primary: Hue
+    positive: Hue
+    caution: Hue
+    critical: Hue
+  }
+  const hues: Hues
+  type Theme = import("sanity").StudioTheme
+  const createTheme = (hues: Hues) => Theme
+  const theme: Theme
+
+  export { hues, createTheme, theme }
+}`
 
     default:
       throw new TypeError('Unknown snippet id: ' + id)

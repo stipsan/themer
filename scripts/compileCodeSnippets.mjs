@@ -71,10 +71,35 @@ export default createConfig({
 `,
   ],
   [
+    'cli-config',
+    [],
+    `import { createCliConfig } from 'sanity/cli'
+    import { type UserConfig } from "vite";
+    
+    export default createCliConfig({
+      api: {
+        projectId: 'b5vzhxkv',
+        dataset: 'production',
+      },
+      vite: (config): UserConfig => {
+        return {
+          ...config,
+          build: {
+            ...config.build,
+            // Change minify and target to allow top-level await in sanity.config.ts
+            minify: 'esbuild',
+            target: "esnext"
+          },
+        };
+      },
+    })
+    
+`,
+  ],
+  [
     'studio-config-create-theme',
     ['import'],
-    `// sanity.config.ts
-import { createConfig } from 'sanity'
+    `import { createConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
 
 import { schemaTypes } from './schemas'
@@ -110,6 +135,32 @@ import { createTheme, hues } from ${dummies.esmUrl};
     `// Use createTheme and hues to iterate locally without needing to mess with URLs
 const { createTheme, hues } = await import(${dummies.esmUrl});
 `,
+  ],
+  [
+    'themer.d.ts',
+    ['esmUrl'],
+    `
+    module ${dummies.esmUrl} {
+      interface Hue extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
+        midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
+      }
+      interface Hues {
+        default: Hue
+        transparent: Hue
+        primary: Hue
+        positive: Hue
+        caution: Hue
+        critical: Hue
+      }
+      const hues: Hues
+      type Theme = import('sanity').StudioTheme
+      const createTheme = (hues: Hues) => Theme
+      const theme: Theme
+
+  export { hues, createTheme, theme }
+}
+
+    `,
   ],
 ]
 

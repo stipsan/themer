@@ -109,7 +109,28 @@ export default createConfig({
 `,
   ],
   [
-    'studio-config-next-runtime',
+    'studio-config-next-runtime-1',
+    [],
+    `
+    // There's no theme import in this file since we're handling that in a useEffect in the index page
+import {createConfig} from 'sanity'
+import { deskTool } from 'sanity/desk'
+import { schemaTypes } from './schemas'
+
+
+export default createConfig({
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: { types: schemaTypes,},
+})
+
+`,
+  ],
+  [
+    'studio-config-next-runtime-2',
     [],
     `
     // Allow reading the default theme variables while the custom theme is loading
@@ -505,6 +526,32 @@ export default createConfig({
   schema: { types: schemaTypes,},
 })
 
+`,
+  ],
+  [
+    'pages-index',
+    ['esmUrl'],
+    `import Head from 'next/head'
+    import {useEffect, useState} from 'react'
+    import {Studio} from 'sanity'
+    
+    import _config from '../sanity.config'
+    
+    export default function IndexPage() {
+      const [config, setConfig] = useState(_config)
+    
+      useEffect(
+        () =>
+          void import(
+            /* webpackIgnore: true */ ${dummies.esmUrl}
+          ).then(({theme}) =>
+            setConfig((config) => ({...config, theme}))
+          ),
+        []
+      )
+    
+      return <Studio config={config} />
+    }
 `,
   ],
 ]

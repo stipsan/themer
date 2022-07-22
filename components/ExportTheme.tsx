@@ -232,7 +232,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                           If you&#39;re quickly iterating on your theme in the
                           comfort of your own Studio it&#39;s annoying to keep
                           changing the import URL to change your theme. You can
-                          use the createTheme utility instead:
+                          use the createTheme utility instead.
                         </>
                       }
                       files={[
@@ -254,7 +254,14 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                       lead={
                         <>
                           You can make the studio load faster by adding a
-                          modulepreload tag for the theme.
+                          modulepreload tag for the theme.{' '}
+                          <a
+                            href="https://github.com/stipsan/example-v3-studio/tree/main/more/sanity-build"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Example studio
+                          </a>
                         </>
                       }
                       files={[
@@ -306,11 +313,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   )}
                 {state.build === 'next build' &&
                   state.typescript !== null &&
-                  state.load === 'runtime' && (
-                    <>
-                      
-                    </>
-                  )}
+                  state.load === 'runtime' && <></>}
               </Stack>
             </TransitionMinHeight>
           </Box>

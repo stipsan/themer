@@ -1,8 +1,5 @@
 import type { QuizState } from 'components/ExportTheme'
-import {
-  FilenameBadge,
-  FilesViewer,
-} from 'components/ExportTheme.styles'
+import { FilenameBadge, FilesViewer } from 'components/ExportTheme.styles'
 import JSON5 from 'json5'
 import { memo, useMemo } from 'react'
 import { snippet } from 'utils/snippets'
@@ -37,7 +34,13 @@ const CodeSnippetsSetup = ({
               make a change to <FilenameBadge>sanity.cli.js</FilenameBadge>.
             </>
           )}
-          <a href="https://github.com/stipsan/example-v3-studio" target="_blank" rel="noreferrer">Example repo</a>
+          <a
+            href="https://github.com/stipsan/example-v3-studio"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Example studio
+          </a>
         </>
       )
     }
@@ -54,32 +57,36 @@ const CodeSnippetsSetup = ({
           <FilenameBadge>
             pages/_document.{state.typescript ? 'tsx' : 'js'}
           </FilenameBadge>{' '}
-          .
+          .{' '}
+          <a
+            href="https://github.com/stipsan/example-v3-studio/tree/main/more/next-build-time"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Example studio
+          </a>
         </>
       )
     }
 
-    if (state.build === 'next build' && state.load === 'build-time') {
+    if (state.build === 'next build' && state.load === 'runtime') {
       return (
         <>
-        Before you can add the import snippet to your
-        <FilenameBadge>
-          sanity.config.{state.typescript ? 'ts' : 'js'}
-        </FilenameBadge>
-        you&#39;ll need to make a few changes to{' '}
-        <FilenameBadge>
-          next.config.js
-        </FilenameBadge>{' '}
-        and{' '}
-        <FilenameBadge>
-          pages/_document.{state.typescript ? 'tsx' : 'js'}
-        </FilenameBadge>{' '}
-        .
-      </>
+          The benefit of loading at runtime is you can dynamically choose what
+          theme to load. You got the full SSR capabilities of Next.js at your
+          disposal.{' '}
+          <a
+            href="https://github.com/stipsan/example-v3-studio-next-runtime"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Example studio
+          </a>
+        </>
       )
     }
 
-    if(state.build === 'other') {
+    if (state.build === 'other') {
       return null
     }
   }, [state.build, state.load, state.typescript])
@@ -94,13 +101,12 @@ const CodeSnippetsSetup = ({
     }
 
     if (state.build === 'next build' && state.load === 'runtime') {
-      return undefined
+      return 'pages-index'
     }
 
-    if(state.build === 'other') {
+    if (state.build === 'other') {
       return undefined
     }
-
   }, [state.build, state.load])
 
   const files = useMemo(() => {
@@ -193,48 +199,51 @@ const CodeSnippetsSetup = ({
           ]
     }
 
-    if(state.build === 'next build' && state.load === 'runtime') {
-return state.typescript
-? [
-    {
-      id: 'sanity.config',
-      filename: 'sanity.config.ts',
-      contents: snippet(
-        'studio-config-next-runtime'
-      )(),
-    },
-    {
-      id: 'pages/_document',
-      filename: 'pages/_document.tsx',
-      contents: snippet('pages/_document.tsx')(),
-    },
-    {
-      filename: 'themer.d.ts',
-      contents: snippet('themer.d.ts')(
-        JSON5.stringify(esmUrlDTS)
-      ),
-    },
-  ]
-: [
-    {
-      id: 'sanity.config',
-      filename: 'sanity.config.js',
-      contents: snippet(
-        'studio-config-next-runtime'
-      )(),
-    },
-    {
-      id: 'pages/_document',
-      filename: 'pages/_document.js',
-      contents: snippet('pages/_document.js')(),
-    },
-  ]
+    if (state.build === 'next build' && state.load === 'runtime') {
+      return state.typescript
+        ? [
+            {
+              id: 'pages-index',
+              filename: 'pages/[[...index]].tsx',
+              contents: snippet('pages-index')(JSON5.stringify(esmUrl)),
+            },
+            {
+              id: 'sanity.config',
+              filename: 'sanity.config.ts',
+              contents: snippet('studio-config-next-runtime-1')(),
+            },
+            {
+              id: 'pages/_document',
+              filename: 'pages/_document.tsx',
+              contents: snippet('pages/_document.tsx')(),
+            },
+            {
+              filename: 'themer.d.ts',
+              contents: snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS)),
+            },
+          ]
+        : [
+            {
+              id: 'pages-index',
+              filename: 'pages/[[...index]].js',
+              contents: snippet('pages-index')(JSON5.stringify(esmUrl)),
+            },
+            {
+              id: 'sanity.config',
+              filename: 'sanity.config.js',
+              contents: snippet('studio-config-next-runtime-1')(),
+            },
+            {
+              id: 'pages/_document',
+              filename: 'pages/_document.js',
+              contents: snippet('pages/_document.js')(),
+            },
+          ]
     }
 
-    if(state.build === 'other') {
+    if (state.build === 'other') {
       return []
     }
-
   }, [
     esmUrl,
     esmUrlDTS,
@@ -253,7 +262,7 @@ return state.typescript
       return state.typescript !== null
     }
 
-    if(state.build === 'next build' && state.load === 'runtime') {
+    if (state.build === 'next build' && state.load === 'runtime') {
       return true
     }
 

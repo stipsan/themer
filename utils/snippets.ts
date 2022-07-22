@@ -7,7 +7,8 @@ export function snippet(id: 'studio-config'): (first: string) => string
 export function snippet(
   id: 'studio-config-static-import'
 ): (first: string) => string
-export function snippet(id: 'studio-config-next-runtime'): () => string
+export function snippet(id: 'studio-config-next-runtime-1'): () => string
+export function snippet(id: 'studio-config-next-runtime-2'): () => string
 export function snippet(id: 'sanity.cli.ts'): () => string
 export function snippet(id: 'sanity.cli.js'): () => string
 export function snippet(
@@ -34,6 +35,7 @@ export function snippet(id: 'pages/_document.js'): () => string
 export function snippet(
   id: 'studio-config-create-theme-static-import'
 ): (first: string) => string
+export function snippet(id: 'pages-index'): (first: string) => string
 export function snippet(id) {
   switch (id) {
     case 'import-dynamic-js':
@@ -89,7 +91,22 @@ export default createConfig({
   schema: {types: schemaTypes}
 })`
 
-    case 'studio-config-next-runtime':
+    case 'studio-config-next-runtime-1':
+      return () => `// There's no theme import in this file since we're handling that in a useEffect in the index page
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+import {schemaTypes} from './schemas'
+
+export default createConfig({
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
+
+    case 'studio-config-next-runtime-2':
       return () => `// Allow reading the default theme variables while the custom theme is loading
 import {createConfig, defaultTheme} from 'sanity'
 import {deskTool} from 'sanity/desk'
@@ -458,6 +475,27 @@ export default createConfig({
   schema: {types: schemaTypes}
 })`
 
+    case 'pages-index':
+      return (first: string) => `import Head from 'next/head'
+import {useEffect, useState} from 'react'
+import {Studio} from 'sanity'
+
+import _config from '../sanity.config'
+
+export default function IndexPage() {
+  const [config, setConfig] = useState(_config)
+
+  useEffect(
+    () =>
+      void import(
+        /* webpackIgnore: true */ ${first}
+      ).then(({theme}) => setConfig(config => ({...config, theme}))),
+    []
+  )
+
+  return <Studio config={config} />
+}`
+
     default:
       throw new TypeError('Unknown snippet id: ' + id)
   }
@@ -469,7 +507,8 @@ export const snippets = [
   'import-static',
   'studio-config',
   'studio-config-static-import',
-  'studio-config-next-runtime',
+  'studio-config-next-runtime-1',
+  'studio-config-next-runtime-2',
   'sanity.cli.ts',
   'sanity.cli.js',
   'studio-config-create-theme',
@@ -484,4 +523,5 @@ export const snippets = [
   'pages/_document.tsx',
   'pages/_document.js',
   'studio-config-create-theme-static-import',
+  'pages-index',
 ] as const

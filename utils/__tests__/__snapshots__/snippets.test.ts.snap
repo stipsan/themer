@@ -253,6 +253,28 @@ export default class CustomDocument extends Document {
 }"
 `;
 
+exports[`pages-index 1`] = `
+"import Head from 'next/head'
+import {useEffect, useState} from 'react'
+import {Studio} from 'sanity'
+
+import _config from '../sanity.config'
+
+export default function IndexPage() {
+  const [config, setConfig] = useState(_config)
+
+  useEffect(
+    () =>
+      void import(
+        /* webpackIgnore: true */ '\${first}}'
+      ).then(({theme}) => setConfig(config => ({...config, theme}))),
+    []
+  )
+
+  return <Studio config={config} />
+}"
+`;
+
 exports[`sanity.cli.js 1`] = `
 "// Change target to allow top-level await in sanity.config.js
 import {createCliConfig} from 'sanity/cli'
@@ -341,7 +363,23 @@ export default createConfig({
 })"
 `;
 
-exports[`studio-config-next-runtime 1`] = `
+exports[`studio-config-next-runtime-1 1`] = `
+"// There's no theme import in this file since we're handling that in a useEffect in the index page
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+import {schemaTypes} from './schemas'
+
+export default createConfig({
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})"
+`;
+
+exports[`studio-config-next-runtime-2 1`] = `
 "// Allow reading the default theme variables while the custom theme is loading
 import {createConfig, defaultTheme} from 'sanity'
 import {deskTool} from 'sanity/desk'

@@ -365,7 +365,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         state.typescript
                           ? [
                               {
-                                id: 'sanity-config',
+                                id: 'sanity.config',
                                 filename: 'sanity.config.ts',
                                 contents: snippet(
                                   'studio-config-static-import'

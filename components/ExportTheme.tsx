@@ -225,20 +225,18 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             <StyledBadge fontSize={0}>
                               tsconfig.json
                             </StyledBadge>{' '}
-                            . Checkout{' '}
-                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>{' '}
-                            to get full typings on the URL imports💖
+                            .
                           </>
                         ) : (
                           <>
                             <StyledBadge fontSize={0}>
                               sanity.config.js
                             </StyledBadge>{' '}
-                            you&#39;ll need to make a few changes to your{' '}
+                            you&#39;ll need to make a change to{' '}
                             <StyledBadge fontSize={0}>
                               sanity.cli.js
-                            </StyledBadge>{' '}
-                            config file.
+                            </StyledBadge>
+                            .
                           </>
                         )}
                       </>

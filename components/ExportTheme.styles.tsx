@@ -25,6 +25,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import styled from 'styled-components'
 import { snippet } from 'utils/snippets'
 
@@ -67,12 +68,14 @@ export const TransitionHeight = ({ children }: TransitionHeightProps) => {
   }, [])
 
   useLayoutEffect(() => {
-    const options = {
-      overflow: ['hidden', 'visible'],
-      height: `${height}px`,
-    }
-    animate(animated.current, options, { easing: spring() })
-    console.log('animate', 'instant', animated.current.style.overflow, options)
+    animate(
+      animated.current,
+      {
+        overflow: ['hidden', 'visible'],
+        height: `${height}px`,
+      },
+      { easing: spring() }
+    )
   }, [height])
 
   return (
@@ -98,9 +101,11 @@ export const TransitionMinHeight = ({ children }: TransitionMinHeightProps) => {
   )
   const startAnimation = useIdleCallback(
     useCallback(() => {
-      const options = { minHeight: `${minHeight}px` }
-      animate(animated.current, options, { easing: spring() })
-      console.log('animate', 'delayed', animated.current, options)
+      animate(
+        animated.current,
+        { minHeight: `${minHeight}px` },
+        { easing: spring() }
+      )
     }, [minHeight])
   )
 
@@ -121,7 +126,7 @@ export const TransitionMinHeight = ({ children }: TransitionMinHeightProps) => {
 }
 
 interface FilesViewerProps {
-  files: { filename: string; contents: string }[]
+  files: { filename: string; contents: string; language?: 'json' }[]
   initial: string
   lead: ReactNode
 }
@@ -131,9 +136,20 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
     () => files.find(({ filename }) => filename === open),
     [files, open]
   )
+  const selectedRef = useRef<HTMLButtonElement>(null)
 
   // Allow a viewer to be initially open while toggling typescript on/off
   useLayoutEffect(() => void setOpen(initial), [initial])
+
+  // Scroll the selected button into view
+  useEffect(() => {
+    if (open) {
+      scrollIntoView(selectedRef.current, {
+        behavior: 'smooth',
+        inline: 'center',
+      })
+    }
+  }, [open])
 
   return (
     <TransitionHeight>
@@ -151,12 +167,13 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
             </Flex>
           </Text>
         </TransitionMinHeight>
-        <Card tone="transparent" shadow={1} radius={2}>
-          <Card tone="default" padding={3} radius={2}>
-            <Inline space={1}>
+        <Card tone="transparent" border radius={2}>
+          <Card tone="default" radius={2} overflow="auto" padding={3}>
+            <Flex style={{ width: 'fit-content' }} gap={1}>
               {files.map(({ filename }) => (
                 <Button
                   key={filename}
+                  ref={filename === open ? selectedRef : undefined}
                   mode="bleed"
                   text={filename}
                   selected={filename === open}
@@ -165,9 +182,13 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
                   }
                 />
               ))}
-            </Inline>
+            </Flex>
           </Card>
-          {active && <CodeSnippet>{active.contents}</CodeSnippet>}
+          {active && (
+            <CodeSnippet key={active.filename} language={active.language}>
+              {active.contents}
+            </CodeSnippet>
+          )}
         </Card>
       </Box>
     </TransitionHeight>

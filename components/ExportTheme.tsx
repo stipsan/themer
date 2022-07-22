@@ -255,44 +255,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             contents: snippet('sanity.cli.ts')(),
                           },
                           {
-                            filename: 'sanity.cli.ts2',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.t3s',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts4',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts5',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts6',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts7',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts8',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts9',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts10',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'sanity.cli.ts11',
-                            contents: snippet('sanity.cli.ts')(),
+                            filename: 'tsconfig.json',
+                            contents: snippet('tsconfig')(),
+                            language: 'json',
                           },
                         ]
                       : [
@@ -303,6 +268,10 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                 JSON5.stringify(esmUrl)
                               )
                             ),
+                          },
+                          {
+                            filename: 'sanity.cli.js',
+                            contents: snippet('sanity.cli.js')(),
                           },
                         ]
                   }

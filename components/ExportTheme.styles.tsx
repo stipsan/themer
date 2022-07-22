@@ -57,6 +57,7 @@ export const TransitionHeight = ({ children }: TransitionHeightProps) => {
   const observed = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
+    animated.current.style.overflow = 'hidden'
     animated.current.style.height = '0px'
     const handleResize = (entries: ResizeObserverEntry[]) => {
       setHeight(entries[0].borderBoxSize[0].blockSize)
@@ -68,14 +69,7 @@ export const TransitionHeight = ({ children }: TransitionHeightProps) => {
   }, [])
 
   useLayoutEffect(() => {
-    animate(
-      animated.current,
-      {
-        overflow: ['hidden', 'visible'],
-        height: `${height}px`,
-      },
-      { easing: spring() }
-    )
+    animate(animated.current, { height: `${height}px` }, { easing: spring() })
   }, [height])
 
   return (

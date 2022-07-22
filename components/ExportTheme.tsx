@@ -267,7 +267,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             {
                               filename: 'themer.d.ts',
                               contents: snippet('themer.d.ts')(
-                                JSON5.stringify(esmUrl)
+                                JSON5.stringify(esmUrlDTS)
                               ),
                             },
                           ]

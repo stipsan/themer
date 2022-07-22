@@ -30,6 +30,9 @@ export function snippet(
 ): (first: string) => string
 export function snippet(id: 'pages/_document.tsx'): () => string
 export function snippet(id: 'pages/_document.js'): () => string
+export function snippet(
+  id: 'studio-config-create-theme-static-import'
+): (first: string) => string
 export function snippet(id) {
   switch (id) {
     case 'import-dynamic-js':
@@ -394,7 +397,7 @@ import Document from 'next/document'
 import {ServerStyleSheet} from 'styled-components'
 
 export default class CustomDocument extends Document {
-  static async getInitialProps(ctx: DocumentContext) {
+  static async getInitialProps(ctx) {
     const sheet = new ServerStyleSheet()
     const originalRenderPage = ctx.renderPage
 
@@ -414,6 +417,28 @@ export default class CustomDocument extends Document {
     }
   }
 }`
+
+    case 'studio-config-create-theme-static-import':
+      return (
+        first: string
+      ) => `// Import createTheme and hues to quickly modify your theme without changing the import URL
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+
+${first}
+
+import {schemaTypes} from './schemas'
+
+export default createConfig({
+  theme: createTheme({...hues, primary: {...hues.primary, mid: '#22fca8'}}),
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
 
     default:
       throw new TypeError('Unknown snippet id: ' + id)

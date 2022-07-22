@@ -305,7 +305,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                     }
                     files={[
                       {
-                        id: 'studio-config',
+                        id: 'studio.config',
                         filename: state.typescript
                           ? 'sanity.config.ts'
                           : 'sanity.config.js',
@@ -365,7 +365,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         state.typescript
                           ? [
                               {
-                                id: 'sanity.config',
+                                id: 'sanity-config',
                                 filename: 'sanity.config.ts',
                                 contents: snippet(
                                   'studio-config-static-import'
@@ -419,6 +419,30 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             ]
                       }
                     />
+                    <FilesViewer
+                    key="next build createTheme"
+                    lead={
+                      <>
+                        If you&#39;re quickly iterating on your theme in the
+                        comfort of your own Studio it&#39;s annoying to keep
+                        changing the import URL to change your theme. You can
+                        use the createTheme utility instead:
+                      </>
+                    }
+                    files={[
+                      {
+                        id: 'studio.config',
+                        filename: state.typescript
+                          ? 'sanity.config.ts'
+                          : 'sanity.config.js',
+                        contents: snippet('studio-config-create-theme-static-import')(
+                          snippet('import-create-theme-static')(
+                            JSON5.stringify(esmUrl)
+                          )
+                        ),
+                      },
+                    ]}
+                  />
                   </Stack>
                 )}
             </TransitionMinHeight>

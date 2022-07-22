@@ -405,7 +405,7 @@ test('pages/_document.js', () => {
     import {ServerStyleSheet} from 'styled-components'
 
     export default class CustomDocument extends Document {
-      static async getInitialProps(ctx: DocumentContext) {
+      static async getInitialProps(ctx) {
         const sheet = new ServerStyleSheet()
         const originalRenderPage = ctx.renderPage
 
@@ -425,5 +425,29 @@ test('pages/_document.js', () => {
         }
       }
     }"
+  `)
+})
+
+test('studio-config-create-theme-static-import', () => {
+  expect(snippet('studio-config-create-theme-static-import')(staticImport))
+    .toMatchInlineSnapshot(`
+    "// Import createTheme and hues to quickly modify your theme without changing the import URL
+    import {createConfig} from 'sanity'
+    import {deskTool} from 'sanity/desk'
+
+    import { theme } from 'http://localhost/api/hues'
+
+    import {schemaTypes} from './schemas'
+
+    export default createConfig({
+      theme: createTheme({...hues, primary: {...hues.primary, mid: '#22fca8'}}),
+
+      name: 'default',
+      title: 'My Sanity Project',
+      projectId: 'b5vzhxkv',
+      dataset: 'production',
+      plugins: [deskTool()],
+      schema: {types: schemaTypes}
+    })"
   `)
 })

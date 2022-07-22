@@ -83,6 +83,32 @@ export default createConfig({
 `,
   ],
   [
+    'studio-config-static-import',
+    ['import'],
+    `
+    // Add two lines of code to your workspace
+import { createConfig } from 'sanity'
+import { deskTool } from 'sanity/desk'
+// 1. Add the import
+${dummies.import}
+
+import { schemaTypes } from './schemas'
+
+
+export default createConfig({
+  theme, // <-- 2. add the theme here
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: { types: schemaTypes,},
+})
+
+`,
+  ],
+  [
     'sanity.cli.ts',
     [],
     `// Change target to allow top-level await in sanity.config.ts

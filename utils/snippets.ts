@@ -4,6 +4,9 @@ export function snippet(id: 'import-dynamic-js'): (first: string) => string
 export function snippet(id: 'import-dynamic-ts'): (first: string) => string
 export function snippet(id: 'import-static'): (first: string) => string
 export function snippet(id: 'studio-config'): (first: string) => string
+export function snippet(
+  id: 'studio-config-static-import'
+): (first: string) => string
 export function snippet(id: 'sanity.cli.ts'): () => string
 export function snippet(id: 'sanity.cli.js'): () => string
 export function snippet(
@@ -31,8 +34,7 @@ export function snippet(id) {
 )) as {theme: import('sanity').StudioTheme}`
 
     case 'import-static':
-      return (first: string) => `// Add this URL ESM import
-import {theme} from ${first}`
+      return (first: string) => `import {theme} from ${first}`
 
     case 'studio-config':
       return (first: string) => `// Add two lines of code to your workspace
@@ -43,6 +45,26 @@ import {schemaTypes} from './schemas'
 
 // 1. Add the import
 ${first}
+
+export default createConfig({
+  theme, // <-- 2. add the theme here
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
+
+    case 'studio-config-static-import':
+      return (first: string) => `// Add two lines of code to your workspace
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+// 1. Add the import
+${first}
+
+import {schemaTypes} from './schemas'
 
 export default createConfig({
   theme, // <-- 2. add the theme here

@@ -345,13 +345,13 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         <>
                           Before you can add the import snippet to your
                           <StyledBadge fontSize={0}>
-                            sanity.config.${state.typescript ? 'ts' : 'js'}
+                            sanity.config.{state.typescript ? 'ts' : 'js'}
                           </StyledBadge>
                           you&#39;ll need to make a few changes to{' '}
                           <StyledBadge fontSize={0}>next.config.js</StyledBadge>{' '}
                           and{' '}
                           <StyledBadge fontSize={0}>
-                            pages/_document.${state.typescript ? 'tsx' : 'js'}
+                            pages/_document.{state.typescript ? 'tsx' : 'js'}
                           </StyledBadge>{' '}
                           .
                         </>
@@ -363,10 +363,18 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                               {
                                 id: 'sanity.config',
                                 filename: 'sanity.config.ts',
-                                contents: snippet('studio-config')(
+                                contents: snippet(
+                                  'studio-config-static-import'
+                                )(
                                   snippet('import-static')(
                                     JSON5.stringify(esmUrl)
                                   )
+                                ),
+                              },
+                              {
+                                filename: 'themer.d.ts',
+                                contents: snippet('themer.d.ts')(
+                                  JSON5.stringify(esmUrlDTS)
                                 ),
                               },
                             ]
@@ -374,7 +382,9 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                               {
                                 id: 'sanity.config',
                                 filename: 'sanity.config.js',
-                                contents: snippet('studio-config')(
+                                contents: snippet(
+                                  'studio-config-static-import'
+                                )(
                                   snippet('import-static')(
                                     JSON5.stringify(esmUrl)
                                   )

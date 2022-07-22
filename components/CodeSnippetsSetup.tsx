@@ -1,19 +1,10 @@
-import { InfoOutlineIcon } from '@sanity/icons'
-import { Badge, Box, Dialog, Grid, Stack, Text } from '@sanity/ui'
-import CopySnippetButton from 'components/CopySnippetButton'
-import type { QuizDispatch, QuizState } from 'components/ExportTheme'
+import type { QuizState } from 'components/ExportTheme'
 import {
   FilenameBadge,
   FilesViewer,
-  QuizButton,
-  QuizRow,
-  TransitionMinHeight,
 } from 'components/ExportTheme.styles'
-import { Button, Label } from 'components/Sidebar.styles'
 import JSON5 from 'json5'
-import { type Dispatch, memo, useMemo, useReducer } from 'react'
-import styled from 'styled-components'
-import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
+import { memo, useMemo } from 'react'
 import { snippet } from 'utils/snippets'
 
 interface Props {
@@ -46,6 +37,7 @@ const CodeSnippetsSetup = ({
               make a change to <FilenameBadge>sanity.cli.js</FilenameBadge>.
             </>
           )}
+          <a href="https://github.com/stipsan/example-v3-studio" target="_blank" rel="noreferrer">Example repo</a>
         </>
       )
     }
@@ -67,7 +59,29 @@ const CodeSnippetsSetup = ({
       )
     }
 
-    return null
+    if (state.build === 'next build' && state.load === 'build-time') {
+      return (
+        <>
+        Before you can add the import snippet to your
+        <FilenameBadge>
+          sanity.config.{state.typescript ? 'ts' : 'js'}
+        </FilenameBadge>
+        you&#39;ll need to make a few changes to{' '}
+        <FilenameBadge>
+          next.config.js
+        </FilenameBadge>{' '}
+        and{' '}
+        <FilenameBadge>
+          pages/_document.{state.typescript ? 'tsx' : 'js'}
+        </FilenameBadge>{' '}
+        .
+      </>
+      )
+    }
+
+    if(state.build === 'other') {
+      return null
+    }
   }, [state.build, state.load, state.typescript])
 
   const initial = useMemo(() => {
@@ -79,7 +93,14 @@ const CodeSnippetsSetup = ({
       return 'sanity.config'
     }
 
-    return undefined
+    if (state.build === 'next build' && state.load === 'runtime') {
+      return undefined
+    }
+
+    if(state.build === 'other') {
+      return undefined
+    }
+
   }, [state.build, state.load])
 
   const files = useMemo(() => {
@@ -172,7 +193,48 @@ const CodeSnippetsSetup = ({
           ]
     }
 
-    return []
+    if(state.build === 'next build' && state.load === 'runtime') {
+return state.typescript
+? [
+    {
+      id: 'sanity.config',
+      filename: 'sanity.config.ts',
+      contents: snippet(
+        'studio-config-next-runtime'
+      )(),
+    },
+    {
+      id: 'pages/_document',
+      filename: 'pages/_document.tsx',
+      contents: snippet('pages/_document.tsx')(),
+    },
+    {
+      filename: 'themer.d.ts',
+      contents: snippet('themer.d.ts')(
+        JSON5.stringify(esmUrlDTS)
+      ),
+    },
+  ]
+: [
+    {
+      id: 'sanity.config',
+      filename: 'sanity.config.js',
+      contents: snippet(
+        'studio-config-next-runtime'
+      )(),
+    },
+    {
+      id: 'pages/_document',
+      filename: 'pages/_document.js',
+      contents: snippet('pages/_document.js')(),
+    },
+  ]
+    }
+
+    if(state.build === 'other') {
+      return []
+    }
+
   }, [
     esmUrl,
     esmUrlDTS,
@@ -189,6 +251,10 @@ const CodeSnippetsSetup = ({
 
     if (state.build === 'next build' && state.load === 'build-time') {
       return state.typescript !== null
+    }
+
+    if(state.build === 'next build' && state.load === 'runtime') {
+      return true
     }
 
     return false

@@ -221,6 +221,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   state={state}
                   esmUrl={esmUrl}
                   esmUrlDTS={esmUrlDTS}
+                  esmUrlOrigin={esmUrlOrigin}
                 />
                 {state.build === 'sanity build' && state.typescript !== null && (
                   <>
@@ -307,64 +308,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   state.typescript !== null &&
                   state.load === 'runtime' && (
                     <>
-                      <FilesViewer
-                        key="next runtime"
-                        lead={
-                          <>
-                            Before you can add the import snippet to your
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>
-                            you&#39;ll need to make a few changes to{' '}
-                            <StyledBadge fontSize={0}>
-                              next.config.js
-                            </StyledBadge>{' '}
-                            and{' '}
-                            <StyledBadge fontSize={0}>
-                              pages/_document.{state.typescript ? 'tsx' : 'js'}
-                            </StyledBadge>{' '}
-                            .
-                          </>
-                        }
-                        initial="sanity.config"
-                        files={
-                          state.typescript
-                            ? [
-                                {
-                                  id: 'sanity.config',
-                                  filename: 'sanity.config.ts',
-                                  contents: snippet(
-                                    'studio-config-next-runtime'
-                                  )(),
-                                },
-                                {
-                                  id: 'pages/_document',
-                                  filename: 'pages/_document.tsx',
-                                  contents: snippet('pages/_document.tsx')(),
-                                },
-                                {
-                                  filename: 'themer.d.ts',
-                                  contents: snippet('themer.d.ts')(
-                                    JSON5.stringify(esmUrlDTS)
-                                  ),
-                                },
-                              ]
-                            : [
-                                {
-                                  id: 'sanity.config',
-                                  filename: 'sanity.config.js',
-                                  contents: snippet(
-                                    'studio-config-next-runtime'
-                                  )(),
-                                },
-                                {
-                                  id: 'pages/_document',
-                                  filename: 'pages/_document.js',
-                                  contents: snippet('pages/_document.js')(),
-                                },
-                              ]
-                        }
-                      />
+                      
                     </>
                   )}
               </Stack>

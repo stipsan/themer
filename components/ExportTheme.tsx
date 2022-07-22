@@ -96,6 +96,10 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
     const url = new URL(esmUrl)
     return `${url.origin}${url.pathname}?*`
   }, [esmUrl])
+  const esmUrlOrigin = useMemo(() => {
+    const url = new URL(esmUrl)
+    return `${url.origin}/`
+  }, [esmUrl])
   const downloadUrl = useMemo(() => {
     const url = new URL(esmUrl)
     url.searchParams.delete('min')
@@ -372,6 +376,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                 ),
                               },
                               {
+                                filename: 'next.config.js',
+                                contents: snippet('next-config-build-time-ts')(
+                                  JSON5.stringify(esmUrlOrigin)
+                                ),
+                              },
+                              {
                                 filename: 'themer.d.ts',
                                 contents: snippet('themer.d.ts')(
                                   JSON5.stringify(esmUrlDTS)
@@ -388,6 +398,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                   snippet('import-static')(
                                     JSON5.stringify(esmUrl)
                                   )
+                                ),
+                              },
+                              {
+                                filename: 'next.config.js',
+                                contents: snippet('next-config-build-time-js')(
+                                  JSON5.stringify(esmUrlOrigin)
                                 ),
                               },
                             ]

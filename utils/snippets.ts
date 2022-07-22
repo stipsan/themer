@@ -22,6 +22,12 @@ export function snippet(id: 'themer.d.ts'): (first: string) => string
 export function snippet(id: 'tsconfig'): () => string
 export function snippet(id: '_document.tsx'): (first: string) => string
 export function snippet(id: '_document.js'): (first: string) => string
+export function snippet(
+  id: 'next-config-build-time-js'
+): (first: string) => string
+export function snippet(
+  id: 'next-config-build-time-ts'
+): (first: string) => string
 export function snippet(id) {
   switch (id) {
     case 'import-dynamic-js':
@@ -333,6 +339,23 @@ export default function DefaultDocument(props) {
     </html>
   )
 }`
+
+    case 'next-config-build-time-js':
+      return (first: string) => `module.exports = {
+  experimental: {urlImports: [${first}]}
+}`
+
+    case 'next-config-build-time-ts':
+      return (first: string) => `// @ts-check
+
+/**
+ * @type {import('next').NextConfig}
+ **/
+const nextConfig = {
+  experimental: {urlImports: [${first}]}
+}
+
+module.exports = nextConfig`
 
     default:
       throw new TypeError('Unknown snippet id: ' + id)

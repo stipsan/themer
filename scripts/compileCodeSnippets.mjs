@@ -371,6 +371,26 @@ export default function DefaultDocument(props) {
 
     `,
   ],
+  [
+    'next-config-build-time-js',
+    ['esmUrl'],
+    `
+module.exports = {experimental: {urlImports: [${dummies.esmUrl}],},}
+    `,
+  ],
+  [
+    'next-config-build-time-ts',
+    ['esmUrl'],
+    `// @ts-check
+
+/**
+ * @type {import('next').NextConfig}
+ **/
+const nextConfig = {experimental: {urlImports: [${dummies.esmUrl}],},}
+
+module.exports = nextConfig
+    `,
+  ],
 ]
 
 // Sanity check

@@ -18,10 +18,9 @@ test('import-dynamic-ts', () => {
   `)
 })
 test('import-static', () => {
-  expect(snippet('import-static')(esmUrl)).toMatchInlineSnapshot(`
-    "// Add this URL ESM import
-    import {theme} from 'http://localhost/api/hues'"
-  `)
+  expect(snippet('import-static')(esmUrl)).toMatchInlineSnapshot(
+    `"import {theme} from 'http://localhost/api/hues'"`
+  )
 })
 test('studio-config', () => {
   expect(snippet('studio-config')(staticImport)).toMatchInlineSnapshot(`

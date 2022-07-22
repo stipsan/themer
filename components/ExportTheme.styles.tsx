@@ -53,11 +53,17 @@ type TransitionHeightProps = {
 }
 export const TransitionHeight = ({ children }: TransitionHeightProps) => {
   const [height, setHeight] = useState(0)
+  const canOverflowClip = useRef(true)
   const animated = useRef<HTMLDivElement>(null)
   const observed = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
-    animated.current.style.overflow = 'hidden'
+    animated.current.style.opacity = '0'
+    animated.current.style.overflow = 'clips'
+    if (animated.current.style.overflow !== 'clip') {
+      animated.current.style.overflow = 'hidden'
+      canOverflowClip.current = false
+    }
     animated.current.style.height = '0px'
     const handleResize = (entries: ResizeObserverEntry[]) => {
       setHeight(entries[0].borderBoxSize[0].blockSize)
@@ -69,7 +75,14 @@ export const TransitionHeight = ({ children }: TransitionHeightProps) => {
   }, [])
 
   useLayoutEffect(() => {
-    animate(animated.current, { height: `${height}px` }, { easing: spring() })
+    if (!canOverflowClip.current) {
+      animated.current.scrollTop = 0
+    }
+    animate(
+      animated.current,
+      { height: `${height}px`, opacity: 1 },
+      { easing: spring() }
+    )
   }, [height])
 
   return (
@@ -195,3 +208,9 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
     </TransitionHeight>
   )
 }
+
+export const FilenameBadge = styled(Badge).attrs({ fontSize: 0 })`
+  span {
+    text-transform: none;
+  }
+`

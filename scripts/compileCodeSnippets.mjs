@@ -109,6 +109,29 @@ export default createConfig({
 `,
   ],
   [
+    'studio-config-next-runtime',
+    [],
+    `
+    // Allow reading the default theme variables while the custom theme is loading
+import {createConfig, defaultTheme} from 'sanity'
+import { deskTool } from 'sanity/desk'
+import { schemaTypes } from './schemas'
+
+
+export default createConfig({
+  theme: defaultTheme,
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: { types: schemaTypes,},
+})
+
+`,
+  ],
+  [
     'sanity.cli.ts',
     [],
     `// Change target to allow top-level await in sanity.config.ts

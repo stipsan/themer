@@ -7,6 +7,7 @@ export function snippet(id: 'studio-config'): (first: string) => string
 export function snippet(
   id: 'studio-config-static-import'
 ): (first: string) => string
+export function snippet(id: 'studio-config-next-runtime'): () => string
 export function snippet(id: 'sanity.cli.ts'): () => string
 export function snippet(id: 'sanity.cli.js'): () => string
 export function snippet(
@@ -79,6 +80,23 @@ import {schemaTypes} from './schemas'
 
 export default createConfig({
   theme, // <-- 2. add the theme here
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
+
+    case 'studio-config-next-runtime':
+      return () => `// Allow reading the default theme variables while the custom theme is loading
+import {createConfig, defaultTheme} from 'sanity'
+import {deskTool} from 'sanity/desk'
+import {schemaTypes} from './schemas'
+
+export default createConfig({
+  theme: defaultTheme,
 
   name: 'default',
   title: 'My Sanity Project',
@@ -451,6 +469,7 @@ export const snippets = [
   'import-static',
   'studio-config',
   'studio-config-static-import',
+  'studio-config-next-runtime',
   'sanity.cli.ts',
   'sanity.cli.js',
   'studio-config-create-theme',

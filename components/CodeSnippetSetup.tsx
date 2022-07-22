@@ -1,3 +1,5 @@
+import { DownloadIcon } from '@sanity/icons'
+import { Button, Card } from '@sanity/ui'
 import type { QuizState } from 'components/ExportTheme'
 import { FilenameBadge, FilesViewer } from 'components/ExportTheme.styles'
 import JSON5 from 'json5'
@@ -9,12 +11,14 @@ interface Props {
   esmUrl: string
   esmUrlDTS: string
   esmUrlOrigin: string
+  downloadUrl: string
 }
-const CodeSnippetsSetup = ({
+const CodeSnippetSetup = ({
   state,
   esmUrl,
   esmUrlDTS,
   esmUrlOrigin,
+  downloadUrl,
 }: Props) => {
   const lead = useMemo(() => {
     if (state.build === 'sanity build') {
@@ -87,7 +91,12 @@ const CodeSnippetsSetup = ({
     }
 
     if (state.build === 'other') {
-      return null
+      return (
+        <>
+          If the other method&#39;s don&#39;t work, or you run a custom setup,
+          you can download the theme manually.
+        </>
+      )
     }
   }, [state.build, state.load, state.typescript])
 
@@ -105,11 +114,21 @@ const CodeSnippetsSetup = ({
     }
 
     if (state.build === 'other') {
-      return undefined
+      return 'theme.js'
     }
   }, [state.build, state.load])
 
   const files = useMemo(() => {
+    const themerDts = {
+      filename: 'themer.d.ts',
+      contents: snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS)),
+    }
+    const pageDocumentJs = {
+      id: 'pages/_document',
+      filename: 'pages/_document.js',
+      contents: snippet('pages/_document.js')(),
+    }
+
     if (state.build === 'sanity build') {
       return state.typescript
         ? [
@@ -130,10 +149,7 @@ const CodeSnippetsSetup = ({
               contents: snippet('tsconfig')(),
               language: 'json' as const,
             },
-            {
-              filename: 'themer.d.ts',
-              contents: snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS)),
-            },
+            themerDts,
           ]
         : [
             {
@@ -172,10 +188,7 @@ const CodeSnippetsSetup = ({
               filename: 'pages/_document.tsx',
               contents: snippet('pages/_document.tsx')(),
             },
-            {
-              filename: 'themer.d.ts',
-              contents: snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS)),
-            },
+            themerDts,
           ]
         : [
             {
@@ -191,11 +204,7 @@ const CodeSnippetsSetup = ({
                 JSON5.stringify(esmUrlOrigin)
               ),
             },
-            {
-              id: 'pages/_document',
-              filename: 'pages/_document.js',
-              contents: snippet('pages/_document.js')(),
-            },
+            pageDocumentJs,
           ]
     }
 
@@ -217,10 +226,7 @@ const CodeSnippetsSetup = ({
               filename: 'pages/_document.tsx',
               contents: snippet('pages/_document.tsx')(),
             },
-            {
-              filename: 'themer.d.ts',
-              contents: snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS)),
-            },
+            themerDts,
           ]
         : [
             {
@@ -233,18 +239,52 @@ const CodeSnippetsSetup = ({
               filename: 'sanity.config.js',
               contents: snippet('studio-config-next-runtime-1')(),
             },
-            {
-              id: 'pages/_document',
-              filename: 'pages/_document.js',
-              contents: snippet('pages/_document.js')(),
-            },
+            pageDocumentJs,
           ]
     }
 
     if (state.build === 'other') {
-      return []
+      const themeJs = {
+        filename: 'theme.js',
+        component: (
+          <Card
+            style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+            tone="transparent"
+            padding={4}
+            radius={2}
+            shadow={1}
+          >
+            <Button
+              style={{ width: '100%' }}
+              text="Download"
+              icon={DownloadIcon}
+              as="a"
+              href={downloadUrl}
+              download="theme.js"
+            />
+          </Card>
+        ),
+      }
+      return state.typescript
+        ? [
+            themeJs,
+            {
+              id: 'sanity.config',
+              filename: 'sanity.config.ts',
+              contents: snippet('studio-config-local-import-ts')(),
+            },
+          ]
+        : [
+            themeJs,
+            {
+              id: 'sanity.config',
+              filename: 'sanity.config.js',
+              contents: snippet('studio-config-local-import')(),
+            },
+          ]
     }
   }, [
+    downloadUrl,
     esmUrl,
     esmUrlDTS,
     esmUrlOrigin,
@@ -259,11 +299,15 @@ const CodeSnippetsSetup = ({
     }
 
     if (state.build === 'next build' && state.load === 'build-time') {
-      return state.typescript !== null
+      return true
     }
 
     if (state.build === 'next build' && state.load === 'runtime') {
       return true
+    }
+
+    if (state.build === 'other') {
+      return state.typescript !== null
     }
 
     return false
@@ -280,4 +324,4 @@ const CodeSnippetsSetup = ({
   )
 }
 
-export default memo(CodeSnippetsSetup)
+export default memo(CodeSnippetSetup)

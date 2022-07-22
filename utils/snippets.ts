@@ -7,6 +7,8 @@ export function snippet(id: 'studio-config'): (first: string) => string
 export function snippet(
   id: 'studio-config-static-import'
 ): (first: string) => string
+export function snippet(id: 'studio-config-local-import'): () => string
+export function snippet(id: 'studio-config-local-import-ts'): () => string
 export function snippet(id: 'studio-config-next-runtime-1'): () => string
 export function snippet(id: 'studio-config-next-runtime-2'): () => string
 export function snippet(id: 'sanity.cli.ts'): () => string
@@ -52,6 +54,7 @@ export function snippet(id) {
 
     case 'studio-config':
       return (first: string) => `// Add two lines of code to your workspace
+
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 
@@ -73,6 +76,7 @@ export default createConfig({
 
     case 'studio-config-static-import':
       return (first: string) => `// Add two lines of code to your workspace
+
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 // 1. Add the import
@@ -91,8 +95,55 @@ export default createConfig({
   schema: {types: schemaTypes}
 })`
 
+    case 'studio-config-local-import':
+      return () => `// Add two lines of code to your workspace
+
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+// 1. Add the impoort to the theme.js you downloaded
+import {theme} from './theme'
+
+import {schemaTypes} from './schemas'
+
+export default createConfig({
+  theme, // <-- 2. add the theme here
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
+
+    case 'studio-config-local-import-ts':
+      return () => `// Add the theme import and its typings to your workspace
+
+import {createConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+
+import {schemaTypes} from './schemas'
+
+// 1. Add the impoort to the theme.js you downloaded
+import {theme as _theme} from './theme'
+
+// 2. Assign typings to the theme
+const theme = _theme as import('sanity').StudioTheme
+
+export default createConfig({
+  theme, // <-- 3. add the theme here
+
+  name: 'default',
+  title: 'My Sanity Project',
+  projectId: 'b5vzhxkv',
+  dataset: 'production',
+  plugins: [deskTool()],
+  schema: {types: schemaTypes}
+})`
+
     case 'studio-config-next-runtime-1':
       return () => `// There's no theme import in this file since we're handling that in a useEffect in the index page
+
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 import {schemaTypes} from './schemas'
@@ -108,6 +159,7 @@ export default createConfig({
 
     case 'studio-config-next-runtime-2':
       return () => `// Allow reading the default theme variables while the custom theme is loading
+
 import {createConfig, defaultTheme} from 'sanity'
 import {deskTool} from 'sanity/desk'
 import {schemaTypes} from './schemas'
@@ -125,6 +177,7 @@ export default createConfig({
 
     case 'sanity.cli.ts':
       return () => `// Change target to allow top-level await in sanity.config.ts
+
 import {createCliConfig} from 'sanity/cli'
 import type {UserConfig} from 'vite'
 
@@ -138,6 +191,7 @@ export default createCliConfig({
 
     case 'sanity.cli.js':
       return () => `// Change target to allow top-level await in sanity.config.js
+
 import {createCliConfig} from 'sanity/cli'
 
 export default createCliConfig({
@@ -149,6 +203,7 @@ export default createCliConfig({
       return (
         first: string
       ) => `// Import createTheme and hues to quickly modify your theme without changing the import URL
+
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 
@@ -457,6 +512,7 @@ export default class CustomDocument extends Document {
       return (
         first: string
       ) => `// Import createTheme and hues to quickly modify your theme without changing the import URL
+
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 
@@ -476,7 +532,11 @@ export default createConfig({
 })`
 
     case 'pages-index':
-      return (first: string) => `import Head from 'next/head'
+      return (
+        first: string
+      ) => `// Loading the custom theme on the page level instead of in sanity.config
+
+import Head from 'next/head'
 import {useEffect, useState} from 'react'
 import {Studio} from 'sanity'
 
@@ -486,7 +546,10 @@ export default function IndexPage() {
   const [config, setConfig] = useState(_config)
 
   useEffect(
+    // Start fetching the theme in parallel with the Studio auth loading
     () =>
+      // The webpackIgnore tells webpack to not attempt bundling this dynamic import,
+      // and instead let it run natively in the browser at runtime
       void import(
         /* webpackIgnore: true */ ${first}
       ).then(({theme}) => setConfig(config => ({...config, theme}))),
@@ -507,6 +570,8 @@ export const snippets = [
   'import-static',
   'studio-config',
   'studio-config-static-import',
+  'studio-config-local-import',
+  'studio-config-local-import-ts',
   'studio-config-next-runtime-1',
   'studio-config-next-runtime-2',
   'sanity.cli.ts',

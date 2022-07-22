@@ -136,7 +136,8 @@ interface FilesViewerProps {
   files: {
     id?: string
     filename: string
-    contents: string
+    contents?: string
+    component?: ReactNode
     language?: 'json'
   }[]
   initial?: string
@@ -198,11 +199,14 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
               ))}
             </Flex>
           </Card>
-          {active && (
-            <CodeSnippet key={active.filename} language={active.language}>
-              {active.contents}
-            </CodeSnippet>
-          )}
+          {active &&
+            (active.component ? (
+              active.component
+            ) : (
+              <CodeSnippet key={active.filename} language={active.language}>
+                {active.contents}
+              </CodeSnippet>
+            ))}
         </Card>
       </Box>
     </TransitionHeight>

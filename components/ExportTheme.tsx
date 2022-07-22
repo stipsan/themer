@@ -1,6 +1,6 @@
 import { InfoOutlineIcon } from '@sanity/icons'
-import { Badge, Box, Dialog, Grid, Stack, Text } from '@sanity/ui'
-import CodeSnippetsSetup from 'components/CodeSnippetsSetup'
+import { Box, Dialog, Grid, Stack } from '@sanity/ui'
+import CodeSnippetSetup from 'components/CodeSnippetSetup'
 import CopySnippetButton from 'components/CopySnippetButton'
 import {
   FilesViewer,
@@ -11,7 +11,6 @@ import {
 import { Button, Label } from 'components/Sidebar.styles'
 import JSON5 from 'json5'
 import { type Dispatch, memo, useMemo, useReducer } from 'react'
-import styled from 'styled-components'
 import { shortenPresetSearchParams } from 'utils/shortenPresetSearchParams'
 import { snippet } from 'utils/snippets'
 
@@ -33,12 +32,6 @@ export interface QuizState {
   load?: QuizLoad
   typescript?: QuizTypeScript
 }
-
-const StyledBadge = styled(Badge)`
-  span {
-    text-transform: none;
-  }
-`
 
 const initialQuizState: QuizState = {
   build: null,
@@ -67,21 +60,6 @@ interface Props {
 }
 const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
   const [state, dispatch] = useReducer(quizReducer, initialQuizState)
-  const showTS = useMemo(() => {
-    if (state.build === 'sanity build') {
-      return true
-    }
-
-    if (state.build === 'next build' && state.load) {
-      return true
-    }
-
-    if (state.build === 'other') {
-      return true
-    }
-
-    return state.typescript !== null
-  }, [state])
 
   const esmUrl = useMemo(() => {
     const params = new URLSearchParams(searchParams)
@@ -216,12 +194,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
             </TransitionMinHeight>
             <TransitionMinHeight key="snippets">
               <Stack space={4}>
-                <CodeSnippetsSetup
-                  key="setup"
+                <CodeSnippetSetup
                   state={state}
                   esmUrl={esmUrl}
                   esmUrlDTS={esmUrlDTS}
                   esmUrlOrigin={esmUrlOrigin}
+                  downloadUrl={downloadUrl}
                 />
                 {state.build === 'sanity build' && state.typescript !== null && (
                   <>
@@ -278,7 +256,6 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                     />
                   </>
                 )}
-
                 {state.build === 'next build' &&
                   state.typescript !== null &&
                   state.load === 'build-time' && (
@@ -311,6 +288,36 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                       />
                     </>
                   )}
+                {state.build === 'other' && state.typescript !== null && (
+                  <>
+                    <FilesViewer
+                      key="next build createTheme"
+                      lead={
+                        <>
+                          If you&#39;re quickly iterating on your theme in the
+                          comfort of your own Studio it&#39;s annoying to keep
+                          changing the import URL to change your theme. You can
+                          use the createTheme utility instead:
+                        </>
+                      }
+                      files={[
+                        {
+                          id: 'studio.config',
+                          filename: state.typescript
+                            ? 'sanity.config.ts'
+                            : 'sanity.config.js',
+                          contents: snippet(
+                            'studio-config-create-theme-static-import'
+                          )(
+                            snippet('import-create-theme-static')(
+                              JSON5.stringify(esmUrl)
+                            )
+                          ),
+                        },
+                      ]}
+                    />
+                  </>
+                )}
                 {state.build === 'next build' &&
                   state.typescript !== null &&
                   state.load === 'runtime' && <></>}

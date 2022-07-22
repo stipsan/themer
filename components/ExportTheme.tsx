@@ -201,10 +201,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   esmUrlOrigin={esmUrlOrigin}
                   downloadUrl={downloadUrl}
                 />
-                {state.build === 'sanity build' && state.typescript !== null && (
-                  <>
+                {(state.build === 'sanity build' ||
+                  (state.build === 'next build' &&
+                    state.load === 'build-time')) &&
+                  state.typescript !== null && (
                     <FilesViewer
-                      key="sanity build createTheme"
+                      key="createTheme"
                       lead={
                         <>
                           If you&#39;re quickly iterating on your theme in the
@@ -227,67 +229,36 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                         },
                       ]}
                     />
-                    <FilesViewer
-                      key="sanity build _document"
-                      lead={
-                        <>
-                          You can make the studio load faster by adding a
-                          modulepreload tag for the theme.{' '}
-                          <a
-                            href="https://github.com/stipsan/example-v3-studio/tree/main/more/sanity-build"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Example studio
-                          </a>
-                        </>
-                      }
-                      files={[
-                        {
-                          id: '_document',
-                          filename: state.typescript
-                            ? '_document.tsx'
-                            : '_document.js',
-                          contents: state.typescript
-                            ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
-                            : snippet('_document.js')(JSON5.stringify(esmUrl)),
-                        },
-                      ]}
-                    />
-                  </>
-                )}
-                {state.build === 'next build' &&
-                  state.typescript !== null &&
-                  state.load === 'build-time' && (
-                    <>
-                      <FilesViewer
-                        key="next build createTheme"
-                        lead={
-                          <>
-                            If you&#39;re quickly iterating on your theme in the
-                            comfort of your own Studio it&#39;s annoying to keep
-                            changing the import URL to change your theme. You
-                            can use the createTheme utility instead:
-                          </>
-                        }
-                        files={[
-                          {
-                            id: 'studio.config',
-                            filename: state.typescript
-                              ? 'sanity.config.ts'
-                              : 'sanity.config.js',
-                            contents: snippet(
-                              'studio-config-create-theme-static-import'
-                            )(
-                              snippet('import-create-theme-static')(
-                                JSON5.stringify(esmUrl)
-                              )
-                            ),
-                          },
-                        ]}
-                      />
-                    </>
                   )}
+                {state.build === 'sanity build' && state.typescript !== null && (
+                  <FilesViewer
+                    key="sanity build _document"
+                    lead={
+                      <>
+                        You can make the studio load faster by adding a
+                        modulepreload tag for the theme.{' '}
+                        <a
+                          href="https://github.com/stipsan/example-v3-studio/tree/main/more/sanity-build"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Example studio
+                        </a>
+                      </>
+                    }
+                    files={[
+                      {
+                        id: '_document',
+                        filename: state.typescript
+                          ? '_document.tsx'
+                          : '_document.js',
+                        contents: state.typescript
+                          ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
+                          : snippet('_document.js')(JSON5.stringify(esmUrl)),
+                      },
+                    ]}
+                  />
+                )}
               </Stack>
             </TransitionMinHeight>
           </Box>

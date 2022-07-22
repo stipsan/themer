@@ -4,16 +4,13 @@ import {
   Badge,
   Box,
   Card,
-  Dialog,
   Flex,
-  Grid,
   Inline,
   Stack,
   Text,
 } from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
-import type { QuizDispatch, QuizState } from 'components/ExportTheme'
-import { Button, Label } from 'components/Sidebar.styles'
+import { Button } from 'components/Sidebar.styles'
 import { useIdleCallback } from 'hooks/useIdleCallback'
 import { animate, spring } from 'motion'
 import {
@@ -27,7 +24,6 @@ import {
 } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import styled from 'styled-components'
-import { snippet } from 'utils/snippets'
 
 interface QuizRowProps {
   children: ReactNode

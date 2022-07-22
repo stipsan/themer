@@ -445,7 +445,7 @@ export default createConfig({
   }
 }
 
-export const snippets = new Set([
+export const snippets = [
   'import-dynamic-js',
   'import-dynamic-ts',
   'import-static',
@@ -465,4 +465,4 @@ export const snippets = new Set([
   'pages/_document.tsx',
   'pages/_document.js',
   'studio-config-create-theme-static-import',
-] as const)
+] as const

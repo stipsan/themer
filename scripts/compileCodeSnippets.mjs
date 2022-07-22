@@ -564,9 +564,9 @@ export function snippet(id) {
   }
 }
 
-export const snippets = new Set([${[...idsChecked]
+export const snippets = [${[...idsChecked]
   .map((id) => JSON5.stringify(id))
-  .join(',')}] as const);
+  .join(',')}] as const;
 `
 
 const dest = new URL('../utils/snippets.ts', import.meta.url)

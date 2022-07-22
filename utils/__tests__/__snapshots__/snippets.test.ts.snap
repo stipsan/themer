@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`_document.js 2`] = `
-"// This is to generate a <link rel=\\"modulepreload\\" href='http://localhost/api/hues'> to the <head>
+exports[`_document.js 1`] = `
+"// This is to generate a <link rel=\\"modulepreload\\" href='\${first}}'> to the <head>
 // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -52,7 +52,7 @@ export default function DefaultDocument(props) {
         {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}
         <link
           rel=\\"modulepreload\\"
-          href={'http://localhost/api/hues'}
+          href={'\${first}}'}
         />
 
         <Favicons basePath={basePath} />
@@ -75,8 +75,8 @@ export default function DefaultDocument(props) {
 }"
 `;
 
-exports[`_document.tsx 2`] = `
-"// This is to generate a <link rel=\\"modulepreload\\" href='http://localhost/api/hues'> to the <head>
+exports[`_document.tsx 1`] = `
+"// This is to generate a <link rel=\\"modulepreload\\" href='\${first}}'> to the <head>
 // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -134,7 +134,7 @@ export default function DefaultDocument(
         {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}
         <link
           rel=\\"modulepreload\\"
-          href={'http://localhost/api/hues'}
+          href={'\${first}}'}
         />
 
         <Favicons basePath={basePath} />
@@ -157,28 +157,28 @@ export default function DefaultDocument(
 }"
 `;
 
-exports[`import-create-theme-dynamic 2`] = `
+exports[`import-create-theme-dynamic 1`] = `
 "const {createTheme, hues} = await import(
-  'http://localhost/api/hues'
+  '\${first}}'
 )"
 `;
 
-exports[`import-create-theme-static 2`] = `"import {createTheme, hues} from 'http://localhost/api/hues'"`;
+exports[`import-create-theme-static 1`] = `"import {createTheme, hues} from '\${first}}'"`;
 
-exports[`import-dynamic-js 2`] = `"const {theme} = await import('http://localhost/api/hues')"`;
+exports[`import-dynamic-js 1`] = `"const {theme} = await import('\${first}}')"`;
 
-exports[`import-dynamic-ts 2`] = `
+exports[`import-dynamic-ts 1`] = `
 "const {theme} = (await import(
   // @ts-expect-error -- TODO setup themer.d.ts to get correct typings
-  'http://localhost/api/hues'
+  '\${first}}'
 )) as {theme: import('sanity').StudioTheme}"
 `;
 
-exports[`import-static 2`] = `"import {theme} from 'http://localhost/api/hues'"`;
+exports[`import-static 1`] = `"import {theme} from '\${first}}'"`;
 
-exports[`next-config-build-time-js 2`] = `
+exports[`next-config-build-time-js 1`] = `
 "module.exports = {
-  experimental: {urlImports: ['http://localhost/api/hues']}
+  experimental: {urlImports: ['\${first}}']}
 }"
 `;
 
@@ -189,13 +189,13 @@ exports[`next-config-build-time-ts 1`] = `
  * @type {import('next').NextConfig}
  **/
 const nextConfig = {
-  experimental: {urlImports: ['http://localhost/api/hues']}
+  experimental: {urlImports: ['\${first}}']}
 }
 
 module.exports = nextConfig"
 `;
 
-exports[`pages/_document.js 2`] = `
+exports[`pages/_document.js 1`] = `
 "// This is necessary for SSR to work correctly and prevents broken CSS
 
 import Document from 'next/document'
@@ -224,7 +224,7 @@ export default class CustomDocument extends Document {
 }"
 `;
 
-exports[`pages/_document.tsx 2`] = `
+exports[`pages/_document.tsx 1`] = `
 "// This is necessary for SSR to work correctly and prevents broken CSS
 
 import Document, {type DocumentContext} from 'next/document'
@@ -253,7 +253,7 @@ export default class CustomDocument extends Document {
 }"
 `;
 
-exports[`sanity.cli.js 2`] = `
+exports[`sanity.cli.js 1`] = `
 "// Change target to allow top-level await in sanity.config.js
 import {createCliConfig} from 'sanity/cli'
 
@@ -263,7 +263,7 @@ export default createCliConfig({
 })"
 `;
 
-exports[`sanity.cli.ts 2`] = `
+exports[`sanity.cli.ts 1`] = `
 "// Change target to allow top-level await in sanity.config.ts
 import {createCliConfig} from 'sanity/cli'
 import type {UserConfig} from 'vite'
@@ -277,7 +277,7 @@ export default createCliConfig({
 })"
 `;
 
-exports[`studio-config 2`] = `
+exports[`studio-config 1`] = `
 "// Add two lines of code to your workspace
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
@@ -285,7 +285,7 @@ import {deskTool} from 'sanity/desk'
 import {schemaTypes} from './schemas'
 
 // 1. Add the import
-'http://localhost/api/hues'
+'\${first}}'
 
 export default createConfig({
   theme, // <-- 2. add the theme here
@@ -299,14 +299,14 @@ export default createConfig({
 })"
 `;
 
-exports[`studio-config-create-theme 2`] = `
+exports[`studio-config-create-theme 1`] = `
 "// Import createTheme and hues to quickly modify your theme without changing the import URL
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 
 import {schemaTypes} from './schemas'
 
-'http://localhost/api/hues'
+'\${first}}'
 
 export default createConfig({
   theme: createTheme({...hues, primary: {...hues.primary, mid: '#22fca8'}}),
@@ -320,12 +320,12 @@ export default createConfig({
 })"
 `;
 
-exports[`studio-config-create-theme-static-import 2`] = `
+exports[`studio-config-create-theme-static-import 1`] = `
 "// Import createTheme and hues to quickly modify your theme without changing the import URL
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 
-'http://localhost/api/hues'
+'\${first}}'
 
 import {schemaTypes} from './schemas'
 
@@ -341,12 +341,12 @@ export default createConfig({
 })"
 `;
 
-exports[`studio-config-static-import 2`] = `
+exports[`studio-config-static-import 1`] = `
 "// Add two lines of code to your workspace
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 // 1. Add the import
-'http://localhost/api/hues'
+'\${first}}'
 
 import {schemaTypes} from './schemas'
 
@@ -362,8 +362,8 @@ export default createConfig({
 })"
 `;
 
-exports[`themer.d.ts 2`] = `
-"module 'http://localhost/api/hues' {
+exports[`themer.d.ts 1`] = `
+"module '\${first}}' {
   interface Hue
     extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
     midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
@@ -385,7 +385,7 @@ exports[`themer.d.ts 2`] = `
 }"
 `;
 
-exports[`tsconfig 2`] = `
+exports[`tsconfig 1`] = `
 "{
   \\"compilerOptions\\": {
     // target needs to be es2017 or newer to allow top-level await

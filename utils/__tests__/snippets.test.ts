@@ -2,6 +2,7 @@ import JSON5 from 'json5'
 import { snippet } from 'utils/snippets'
 
 const esmUrl = JSON5.stringify('http://localhost/api/hues')
+const esmOrigin = JSON5.stringify('http://localhost/')
 const staticImport = `import { theme } from 'http://localhost/api/hues'`
 
 test('import-dynamic-js', () => {
@@ -32,6 +33,29 @@ test('studio-config', () => {
 
     // 1. Add the import
     import { theme } from 'http://localhost/api/hues'
+
+    export default createConfig({
+      theme, // <-- 2. add the theme here
+
+      name: 'default',
+      title: 'My Sanity Project',
+      projectId: 'b5vzhxkv',
+      dataset: 'production',
+      plugins: [deskTool()],
+      schema: {types: schemaTypes}
+    })"
+  `)
+})
+test('studio-config-static-import', () => {
+  expect(snippet('studio-config-static-import')(staticImport))
+    .toMatchInlineSnapshot(`
+    "// Add two lines of code to your workspace
+    import {createConfig} from 'sanity'
+    import {deskTool} from 'sanity/desk'
+    // 1. Add the import
+    import { theme } from 'http://localhost/api/hues'
+
+    import {schemaTypes} from './schemas'
 
     export default createConfig({
       theme, // <-- 2. add the theme here
@@ -313,6 +337,93 @@ test('_document.js', () => {
           </body>
         </html>
       )
+    }"
+  `)
+})
+
+test('next-config-build-time-js', () => {
+  expect(snippet('next-config-build-time-js')(esmOrigin))
+    .toMatchInlineSnapshot(`
+    "module.exports = {
+      experimental: {urlImports: ['http://localhost/']}
+    }"
+  `)
+})
+
+test('next-config-build-time-tsconfig', () => {
+  expect(snippet('next-config-build-time-ts')(esmOrigin))
+    .toMatchInlineSnapshot(`
+    "// @ts-check
+
+    /**
+     * @type {import('next').NextConfig}
+     **/
+    const nextConfig = {
+      experimental: {urlImports: ['http://localhost/']}
+    }
+
+    module.exports = nextConfig"
+  `)
+})
+
+test('pages/_document.tsx', () => {
+  expect(snippet('pages/_document.tsx')()).toMatchInlineSnapshot(`
+    "// This is necessary for SSR to work correctly and prevents broken CSS
+
+    import Document, {type DocumentContext} from 'next/document'
+    import {ServerStyleSheet} from 'styled-components'
+
+    export default class CustomDocument extends Document {
+      static async getInitialProps(ctx: DocumentContext) {
+        const sheet = new ServerStyleSheet()
+        const originalRenderPage = ctx.renderPage
+
+        try {
+          ctx.renderPage = () =>
+            originalRenderPage({
+              enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+            })
+
+          const initialProps = await Document.getInitialProps(ctx)
+          return {
+            ...initialProps,
+            styles: [initialProps.styles, sheet.getStyleElement()]
+          }
+        } finally {
+          sheet.seal()
+        }
+      }
+    }"
+  `)
+})
+
+test('pages/_document.js', () => {
+  expect(snippet('pages/_document.js')()).toMatchInlineSnapshot(`
+    "// This is necessary for SSR to work correctly and prevents broken CSS
+
+    import Document from 'next/document'
+    import {ServerStyleSheet} from 'styled-components'
+
+    export default class CustomDocument extends Document {
+      static async getInitialProps(ctx: DocumentContext) {
+        const sheet = new ServerStyleSheet()
+        const originalRenderPage = ctx.renderPage
+
+        try {
+          ctx.renderPage = () =>
+            originalRenderPage({
+              enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+            })
+
+          const initialProps = await Document.getInitialProps(ctx)
+          return {
+            ...initialProps,
+            styles: [initialProps.styles, sheet.getStyleElement()]
+          }
+        } finally {
+          sheet.seal()
+        }
+      }
     }"
   `)
 })

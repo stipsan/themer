@@ -28,6 +28,8 @@ export function snippet(
 export function snippet(
   id: 'next-config-build-time-ts'
 ): (first: string) => string
+export function snippet(id: 'pages/_document.tsx'): () => string
+export function snippet(id: 'pages/_document.js'): () => string
 export function snippet(id) {
   switch (id) {
     case 'import-dynamic-js':
@@ -356,6 +358,62 @@ const nextConfig = {
 }
 
 module.exports = nextConfig`
+
+    case 'pages/_document.tsx':
+      return () => `// This is necessary for SSR to work correctly and prevents broken CSS
+
+import Document, {type DocumentContext} from 'next/document'
+import {ServerStyleSheet} from 'styled-components'
+
+export default class CustomDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext) {
+    const sheet = new ServerStyleSheet()
+    const originalRenderPage = ctx.renderPage
+
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+        })
+
+      const initialProps = await Document.getInitialProps(ctx)
+      return {
+        ...initialProps,
+        styles: [initialProps.styles, sheet.getStyleElement()]
+      }
+    } finally {
+      sheet.seal()
+    }
+  }
+}`
+
+    case 'pages/_document.js':
+      return () => `// This is necessary for SSR to work correctly and prevents broken CSS
+
+import Document from 'next/document'
+import {ServerStyleSheet} from 'styled-components'
+
+export default class CustomDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext) {
+    const sheet = new ServerStyleSheet()
+    const originalRenderPage = ctx.renderPage
+
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+        })
+
+      const initialProps = await Document.getInitialProps(ctx)
+      return {
+        ...initialProps,
+        styles: [initialProps.styles, sheet.getStyleElement()]
+      }
+    } finally {
+      sheet.seal()
+    }
+  }
+}`
 
     default:
       throw new TypeError('Unknown snippet id: ' + id)

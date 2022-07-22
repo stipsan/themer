@@ -382,6 +382,11 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                 ),
                               },
                               {
+                                id: 'pages/_document',
+                                filename: 'pages/_document.tsx',
+                                contents: snippet('pages/_document.tsx')(),
+                              },
+                              {
                                 filename: 'themer.d.ts',
                                 contents: snippet('themer.d.ts')(
                                   JSON5.stringify(esmUrlDTS)
@@ -405,6 +410,11 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                                 contents: snippet('next-config-build-time-js')(
                                   JSON5.stringify(esmUrlOrigin)
                                 ),
+                              },
+                              {
+                                id: 'pages/_document',
+                                filename: 'pages/_document.js',
+                                contents: snippet('pages/_document.js')(),
                               },
                             ]
                       }

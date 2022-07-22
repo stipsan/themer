@@ -53,7 +53,6 @@ const {theme} = await import(${dummies.esmUrl})
     'import-static',
     ['esmUrl'],
     `
-  // Add this URL ESM import
   import { theme } from ${dummies.esmUrl};
 `,
   ],

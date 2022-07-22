@@ -204,7 +204,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 </QuizRow>
               )}
             </TransitionMinHeight>
-            <TransitionMinHeight key="getting started">
+            <TransitionMinHeight key="snippets">
               {state.build === 'sanity build' && state.typescript !== null && (
                 <Stack space={4}>
                   <FilesViewer
@@ -335,126 +335,57 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                   />
                 </Stack>
               )}
-            </TransitionMinHeight>
-            {showTS && state.typescript !== null && false && (
-              <>
-                {state.build === 'sanity build' && (
-                  <>
-                    <Box paddingTop={4}>
-                      <Text size={1}>
-                        Before you can add the import snippet to To get started
-                        you&#39;ll need to modify your{' '}
-                        {state.typescript ? (
-                          <>
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>
-                            ,{' '}
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>{' '}
-                            <StyledBadge fontSize={0}>
-                              tsconfig.json
-                            </StyledBadge>{' '}
-                            and create a{' '}
-                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>
-                          </>
-                        ) : (
-                          <>
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>{' '}
-                            and{' '}
-                            <StyledBadge fontSize={0}>
-                              sanity.config.{state.typescript ? 'ts' : 'js'}
-                            </StyledBadge>
-                          </>
-                        )}
-                      </Text>
-                    </Box>
-                    <Stack space={2}>
-                      <Box>
-                        <StyledBadge>
-                          sanity.config.{state.typescript ? 'ts' : 'js'}
-                        </StyledBadge>
-                      </Box>
-                      <CodeSnippet>
-                        {snippet('studio-config')(
-                          snippet('import-dynamic-js')(JSON5.stringify(esmUrl))
-                        )}
-                      </CodeSnippet>
-                    </Stack>
-                    <Stack space={2}>
-                      <Box>
-                        <StyledBadge>
-                          sanity.cli.{state.typescript ? 'ts' : 'js'}
-                        </StyledBadge>
-                      </Box>
-                      <CodeSnippet>
-                        {state.typescript
-                          ? snippet('sanity.cli.ts')()
-                          : snippet('sanity.cli.js')()}
-                      </CodeSnippet>
-                    </Stack>
-                    {state.typescript && (
-                      <>
-                        <Stack space={2}>
-                          <Box>
-                            <StyledBadge>themer.d.ts</StyledBadge>
-                          </Box>
-                          <CodeSnippet>
-                            {snippet('themer.d.ts')(JSON5.stringify(esmUrlDTS))}
-                          </CodeSnippet>
-                        </Stack>
-                        <Stack space={2}>
-                          <Box>
-                            <StyledBadge>tsconfig.json</StyledBadge>
-                          </Box>
-                          <CodeSnippet>{snippet('tsconfig')()}</CodeSnippet>
-                        </Stack>
-                      </>
-                    )}
-
-                    <Stack space={2}>
-                      <Text size={1}>
-                        If you&#39;re quickly iterating on your theme in the
-                        comfort of your own Studio it&#39;s annoying to keep
-                        changing the import URL to change your theme. You can
-                        use the createTheme utility instead:
-                      </Text>
-                      <Box>
-                        <StyledBadge>
-                          sanity.config.{state.typescript ? 'ts' : 'js'}
-                        </StyledBadge>
-                      </Box>
-                      <CodeSnippet>
-                        {snippet('studio-config-create-theme')(
-                          snippet('import-create-theme-dynamic')(
-                            JSON5.stringify(esmUrl)
-                          )
-                        )}
-                      </CodeSnippet>
-                    </Stack>
-                    <Stack space={2}>
-                      <Text size={1}>
-                        You can make the studio load faster by adding a
-                        modulepreload tag for the theme.
-                      </Text>
-                      <Box>
-                        <StyledBadge>
-                          _document.{state.typescript ? 'tsx' : 'js'}
-                        </StyledBadge>
-                      </Box>
-                      <CodeSnippet>
-                        {state.typescript
-                          ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
-                          : snippet('_document.js')(JSON5.stringify(esmUrl))}
-                      </CodeSnippet>
-                    </Stack>
-                  </>
+              {state.build === 'next build' &&
+                state.typescript !== null &&
+                state.load === 'build-time' && (
+                  <Stack space={4}>
+                    <FilesViewer
+                      key="next build build-time"
+                      lead={
+                        <>
+                          Before you can add the import snippet to your
+                          <StyledBadge fontSize={0}>
+                            sanity.config.${state.typescript ? 'ts' : 'js'}
+                          </StyledBadge>
+                          you&#39;ll need to make a few changes to{' '}
+                          <StyledBadge fontSize={0}>next.config.js</StyledBadge>{' '}
+                          and{' '}
+                          <StyledBadge fontSize={0}>
+                            pages/_document.${state.typescript ? 'tsx' : 'js'}
+                          </StyledBadge>{' '}
+                          .
+                        </>
+                      }
+                      initial="sanity.config"
+                      files={
+                        state.typescript
+                          ? [
+                              {
+                                id: 'sanity.config',
+                                filename: 'sanity.config.ts',
+                                contents: snippet('studio-config')(
+                                  snippet('import-static')(
+                                    JSON5.stringify(esmUrl)
+                                  )
+                                ),
+                              },
+                            ]
+                          : [
+                              {
+                                id: 'sanity.config',
+                                filename: 'sanity.config.js',
+                                contents: snippet('studio-config')(
+                                  snippet('import-static')(
+                                    JSON5.stringify(esmUrl)
+                                  )
+                                ),
+                              },
+                            ]
+                      }
+                    />
+                  </Stack>
                 )}
-              </>
-            )}
+            </TransitionMinHeight>
           </Box>
         </Dialog>
       )}

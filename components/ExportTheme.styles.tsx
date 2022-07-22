@@ -126,24 +126,28 @@ export const TransitionMinHeight = ({ children }: TransitionMinHeightProps) => {
 }
 
 interface FilesViewerProps {
-  files: { filename: string; contents: string; language?: 'json' }[]
+  files: { id?: string, filename: string; contents: string; language?: 'json' }[]
   initial: string
   lead: ReactNode
 }
 export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
   const [open, setOpen] = useState(initial)
   const active = useMemo(
-    () => files.find(({ filename }) => filename === open),
+    () => files.find(({ filename, id = filename }) => id === open),
     [files, open]
   )
   const selectedRef = useRef<HTMLButtonElement>(null)
 
   // Allow a viewer to be initially open while toggling typescript on/off
-  useLayoutEffect(() => void setOpen(initial), [initial])
+  useLayoutEffect(() => {
+    if(initial && open && !active) {
+      setOpen(initial)
+    }
+  }, [initial, open, active])
 
   // Scroll the selected button into view
   useEffect(() => {
-    if (open) {
+    if (open && selectedRef.current) {
       scrollIntoView(selectedRef.current, {
         behavior: 'smooth',
         inline: 'center',
@@ -170,15 +174,15 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
         <Card tone="transparent" border radius={2}>
           <Card tone="default" radius={2} overflow="auto" padding={3}>
             <Flex style={{ width: 'fit-content' }} gap={1}>
-              {files.map(({ filename }) => (
+              {files.map(({ filename, id = filename }) => (
                 <Button
-                  key={filename}
-                  ref={filename === open ? selectedRef : undefined}
+                  key={id}
+                  ref={id === open ? selectedRef : undefined}
                   mode="bleed"
                   text={filename}
-                  selected={filename === open}
+                  selected={id === open}
                   onClick={() =>
-                    setOpen((open) => (open === filename ? null : filename))
+                    setOpen((open) => (open === id ? null : id))
                   }
                 />
               ))}

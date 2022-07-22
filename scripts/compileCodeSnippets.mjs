@@ -12,7 +12,6 @@ const options = {
   bracketSpacing: false,
   parser: 'typescript',
   plugins: [parserTypescript],
-  printWidth: 100,
   semi: false,
   singleQuote: true,
   trailingComma: 'none',
@@ -26,9 +25,7 @@ const jsonOptions = {
 
 const args = ['first', 'second']
 const dummies = {
-  esmUrl: `/* @dummy */ ${JSON5.stringify(
-    'https://example.com/api/hues?preset=verdant&min=1'
-  )}`,
+  esmUrl: `/* @dummy */ ${JSON5.stringify('https://example.com/api/hues')}`,
   themeConfigProperty: '/* @dummy */ theme,',
   import: `/* @dummy */
 import {studioTheme as theme} from '@sanity/ui'`,

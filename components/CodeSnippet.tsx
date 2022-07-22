@@ -28,9 +28,14 @@ const Tools = styled(Card)`
 
 interface Props {
   children: string
+  toastTitle?: string
   language?: CodeProps['language']
 }
-const CodeSnippet = ({ children, language = 'ts' }: Props) => {
+const CodeSnippet = ({
+  children,
+  toastTitle = 'Copied code to clipboard',
+  language = 'ts',
+}: Props) => {
   const { push: pushToast } = useToast()
 
   return (
@@ -41,6 +46,14 @@ const CodeSnippet = ({ children, language = 'ts' }: Props) => {
           tone="default"
           aria-label="Copy code to clipboard"
           icon={ClipboardIcon}
+          onClick={() => {
+            navigator.clipboard.writeText(children)
+            pushToast({
+              closable: true,
+              status: 'success',
+              title: toastTitle,
+            })
+          }}
         />
       </Tools>
       <StyledCard

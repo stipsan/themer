@@ -236,13 +236,12 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                       )}
                     </>
                   }
-                  initial={
-                    state.typescript ? 'sanity.config.ts' : 'sanity.config.js'
-                  }
+                  initial="sanity.config"
                   files={
                     state.typescript
                       ? [
                           {
+                            id: 'sanity.config',
                             filename: 'sanity.config.ts',
                             contents: snippet('studio-config')(
                               snippet('import-dynamic-js')(
@@ -251,6 +250,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             ),
                           },
                           {
+                            id: 'sanity.cli',
                             filename: 'sanity.cli.ts',
                             contents: snippet('sanity.cli.ts')(),
                           },
@@ -259,9 +259,14 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             contents: snippet('tsconfig')(),
                             language: 'json',
                           },
+                          {
+                            filename: 'themer.d.ts',
+                            contents: snippet('themer.d.ts')(JSON5.stringify(esmUrl)),
+                          },
                         ]
                       : [
                           {
+                            id: 'sanity.config',
                             filename: 'sanity.config.js',
                             contents: snippet('studio-config')(
                               snippet('import-dynamic-js')(
@@ -270,6 +275,7 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                             ),
                           },
                           {
+                            id: 'sanity.cli',
                             filename: 'sanity.cli.js',
                             contents: snippet('sanity.cli.js')(),
                           },

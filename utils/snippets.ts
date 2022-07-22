@@ -109,7 +109,8 @@ export default createConfig({
 
     case 'themer.d.ts':
       return (first: string) => `module ${first} {
-  interface Hue extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
+  interface Hue
+    extends Omit<import('@sanity/color').ColorHueConfig, 'title' | 'midPoint'> {
     midPoint: 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950
   }
   interface Hues {
@@ -195,13 +196,18 @@ function Favicons({basePath}: FaviconProps) {
 }
 
 const EMPTY_ARRAY: never[] = []
-export default function DefaultDocument(props: DefaultDocumentProps): React.ReactElement {
+export default function DefaultDocument(
+  props: DefaultDocumentProps
+): React.ReactElement {
   const {entryPath, css = EMPTY_ARRAY, basePath = '/'} = props
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <meta name="robots" content="noindex" />
         <meta name="referrer" content="same-origin" />
         {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}
@@ -273,7 +279,10 @@ export default function DefaultDocument(props) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <meta name="robots" content="noindex" />
         <meta name="referrer" content="same-origin" />
         {/* This is the only line of code we're adding that is different from the default implementation of DefaultDocument */}

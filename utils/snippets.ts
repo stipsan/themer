@@ -189,7 +189,7 @@ export default createConfig({
     case '_document.tsx':
       return (
         first: string
-      ) => `// This is to generate a <link rel="modulepreload" href="${first}"> to the <head>
+      ) => `// This is to generate a <link rel="modulepreload" href=${first}> to the <head>
 // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -272,7 +272,7 @@ export default function DefaultDocument(
     case '_document.js':
       return (
         first: string
-      ) => `// This is to generate a <link rel="modulepreload" href="${first}"> to the <head>
+      ) => `// This is to generate a <link rel="modulepreload" href=${first}> to the <head>
 // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -444,3 +444,25 @@ export default createConfig({
       throw new TypeError('Unknown snippet id: ' + id)
   }
 }
+
+export const snippets = new Set([
+  'import-dynamic-js',
+  'import-dynamic-ts',
+  'import-static',
+  'studio-config',
+  'studio-config-static-import',
+  'sanity.cli.ts',
+  'sanity.cli.js',
+  'studio-config-create-theme',
+  'import-create-theme-static',
+  'import-create-theme-dynamic',
+  'themer.d.ts',
+  'tsconfig',
+  '_document.tsx',
+  '_document.js',
+  'next-config-build-time-js',
+  'next-config-build-time-ts',
+  'pages/_document.tsx',
+  'pages/_document.js',
+  'studio-config-create-theme-static-import',
+] as const)

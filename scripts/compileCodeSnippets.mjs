@@ -222,7 +222,7 @@ export default createConfig({
   [
     '_document.tsx',
     ['esmUrl'],
-    `// This is to generate a <link rel="modulepreload" href="${dummies.esmUrl}"> to the <head>
+    `// This is to generate a <link rel="modulepreload" href=${dummies.esmUrl}> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -301,7 +301,7 @@ export default function DefaultDocument(props: DefaultDocumentProps): React.Reac
     '_document.js',
     ['esmUrl'],
     `
-    // This is to generate a <link rel="modulepreload" href="${dummies.esmUrl}"> to the <head>
+    // This is to generate a <link rel="modulepreload" href=${dummies.esmUrl}> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -508,6 +508,10 @@ const getArgs = (argsLength) => {
   }
 }
 
+const idsList = `export [${[...idsChecked]
+  .map((id) => JSON5.stringify(id))
+  .join(',')}]`
+
 console.group('snippets.map')
 const cases = snippets.map(
   ([id, placeholders, snippet, format = 'typescript']) => {
@@ -559,6 +563,10 @@ export function snippet(id) {
       throw new TypeError('Unknown snippet id: ' + id);
   }
 }
+
+export const snippets = new Set([${[...idsChecked]
+  .map((id) => JSON5.stringify(id))
+  .join(',')}] as const);
 `
 
 const dest = new URL('../utils/snippets.ts', import.meta.url)

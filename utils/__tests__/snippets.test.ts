@@ -1,5 +1,5 @@
 import JSON5 from 'json5'
-import { snippet } from 'utils/snippets'
+import { snippet, snippets } from 'utils/snippets'
 
 const esmUrl = JSON5.stringify('http://localhost/api/hues')
 const esmOrigin = JSON5.stringify('http://localhost/')
@@ -182,7 +182,7 @@ test('tsconfig', () => {
 })
 test('_document.tsx', () => {
   expect(snippet('_document.tsx')(esmUrl)).toMatchInlineSnapshot(`
-    "// This is to generate a <link rel=\\"modulepreload\\" href=\\"'http://localhost/api/hues'\\"> to the <head>
+    "// This is to generate a <link rel=\\"modulepreload\\" href='http://localhost/api/hues'> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
     // Thus we have to re-implement DefaultDocument to make it happen.
     // Expect this to get much easier before v3 hits stable
@@ -266,7 +266,7 @@ test('_document.tsx', () => {
 
 test('_document.js', () => {
   expect(snippet('_document.js')(esmUrl)).toMatchInlineSnapshot(`
-    "// This is to generate a <link rel=\\"modulepreload\\" href=\\"'http://localhost/api/hues'\\"> to the <head>
+    "// This is to generate a <link rel=\\"modulepreload\\" href='http://localhost/api/hues'> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
     // Thus we have to re-implement DefaultDocument to make it happen.
     // Expect this to get much easier before v3 hits stable
@@ -451,3 +451,9 @@ test('studio-config-create-theme-static-import', () => {
     })"
   `)
 })
+
+for (const id of snippets) {
+  test(id, () => {
+    expect(snippet(id as any)(id === 'foo' ? 'foo' : esmUrl)).toMatchSnapshot()
+  })
+}

@@ -1,6 +1,12 @@
-import { Card, Code, Skeleton } from '@sanity/ui'
+import { Card, Code } from '@sanity/ui'
 import { useFormatted } from 'hooks/usePrettier'
-import { memo, Suspense } from 'react'
+import { memo } from 'react'
+import styled from 'styled-components'
+
+const StyledCard = styled(Card)`
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+`
 
 interface Props {
   children: string
@@ -8,16 +14,16 @@ interface Props {
 const CodeSnippet = ({ children }: Props) => {
   const prettyCode = useFormatted(children)
   return (
-    <Card overflow="auto" padding={4} radius={2} shadow={1}>
+    <StyledCard
+      overflow="auto"
+      tone="transparent"
+      padding={4}
+      radius={2}
+      shadow={1}
+    >
       <Code language="ts">{prettyCode}</Code>
-    </Card>
+    </StyledCard>
   )
 }
-
-const CodeSnippetSuspense = (props: Props) => (
-  <Suspense fallback={<Skeleton animated padding={4} radius={2} />}>
-    <CodeSnippet {...props} />
-  </Suspense>
-)
 
 export default memo(CodeSnippet)

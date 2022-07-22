@@ -1,6 +1,16 @@
 import type { ResizeObserverEntry } from '@juggle/resize-observer'
 import { ResizeObserver } from '@juggle/resize-observer'
-import { Badge, Box, Dialog, Grid, Inline, Stack, Text } from '@sanity/ui'
+import {
+  Badge,
+  Box,
+  Card,
+  Dialog,
+  Flex,
+  Grid,
+  Inline,
+  Stack,
+  Text,
+} from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
 import type { QuizDispatch, QuizState } from 'components/ExportTheme'
 import { Button, Label } from 'components/Sidebar.styles'
@@ -11,6 +21,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -106,5 +117,59 @@ export const TransitionMinHeight = ({ children }: TransitionMinHeightProps) => {
     <div ref={animated}>
       <div ref={observed}>{children}</div>
     </div>
+  )
+}
+
+interface FilesViewerProps {
+  files: { filename: string; contents: string }[]
+  initial: string
+  lead: ReactNode
+}
+export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
+  const [open, setOpen] = useState(initial)
+  const active = useMemo(
+    () => files.find(({ filename }) => filename === open),
+    [files, open]
+  )
+
+  // Allow a viewer to be initially open while toggling typescript on/off
+  useLayoutEffect(() => void setOpen(initial), [initial])
+
+  return (
+    <TransitionHeight>
+      <Box>
+        <TransitionMinHeight>
+          <Text size={1}>
+            <Flex
+              paddingTop={1}
+              paddingBottom={3}
+              gap={1}
+              wrap="wrap"
+              align="center"
+            >
+              {lead}
+            </Flex>
+          </Text>
+        </TransitionMinHeight>
+        <Card tone="transparent" shadow={1} radius={2}>
+          <Card tone="default" padding={3} radius={2}>
+            <Inline space={1}>
+              {files.map(({ filename }) => (
+                <Button
+                  key={filename}
+                  mode="bleed"
+                  text={filename}
+                  selected={filename === open}
+                  onClick={() =>
+                    setOpen((open) => (open === filename ? null : filename))
+                  }
+                />
+              ))}
+            </Inline>
+          </Card>
+          {active && <CodeSnippet>{active.contents}</CodeSnippet>}
+        </Card>
+      </Box>
+    </TransitionHeight>
   )
 }

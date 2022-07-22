@@ -3,6 +3,7 @@ import { Badge, Box, Dialog, Grid, Stack, Text } from '@sanity/ui'
 import CodeSnippet from 'components/CodeSnippet'
 import CopySnippetButton from 'components/CopySnippetButton'
 import {
+  FilesViewer,
   QuizButton,
   QuizRow,
   TransitionMinHeight,
@@ -161,26 +162,6 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 selected={state.build === 'other'}
               />
             </QuizRow>
-            <TransitionMinHeight key="state.load">
-              {state.build === 'next build' && (
-                <QuizRow text="Load the theme at?">
-                  <QuizButton
-                    text="Build time"
-                    onClick={() =>
-                      dispatch({ type: 'load', payload: 'build-time' })
-                    }
-                    selected={state.load === 'build-time'}
-                  />
-                  <QuizButton
-                    text="Runtime"
-                    onClick={() =>
-                      dispatch({ type: 'load', payload: 'runtime' })
-                    }
-                    selected={state.load === 'runtime'}
-                  />
-                </QuizRow>
-              )}
-            </TransitionMinHeight>
             <TransitionMinHeight key="state.typescript">
               {state.build && (
                 <QuizRow text="Are you using TypeScript?">
@@ -203,13 +184,139 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                 </QuizRow>
               )}
             </TransitionMinHeight>
-            {showTS && state.typescript !== null && (
+            <TransitionMinHeight key="state.load">
+              {state.typescript !== null && state.build === 'next build' && (
+                <QuizRow text="Load the theme at?">
+                  <QuizButton
+                    text="Build time"
+                    onClick={() =>
+                      dispatch({ type: 'load', payload: 'build-time' })
+                    }
+                    selected={state.load === 'build-time'}
+                  />
+                  <QuizButton
+                    text="Runtime"
+                    onClick={() =>
+                      dispatch({ type: 'load', payload: 'runtime' })
+                    }
+                    selected={state.load === 'runtime'}
+                  />
+                </QuizRow>
+              )}
+            </TransitionMinHeight>
+            <TransitionMinHeight key="getting started">
+              {state.build === 'sanity build' && state.typescript !== null && (
+                <FilesViewer
+                  key="sanity build"
+                  lead={
+                    <>
+                      Before you can add the import snippet to your
+                      {state.typescript ? (
+                        <>
+                          <StyledBadge fontSize={0}>
+                            sanity.config.ts
+                          </StyledBadge>
+                          you&#39;ll need to make a few changes to{' '}
+                          <StyledBadge fontSize={0}>sanity.cli.ts</StyledBadge>{' '}
+                          and{' '}
+                          <StyledBadge fontSize={0}>tsconfig.json</StyledBadge>{' '}
+                          . Checkout{' '}
+                          <StyledBadge fontSize={0}>themer.d.ts</StyledBadge> to
+                          get full typings on the URL imports💖
+                        </>
+                      ) : (
+                        <>
+                          <StyledBadge fontSize={0}>
+                            sanity.config.js
+                          </StyledBadge>{' '}
+                          you&#39;ll need to make a few changes to your{' '}
+                          <StyledBadge fontSize={0}>sanity.cli.js</StyledBadge>{' '}
+                          config file.
+                        </>
+                      )}
+                    </>
+                  }
+                  initial={
+                    state.typescript ? 'sanity.config.ts' : 'sanity.config.js'
+                  }
+                  files={
+                    state.typescript
+                      ? [
+                          {
+                            filename: 'sanity.config.ts',
+                            contents: snippet('studio-config')(
+                              snippet('import-dynamic-js')(
+                                JSON5.stringify(esmUrl)
+                              )
+                            ),
+                          },
+                          {
+                            filename: 'sanity.cli.ts',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts2',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.t3s',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts4',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts5',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts6',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts7',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts8',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts9',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts10',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                          {
+                            filename: 'sanity.cli.ts11',
+                            contents: snippet('sanity.cli.ts')(),
+                          },
+                        ]
+                      : [
+                          {
+                            filename: 'sanity.config.js',
+                            contents: snippet('studio-config')(
+                              snippet('import-dynamic-js')(
+                                JSON5.stringify(esmUrl)
+                              )
+                            ),
+                          },
+                        ]
+                  }
+                />
+              )}
+            </TransitionMinHeight>
+            {showTS && state.typescript !== null && false && (
               <>
                 {state.build === 'sanity build' && (
                   <>
                     <Box paddingTop={4}>
                       <Text size={1}>
-                        To get started you&#39;ll need to modify your{' '}
+                        Before you can add the import snippet to To get started
+                        you&#39;ll need to modify your{' '}
                         {state.typescript ? (
                           <>
                             <StyledBadge fontSize={0}>

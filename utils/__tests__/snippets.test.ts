@@ -159,7 +159,8 @@ test('tsconfig', () => {
 })
 test('_document.tsx', () => {
   expect(snippet('_document.tsx')(esmUrl)).toMatchInlineSnapshot(`
-    "// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
+    "// This is to generate a <link rel=\\"modulepreload\\" href=\\"'http://localhost/api/hues'\\"> to the <head>
+    // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
     // Thus we have to re-implement DefaultDocument to make it happen.
     // Expect this to get much easier before v3 hits stable
 
@@ -242,7 +243,8 @@ test('_document.tsx', () => {
 
 test('_document.js', () => {
   expect(snippet('_document.js')(esmUrl)).toMatchInlineSnapshot(`
-    "// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
+    "// This is to generate a <link rel=\\"modulepreload\\" href=\\"'http://localhost/api/hues'\\"> to the <head>
+    // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
     // Thus we have to re-implement DefaultDocument to make it happen.
     // Expect this to get much easier before v3 hits stable
 

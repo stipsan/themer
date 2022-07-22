@@ -197,7 +197,7 @@ export default createConfig({
   [
     '_document.tsx',
     ['esmUrl'],
-    `
+    `// This is to generate a <link rel="modulepreload" href="${dummies.esmUrl}"> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
@@ -276,6 +276,7 @@ export default function DefaultDocument(props: DefaultDocumentProps): React.Reac
     '_document.js',
     ['esmUrl'],
     `
+    // This is to generate a <link rel="modulepreload" href="${dummies.esmUrl}"> to the <head>
     // As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable

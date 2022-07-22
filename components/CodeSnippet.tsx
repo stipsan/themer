@@ -13,6 +13,8 @@ const StyledCard = styled(Card)`
   position: relative;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+  max-height: 50vh;
+  max-height: 50dvh;
 `
 
 const StyledBox = styled(Box)`

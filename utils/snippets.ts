@@ -156,7 +156,8 @@ export default createConfig({
     case '_document.tsx':
       return (
         first: string
-      ) => `// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
+      ) => `// This is to generate a <link rel="modulepreload" href="${first}"> to the <head>
+// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
 
@@ -238,7 +239,8 @@ export default function DefaultDocument(
     case '_document.js':
       return (
         first: string
-      ) => `// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
+      ) => `// This is to generate a <link rel="modulepreload" href="${first}"> to the <head>
+// As Studio v3 is in developer preview there's not yet a simple way to just add a <link> tag to the <head>
 // Thus we have to re-implement DefaultDocument to make it happen.
 // Expect this to get much easier before v3 hits stable
 

@@ -126,8 +126,13 @@ export const TransitionMinHeight = ({ children }: TransitionMinHeightProps) => {
 }
 
 interface FilesViewerProps {
-  files: { id?: string, filename: string; contents: string; language?: 'json' }[]
-  initial: string
+  files: {
+    id?: string
+    filename: string
+    contents: string
+    language?: 'json'
+  }[]
+  initial?: string
   lead: ReactNode
 }
 export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
@@ -140,7 +145,7 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
 
   // Allow a viewer to be initially open while toggling typescript on/off
   useLayoutEffect(() => {
-    if(initial && open && !active) {
+    if (initial && open && !active) {
       setOpen(initial)
     }
   }, [initial, open, active])
@@ -181,9 +186,7 @@ export const FilesViewer = ({ lead, files, initial }: FilesViewerProps) => {
                   mode="bleed"
                   text={filename}
                   selected={id === open}
-                  onClick={() =>
-                    setOpen((open) => (open === id ? null : id))
-                  }
+                  onClick={() => setOpen((open) => (open === id ? null : id))}
                 />
               ))}
             </Flex>

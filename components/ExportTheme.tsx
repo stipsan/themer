@@ -206,82 +206,136 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
             </TransitionMinHeight>
             <TransitionMinHeight key="getting started">
               {state.build === 'sanity build' && state.typescript !== null && (
-                <FilesViewer
-                  key="sanity build"
-                  lead={
-                    <>
-                      Before you can add the import snippet to your
-                      {state.typescript ? (
-                        <>
-                          <StyledBadge fontSize={0}>
-                            sanity.config.ts
-                          </StyledBadge>
-                          you&#39;ll need to make a few changes to{' '}
-                          <StyledBadge fontSize={0}>sanity.cli.ts</StyledBadge>{' '}
-                          and{' '}
-                          <StyledBadge fontSize={0}>tsconfig.json</StyledBadge>{' '}
-                          . Checkout{' '}
-                          <StyledBadge fontSize={0}>themer.d.ts</StyledBadge> to
-                          get full typings on the URL imports💖
-                        </>
-                      ) : (
-                        <>
-                          <StyledBadge fontSize={0}>
-                            sanity.config.js
-                          </StyledBadge>{' '}
-                          you&#39;ll need to make a few changes to your{' '}
-                          <StyledBadge fontSize={0}>sanity.cli.js</StyledBadge>{' '}
-                          config file.
-                        </>
-                      )}
-                    </>
-                  }
-                  initial="sanity.config"
-                  files={
-                    state.typescript
-                      ? [
-                          {
-                            id: 'sanity.config',
-                            filename: 'sanity.config.ts',
-                            contents: snippet('studio-config')(
-                              snippet('import-dynamic-js')(
+                <Stack space={4}>
+                  <FilesViewer
+                    key="sanity build"
+                    lead={
+                      <>
+                        Before you can add the import snippet to your
+                        {state.typescript ? (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.ts
+                            </StyledBadge>
+                            you&#39;ll need to make a few changes to{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.cli.ts
+                            </StyledBadge>{' '}
+                            and{' '}
+                            <StyledBadge fontSize={0}>
+                              tsconfig.json
+                            </StyledBadge>{' '}
+                            . Checkout{' '}
+                            <StyledBadge fontSize={0}>themer.d.ts</StyledBadge>{' '}
+                            to get full typings on the URL imports💖
+                          </>
+                        ) : (
+                          <>
+                            <StyledBadge fontSize={0}>
+                              sanity.config.js
+                            </StyledBadge>{' '}
+                            you&#39;ll need to make a few changes to your{' '}
+                            <StyledBadge fontSize={0}>
+                              sanity.cli.js
+                            </StyledBadge>{' '}
+                            config file.
+                          </>
+                        )}
+                      </>
+                    }
+                    initial="sanity.config"
+                    files={
+                      state.typescript
+                        ? [
+                            {
+                              id: 'sanity.config',
+                              filename: 'sanity.config.ts',
+                              contents: snippet('studio-config')(
+                                snippet('import-dynamic-js')(
+                                  JSON5.stringify(esmUrl)
+                                )
+                              ),
+                            },
+                            {
+                              id: 'sanity.cli',
+                              filename: 'sanity.cli.ts',
+                              contents: snippet('sanity.cli.ts')(),
+                            },
+                            {
+                              filename: 'tsconfig.json',
+                              contents: snippet('tsconfig')(),
+                              language: 'json',
+                            },
+                            {
+                              filename: 'themer.d.ts',
+                              contents: snippet('themer.d.ts')(
                                 JSON5.stringify(esmUrl)
-                              )
-                            ),
-                          },
-                          {
-                            id: 'sanity.cli',
-                            filename: 'sanity.cli.ts',
-                            contents: snippet('sanity.cli.ts')(),
-                          },
-                          {
-                            filename: 'tsconfig.json',
-                            contents: snippet('tsconfig')(),
-                            language: 'json',
-                          },
-                          {
-                            filename: 'themer.d.ts',
-                            contents: snippet('themer.d.ts')(JSON5.stringify(esmUrl)),
-                          },
-                        ]
-                      : [
-                          {
-                            id: 'sanity.config',
-                            filename: 'sanity.config.js',
-                            contents: snippet('studio-config')(
-                              snippet('import-dynamic-js')(
-                                JSON5.stringify(esmUrl)
-                              )
-                            ),
-                          },
-                          {
-                            id: 'sanity.cli',
-                            filename: 'sanity.cli.js',
-                            contents: snippet('sanity.cli.js')(),
-                          },
-                        ]
-                  }
-                />
+                              ),
+                            },
+                          ]
+                        : [
+                            {
+                              id: 'sanity.config',
+                              filename: 'sanity.config.js',
+                              contents: snippet('studio-config')(
+                                snippet('import-dynamic-js')(
+                                  JSON5.stringify(esmUrl)
+                                )
+                              ),
+                            },
+                            {
+                              id: 'sanity.cli',
+                              filename: 'sanity.cli.js',
+                              contents: snippet('sanity.cli.js')(),
+                            },
+                          ]
+                    }
+                  />
+                  <FilesViewer
+                    key="sanity build createTheme"
+                    lead={
+                      <>
+                        If you&#39;re quickly iterating on your theme in the
+                        comfort of your own Studio it&#39;s annoying to keep
+                        changing the import URL to change your theme. You can
+                        use the createTheme utility instead:
+                      </>
+                    }
+                    files={[
+                      {
+                        id: 'studio-config',
+                        filename: state.typescript
+                          ? 'sanity.config.ts'
+                          : 'sanity.config.js',
+                        contents: snippet('studio-config-create-theme')(
+                          snippet('import-create-theme-dynamic')(
+                            JSON5.stringify(esmUrl)
+                          )
+                        ),
+                      },
+                    ]}
+                  />
+                  <FilesViewer
+                    key="sanity build _document"
+                    lead={
+                      <>
+                        You can make the studio load faster by adding a
+                        modulepreload tag for the theme.
+                      </>
+                    }
+                    files={[
+                      {
+                        id: '_document',
+                        filename: state.typescript
+                          ? '_document.tsx'
+                          : '_document.js',
+                        contents: state.typescript
+                          ? snippet('_document.tsx')(JSON5.stringify(esmUrl))
+                          : snippet('_document.js')(JSON5.stringify(esmUrl)),
+                      },
+                    ]}
+                  />
+                </Stack>
               )}
             </TransitionMinHeight>
             {showTS && state.typescript !== null && false && (

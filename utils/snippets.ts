@@ -100,7 +100,7 @@ export default createConfig({
 
 import {createConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
-// 1. Add the impoort to the theme.js you downloaded
+// 1. Add the import to the theme.js you downloaded
 import {theme} from './theme'
 
 import {schemaTypes} from './schemas'
@@ -124,7 +124,7 @@ import {deskTool} from 'sanity/desk'
 
 import {schemaTypes} from './schemas'
 
-// 1. Add the impoort to the theme.js you downloaded
+// 1. Add the import to the theme.js you downloaded
 import {theme as _theme} from './theme'
 
 // 2. Assign typings to the theme

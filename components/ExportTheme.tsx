@@ -288,39 +288,6 @@ const ExportTheme = ({ searchParams, open, onClose, onOpen }: Props) => {
                       />
                     </>
                   )}
-                {state.build === 'other' && state.typescript !== null && (
-                  <>
-                    <FilesViewer
-                      key="next build createTheme"
-                      lead={
-                        <>
-                          If you&#39;re quickly iterating on your theme in the
-                          comfort of your own Studio it&#39;s annoying to keep
-                          changing the import URL to change your theme. You can
-                          use the createTheme utility instead:
-                        </>
-                      }
-                      files={[
-                        {
-                          id: 'studio.config',
-                          filename: state.typescript
-                            ? 'sanity.config.ts'
-                            : 'sanity.config.js',
-                          contents: snippet(
-                            'studio-config-create-theme-static-import'
-                          )(
-                            snippet('import-create-theme-static')(
-                              JSON5.stringify(esmUrl)
-                            )
-                          ),
-                        },
-                      ]}
-                    />
-                  </>
-                )}
-                {state.build === 'next build' &&
-                  state.typescript !== null &&
-                  state.load === 'runtime' && <></>}
               </Stack>
             </TransitionMinHeight>
           </Box>

@@ -261,6 +261,7 @@ const CodeSnippetSetup = ({
               as="a"
               href={downloadUrl}
               download="theme.js"
+              mode="bleed"
             />
           </Card>
         ),
